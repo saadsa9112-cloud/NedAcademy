@@ -1,0 +1,112 @@
+@model IEnumerable<NedAcademyWebsite.Models.MediaAsset>
+@{
+    ViewData["Title"] = "Campus Visual Gallery";
+}
+
+<!-- Premium Hero Banner -->
+<section class="py-5 position-relative" style="background: radial-gradient(circle at 10% 20%, rgba(0, 119, 255, 0.08) 0%, transparent 60%); border-bottom: 1px solid var(--glass-border); padding-top: 100px !important;">
+    <div class="container text-start">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-4 reveal-up">
+            <ol class="breadcrumb" style="margin: 0; background: transparent;">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-gradient-cyan text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Campus Gallery</li>
+            </ol>
+        </nav>
+        
+        <h1 class="display-3 text-white fw-bold mb-3 reveal-up" style="letter-spacing: -0.02em;">Campus Gallery</h1>
+        <p class="text-muted fs-5 m-0 max-width-600 reveal-up" style="line-height: 1.6;">
+            A visual overview of our technology-driven spaces, research laboratories, and student activities.
+        </p>
+    </div>
+</section>
+
+<!-- Filterable Gallery Grid -->
+<section class="py-5" style="margin-top: 50px; margin-bottom: 50px;">
+    <div class="container">
+        
+        <!-- Filter Controls -->
+        <div class="glass-card p-4 mb-5 reveal-up" style="background: rgba(15,23,42,0.3);">
+            <div class="d-flex flex-wrap gap-2 justify-content-start" id="galleryFilters">
+                <button class="btn btn-cyber-outline py-2 px-3 active filter-btn" data-filter="all" style="font-size: 0.85rem;">All Media</button>
+                <button class="btn btn-cyber-outline py-2 px-3 filter-btn" data-filter="campus" style="font-size: 0.85rem;">Campus Architecture</button>
+                <button class="btn btn-cyber-outline py-2 px-3 filter-btn" data-filter="labs" style="font-size: 0.85rem;">Laboratories</button>
+                <button class="btn btn-cyber-outline py-2 px-3 filter-btn" data-filter="events" style="font-size: 0.85rem;">Events & Sprints</button>
+            </div>
+        </div>
+        
+        <!-- Gallery Grid -->
+        <div class="row g-4" id="galleryGrid">
+            @if (Model == null || !Model.Any())
+            {
+                <!-- Sample / Demo Gallery Items -->
+                <div class="col-lg-4 col-md-6 gallery-item" data-tag="labs">
+                    <div class="glass-card p-0 overflow-hidden reveal-up position-relative group" style="border: 1px solid var(--glass-border); border-radius: 16px;">
+                        <div style="height: 240px; background: linear-gradient(135deg, var(--card-bg) 0%, rgba(0, 242, 254, 0.15) 100%); display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-server text-gradient-cyan" style="font-size: 4rem;"></i>
+                        </div>
+                        <div class="p-4" style="background: rgba(8, 15, 30, 0.95); border-top: 1px solid var(--glass-border);">
+                            <h5 class="text-light mb-1" style="font-weight: 600;">HPC Compute Server Room [DEMO]</h5>
+                            <span class="text-muted" style="font-size: 0.82rem; text-transform: uppercase;">Laboratories</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 gallery-item" data-tag="campus">
+                    <div class="glass-card p-0 overflow-hidden reveal-up position-relative group" style="border: 1px solid var(--glass-border); border-radius: 16px;">
+                        <div style="height: 240px; background: linear-gradient(135deg, var(--card-bg) 0%, rgba(0, 119, 255, 0.15) 100%); display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-building text-gradient-blue" style="font-size: 4rem;"></i>
+                        </div>
+                        <div class="p-4" style="background: rgba(8, 15, 30, 0.95); border-top: 1px solid var(--glass-border);">
+                            <h5 class="text-light mb-1" style="font-weight: 600;">Main Campus Plaza [DEMO]</h5>
+                            <span class="text-muted" style="font-size: 0.82rem; text-transform: uppercase;">Campus Architecture</span>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <div class="col-lg-4 col-md-6 gallery-item" data-tag="campus">
+                        <div class="glass-card p-0 overflow-hidden reveal-up position-relative group" style="border: 1px solid var(--glass-border); border-radius: 16px;">
+                            @if (item.FileType == "Image")
+                            {
+                                <img src="@item.FilePath" alt="@item.Title" class="w-100" style="height: 240px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div style="height: 240px; background: linear-gradient(135deg, var(--card-bg) 0%, rgba(0, 242, 254, 0.15) 100%); display: flex; align-items: center; justify-content: center;">
+                                    <i class="fa-solid fa-photo-film text-gradient-cyan" style="font-size: 4rem;"></i>
+                                </div>
+                            }
+                            <div class="p-4" style="background: rgba(8, 15, 30, 0.95); border-top: 1px solid var(--glass-border);">
+                                <h5 class="text-light mb-1" style="font-weight: 600;">@item.Title</h5>
+                                <span class="text-muted" style="font-size: 0.82rem; text-transform: uppercase;">@item.Category</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.filter-btn').on('click', function() {
+                $('.filter-btn').removeClass('active');
+                $(this).addClass('active');
+                
+                var filter = $(this).attr('data-filter');
+                if (filter === 'all') {
+                    $('.gallery-item').fadeIn(300);
+                } else {
+                    $('.gallery-item').hide();
+                    $('.gallery-item[data-tag="' + filter + '"]').fadeIn(300);
+                }
+            });
+        });
+    </script>
+}

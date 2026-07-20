@@ -1,0 +1,104 @@
+@{
+    ViewData["Title"] = "Academics Overview";
+}
+
+<!-- Premium Hero Banner -->
+<section class="py-5 position-relative" style="background: radial-gradient(circle at 10% 20%, rgba(0, 119, 255, 0.08) 0%, transparent 60%); border-bottom: 1px solid var(--glass-border); padding-top: 100px !important;">
+    <div class="container text-start">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-4 reveal-up">
+            <ol class="breadcrumb" style="margin: 0; background: transparent;">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-gradient-cyan text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Academics</li>
+            </ol>
+        </nav>
+        
+        <h1 class="display-3 text-white fw-bold mb-3 reveal-up" style="letter-spacing: -0.02em;">Academics Overview</h1>
+        <p class="text-muted fs-5 m-0 max-width-600 reveal-up" style="line-height: 1.6;">
+            A revolutionary, project-first academic design. We prepare learners to solve computational problems at global scale.
+        </p>
+    </div>
+</section>
+
+<!-- Core Pedagogy Section -->
+<section class="py-5" style="margin-top: 50px;">
+    <div class="container">
+        <div class="row align-items-center gy-5">
+            <div class="col-lg-6 text-start">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-3" style="background: rgba(0, 242, 254, 0.06); border: 1px solid rgba(0, 242, 254, 0.15);">
+                    <span class="text-uppercase font-headings fw-bold text-gradient-cyan" style="font-size: 0.75rem; letter-spacing: 0.1em;">Educational Philosophy</span>
+                </div>
+                <h2 class="display-5 text-white mb-4" style="font-weight: 700;">Engineered for Computational Impact.</h2>
+                <p class="text-muted mb-4" style="line-height: 1.7; font-size: 1.05rem;">
+                    NED Academy abandons classic memorization models. Instead, we structure our courses around **system-building challenges** where students construct databases, compilers, networks, and hardened infrastructure from scratch.
+                </p>
+                <p class="text-muted" style="line-height: 1.7;">
+                    Academic metrics are calculated through code review feedback, pipeline execution status, and technical design defense presentations before senior advisory committees.
+                </p>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="glass-card p-4 reveal-up h-100" style="border-top: 2px solid var(--cyan);">
+                            <i class="fa-solid fa-code text-gradient-cyan mb-3" style="font-size: 1.5rem;"></i>
+                            <h5 class="text-light" style="font-weight: 600;">Project-Centric</h5>
+                            <p class="text-muted" style="font-size: 0.88rem; line-height: 1.5; margin: 0;">Students submit software configurations and pull requests as the main core of grading guidelines.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="glass-card p-4 reveal-up h-100" style="border-top: 2px solid var(--royal-blue);">
+                            <i class="fa-solid fa-layer-group text-gradient-blue mb-3" style="font-size: 1.5rem;"></i>
+                            <h5 class="text-light" style="font-weight: 600;">Systems-first</h5>
+                            <p class="text-muted" style="font-size: 0.88rem; line-height: 1.5; margin: 0;">Deep-dive focuses on memory management, network protocols, and distributed cluster operations.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="glass-card p-4 reveal-up h-100" style="border-top: 2px solid var(--royal-blue);">
+                            <i class="fa-solid fa-people-arrows text-gradient-blue mb-3" style="font-size: 1.5rem;"></i>
+                            <h5 class="text-light" style="font-weight: 600;">Peer Review</h5>
+                            <p class="text-muted" style="font-size: 0.88rem; line-height: 1.5; margin: 0;">Emulating elite engineering setups, peer review cycles ensure code readability and robust design.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="glass-card p-4 reveal-up h-100" style="border-top: 2px solid var(--cyan);">
+                            <i class="fa-solid fa-terminal text-gradient-cyan mb-3" style="font-size: 1.5rem;"></i>
+                            <h5 class="text-light" style="font-weight: 600;">Agile Sprints</h5>
+                            <p class="text-muted" style="font-size: 0.88rem; line-height: 1.5; margin: 0;">Weekly standups, scrum boards, and system demos replace standard static homework sheets.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Curriculum Highlights -->
+<section class="py-5" style="margin-top: 60px; margin-bottom: 50px; background: rgba(15,23,42,0.15); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);">
+    <div class="container text-start">
+        <div class="row gy-5 align-items-center">
+            <div class="col-lg-6">
+                <h3 class="display-5 text-white mb-4" style="font-weight: 700;">Global Curriculum Benchmarks</h3>
+                <p class="text-muted" style="line-height: 1.7;">
+                    Our syllabi are designed in coordination with technical fellows from top international SaaS providers and open-source foundations. We ensure that our graduates possess:
+                </p>
+                <ul class="list-unstyled d-flex flex-column gap-3 text-muted" style="font-size: 0.95rem;">
+                    <li><i class="fa-solid fa-square-check text-gradient-cyan me-2"></i> Strong understanding of data structures, algorithms, and design patterns.</li>
+                    <li><i class="fa-solid fa-square-check text-gradient-cyan me-2"></i> Practical skills in cloud deployments, CI/CD pipelines, and secure scripting.</li>
+                    <li><i class="fa-solid fa-square-check text-gradient-cyan me-2"></i> Professional habits in automated unit testing and architecture documentation.</li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-6 ps-lg-5">
+                <div class="glass-card p-5 reveal-up" style="border-left: 3px solid var(--cyan);">
+                    <h4 class="text-gradient-cyan font-headings text-uppercase tracking-wider mb-3" style="font-size: 0.82rem; letter-spacing: 0.15em;">Active Pathways</h4>
+                    <h3 class="text-light mb-4" style="font-weight: 700;">Dynamic Learning Streams</h3>
+                    <p class="text-muted mb-4" style="font-size: 0.95rem; line-height: 1.6;">
+                        Check out our specialized paths mapping computational sciences, deep data processing, AI grids, and hardware security frameworks.
+                    </p>
+                    <a asp-controller="Home" asp-action="Programs" class="btn btn-cyber font-headings" style="font-size: 0.85rem;">View Degree Paths</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

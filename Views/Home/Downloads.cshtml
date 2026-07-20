@@ -1,0 +1,173 @@
+@{
+    ViewData["Title"] = "Resource Download Center";
+}
+
+<!-- Premium Hero Banner -->
+<section class="py-5 position-relative" style="background: radial-gradient(circle at 10% 20%, rgba(0, 119, 255, 0.08) 0%, transparent 60%); border-bottom: 1px solid var(--glass-border); padding-top: 100px !important;">
+    <div class="container text-start">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-4 reveal-up">
+            <ol class="breadcrumb" style="margin: 0; background: transparent;">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-gradient-cyan text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Academics" class="text-gradient-cyan text-decoration-none">Academics</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Downloads</li>
+            </ol>
+        </nav>
+        
+        <h1 class="display-3 text-white fw-bold mb-3 reveal-up" style="letter-spacing: -0.02em;">Resource Center</h1>
+        <p class="text-muted fs-5 m-0 max-width-600 reveal-up" style="line-height: 1.6;">
+            Search and download digital prospectus files, curriculum handbooks, calendar outlines, and admission forms.
+        </p>
+    </div>
+</section>
+
+<!-- Resource Catalog Section with Client-Side Search/Filters -->
+<section class="py-5" style="margin-top: 50px; margin-bottom: 50px;">
+    <div class="container">
+        
+        <!-- Filter and Search Controls -->
+        <div class="glass-card p-4 mb-5 reveal-up" style="background: rgba(15,23,42,0.3);">
+            <div class="row align-items-center gy-3">
+                <div class="col-lg-6 col-md-12 text-start">
+                    <div class="d-flex flex-wrap gap-2" id="filterContainer">
+                        <button class="btn btn-cyber-outline py-2 px-3 active filter-btn" data-filter="all" style="font-size: 0.85rem;">All Resources</button>
+                        <button class="btn btn-cyber-outline py-2 px-3 filter-btn" data-filter="admissions" style="font-size: 0.85rem;">Admissions</button>
+                        <button class="btn btn-cyber-outline py-2 px-3 filter-btn" data-filter="academic" style="font-size: 0.85rem;">Academic</button>
+                        <button class="btn btn-cyber-outline py-2 px-3 filter-btn" data-filter="policy" style="font-size: 0.85rem;">Policies</button>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 col-md-12">
+                    <div class="position-relative">
+                        <input type="text" id="resourceSearch" class="form-control" placeholder="Search documents by title..." style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); color: #fff; border-radius: 8px; font-size: 0.92rem; padding: 12px 16px 12px 45px;" />
+                        <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left: 16px; top: 50%; transform: translateY(-50%); font-size: 0.95rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+@model IEnumerable<NedAcademyWebsite.Models.DownloadFile>
+@using NedAcademyWebsite.Models
+
+        <!-- Resource Table/Grid -->
+        <div class="row g-4" id="resourceCatalog">
+            @foreach (var file in Model)
+            {
+                var borderStyle = file.Category.ToLower() == "admissions" ? "border-top: 2px solid var(--cyan);" : "border-top: 2px solid var(--royal-blue);";
+                var categoryName = file.Category.ToLower() == "admissions" ? "Admissions" : (file.Category.ToLower() == "academic" ? "Academic" : "Policies");
+                var badgeClass = file.Category.ToLower() == "admissions" ? "bg-primary" : (file.Category.ToLower() == "academic" ? "bg-success" : "bg-warning");
+                var desc = file.Title.Contains("Prospectus") 
+                    ? "Comprehensive booklet outlining the university mission, faculty profiles, degree tracks, and laboratory architectures." 
+                    : (file.Title.Contains("Admission") 
+                        ? "Checklist of documents, detailed eligibility formulas, equivalence scales, and fee schedule outline." 
+                        : (file.Title.Contains("Calendar") 
+                            ? "Schedules for start of lectures, mid-term evaluation cycles, coding sprint submissions, hackathons, and final juries." 
+                            : "Detailed guide detailing academic workflows, research support stipends, codes of conduct, and parameters."));
+
+                <div class="col-lg-4 col-md-6 resource-item" data-category="@file.Category.ToLower()">
+                    <div class="glass-card text-start h-100 d-flex flex-column justify-content-between reveal-up" style="@borderStyle">
+                        <div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="badge @badgeClass px-3 py-1 font-headings text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.05em;">@categoryName</span>
+                                <span class="text-muted" style="font-size: 0.8rem;"><i class="fa-solid fa-file-pdf text-danger"></i> @file.SizeString</span>
+                            </div>
+                            <h4 class="text-light mb-3" style="font-weight: 600; font-size: 1.2rem;">@file.Title</h4>
+                            <p class="text-muted" style="font-size: 0.88rem; line-height: 1.5; margin: 0;">@desc</p>
+                        </div>
+                        <div class="mt-4">
+                            <a href="#" class="btn btn-cyber w-100 font-headings download-trigger" data-filename="@file.FilePath" style="font-size: 0.85rem;"><i class="fa-solid fa-download me-2"></i> Download File</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+
+        <!-- No Results Warning -->
+        <div class="text-center py-5 d-none" id="noResults">
+            <i class="fa-solid fa-magnifying-glass text-muted mb-3" style="font-size: 3rem;"></i>
+            <h4 class="text-light" style="font-weight:600;">No Resources Found</h4>
+            <p class="text-muted">Try adjusting your search query or choosing another category filter.</p>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('resourceSearch');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const resourceItems = document.querySelectorAll('.resource-item');
+            const noResults = document.getElementById('noResults');
+            const downloadTriggers = document.querySelectorAll('.download-trigger');
+
+            let currentCategory = 'all';
+            let searchQuery = '';
+
+            function updateCatalog() {
+                let visibleCount = 0;
+                
+                resourceItems.forEach((item) => {
+                    const title = item.querySelector('h4').textContent.toLowerCase();
+                    const desc = item.querySelector('p').textContent.toLowerCase();
+                    const category = item.getAttribute('data-category');
+                    
+                    const matchesCategory = currentCategory === 'all' || category === currentCategory;
+                    const matchesSearch = title.includes(searchQuery) || desc.includes(searchQuery);
+                    
+                    if (matchesCategory && matchesSearch) {
+                        item.classList.remove('d-none');
+                        visibleCount++;
+                    } else {
+                        item.classList.add('d-none');
+                    }
+                });
+
+                if (visibleCount === 0) {
+                    noResults.classList.remove('d-none');
+                } else {
+                    noResults.classList.add('d-none');
+                }
+            }
+
+            // Search event
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchQuery = e.target.value.toLowerCase().trim();
+                    updateCatalog();
+                });
+            }
+
+            // Category filter events
+            filterButtons.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    filterButtons.forEach((b) => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCategory = btn.getAttribute('data-filter');
+                    updateCatalog();
+                });
+            });
+
+            // Mock Download SweetAlert feedback
+            downloadTriggers.forEach((trigger) => {
+                trigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const filename = trigger.getAttribute('data-filename');
+                    Swal.fire({
+                        title: 'Initiating Download',
+                        text: `Starting the download process for: ${filename}`,
+                        icon: 'info',
+                        timer: 2000,
+                        timerProgressBar: true,
+                        background: '#0b1329',
+                        color: '#f8fafc',
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: 'glass-card border-0'
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}

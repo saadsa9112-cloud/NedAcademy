@@ -1,0 +1,95 @@
+@{
+    ViewData["Title"] = "Academic Degree Programs";
+}
+
+<!-- Premium Hero Banner -->
+<section class="py-5 position-relative" style="background: radial-gradient(circle at 10% 20%, rgba(0, 119, 255, 0.08) 0%, transparent 60%); border-bottom: 1px solid var(--glass-border); padding-top: 100px !important;">
+    <div class="container text-start">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-4 reveal-up">
+            <ol class="breadcrumb" style="margin: 0; background: transparent;">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-gradient-cyan text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Academics" class="text-gradient-cyan text-decoration-none">Academics</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Programs</li>
+            </ol>
+        </nav>
+        
+        <h1 class="display-3 text-white fw-bold mb-3 reveal-up" style="letter-spacing: -0.02em;">Degree Programs</h1>
+        <p class="text-muted fs-5 m-0 max-width-600 reveal-up" style="line-height: 1.6;">
+            Discover our world-class, industry-aligned engineering degree programs designed for futuristic tech paradigms.
+        </p>
+    </div>
+</section>
+
+<!-- Programs Showcase List -->
+<section class="py-5" style="margin-top: 50px; margin-bottom: 50px;">
+    <div class="container">
+        
+        @{
+            int index = 0;
+            foreach (var program in Model)
+            {
+                var borderStyle = index % 2 == 0 ? "border-left: 4px solid var(--cyan);" : "border-left: 4px solid var(--royal-blue);";
+                var badgeColor = index % 2 == 0 ? "bg-primary" : "bg-success";
+                var textGrad = index % 2 == 0 ? "text-gradient-cyan" : "text-gradient-blue";
+                
+                <div class="glass-card p-5 mb-5 reveal-up" style="@borderStyle">
+                    <div class="row align-items-start gy-4">
+                        <div class="col-lg-8">
+                            <span class="badge @badgeColor px-3 py-2 text-uppercase font-headings mb-3" style="font-size: 0.72rem; letter-spacing: 0.05em;">@(program.Department?.Name ?? "Academics")</span>
+                            <h2 class="text-light mb-3" style="font-weight: 700;">@program.Name</h2>
+                            <p class="text-muted mb-4" style="font-size: 1rem; line-height: 1.6;">
+                                @program.Description
+                            </p>
+                            
+                            <!-- Program Details Accordion/Grid -->
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="p-3 rounded-3" style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);">
+                                        <h6 class="@textGrad font-headings text-uppercase" style="font-size: 0.75rem; font-weight:700;">Duration</h6>
+                                        <p class="text-muted m-0" style="font-size: 0.92rem;">@program.Duration</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 rounded-3" style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);">
+                                        <h6 class="@textGrad font-headings text-uppercase" style="font-size: 0.75rem; font-weight:700;">Eligibility</h6>
+                                        <p class="text-muted m-0" style="font-size: 0.92rem;">@program.Eligibility</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="p-3 rounded-3" style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);">
+                                        <h6 class="@textGrad font-headings text-uppercase mb-2" style="font-size: 0.75rem; font-weight:700;">Learning Outcomes</h6>
+                                        <ul class="m-0 ps-3 text-muted" style="font-size: 0.9rem; line-height: 1.5;">
+                                            @foreach (var outcome in program.LearningOutcomes.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries))
+                                            {
+                                                <li>@outcome</li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4 text-start text-lg-end d-flex flex-column justify-content-between h-100 ps-lg-4" style="min-height: 250px;">
+                            <div>
+                                <h6 class="text-muted font-headings text-uppercase mb-2" style="font-size: 0.75rem;">Career Opportunities</h6>
+                                <ul class="list-unstyled text-muted d-flex flex-column gap-2" style="font-size: 0.92rem;">
+                                    @foreach (var career in program.CareerOpportunities.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries))
+                                    {
+                                        <li><i class="fa-solid fa-arrow-right @textGrad me-2"></i> @career</li>
+                                    }
+                                </ul>
+                            </div>
+                            <div class="mt-4 mt-lg-0">
+                                <a asp-controller="Home" asp-action="Admissions" class="btn btn-cyber w-100">Apply Now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                index++;
+            }
+        }
+    </div>
+</section>
+

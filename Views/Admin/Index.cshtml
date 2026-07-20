@@ -1,0 +1,234 @@
+@model IEnumerable<NedAcademyWebsite.Models.ContactMessage>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Executive System Dashboard";
+    var recentLogs = (List<NedAcademyWebsite.Models.AuditLog>)ViewBag.RecentLogs;
+    var recentUploads = (List<NedAcademyWebsite.Models.MediaAsset>)ViewBag.RecentUploads;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-5 reveal-up">
+    <div>
+        <h1 class="display-5 font-headings fw-bold m-0 text-white">Executive Control Console</h1>
+        <p class="text-muted m-0">Live system performance indicators, storage metrics, audit streams, and quick CMS shortcuts.</p>
+    </div>
+    <div>
+        <span class="badge bg-success py-2 px-3 font-headings text-uppercase" style="letter-spacing: 0.05em;"><i class="fa-solid fa-circle-check me-1"></i> System Online</span>
+    </div>
+</div>
+
+<!-- Metrics Cards Bar -->
+<div class="row g-4 mb-5 reveal-up">
+    <div class="col-xl-3 col-md-6">
+        <div class="glass-card p-4" style="border-left: 4px solid var(--cyan);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted font-headings text-uppercase" style="font-size:0.7rem; font-weight:700;">Degree Programs</span>
+                    <h2 class="text-white font-headings fw-bold mt-1 mb-0">@ViewBag.ProgramsCount</h2>
+                </div>
+                <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-gradient-cyan">
+                    <i class="fa-solid fa-graduation-cap fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="glass-card p-4" style="border-left: 4px solid var(--royal-blue);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted font-headings text-uppercase" style="font-size:0.7rem; font-weight:700;">Faculty Profiles</span>
+                    <h2 class="text-white font-headings fw-bold mt-1 mb-0">@ViewBag.FacultyCount</h2>
+                </div>
+                <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-gradient-blue">
+                    <i class="fa-solid fa-users-line fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="glass-card p-4" style="border-left: 4px solid var(--cyan);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted font-headings text-uppercase" style="font-size:0.7rem; font-weight:700;">Media Assets</span>
+                    <h2 class="text-white font-headings fw-bold mt-1 mb-0">@ViewBag.MediaAssetsCount</h2>
+                </div>
+                <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-gradient-cyan">
+                    <i class="fa-solid fa-photo-film fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="glass-card p-4" style="border-left: 4px solid var(--royal-blue);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted font-headings text-uppercase" style="font-size:0.7rem; font-weight:700;">Inquiries</span>
+                    <h2 class="text-white font-headings fw-bold mt-1 mb-0">@ViewBag.MessagesCount</h2>
+                </div>
+                <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-gradient-blue">
+                    <i class="fa-solid fa-envelope fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- Storage & System Health Gauge -->
+    <div class="col-lg-4">
+        <div class="glass-card p-4 h-100 reveal-up">
+            <h4 class="text-white font-headings fw-bold mb-3"><i class="fa-solid fa-server text-gradient-cyan me-2"></i> System Health & Storage</h4>
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:0.85rem;">
+                    <span class="text-muted">Storage Usage</span>
+                    <span class="text-light fw-bold">14.2 MB / 10 GB</span>
+                </div>
+                <div class="progress" style="height: 8px; background: rgba(255,255,255,0.05);">
+                    <div class="progress-bar bg-info" role="progressbar" style="width: 12%;"></div>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column gap-3" style="font-size:0.9rem;">
+                <div class="d-flex justify-content-between border-bottom border-white border-opacity-10 pb-2">
+                    <span class="text-muted">Framework Version</span>
+                    <span class="text-gradient-cyan font-monospace">.NET 10.0 MVC</span>
+                </div>
+                <div class="d-flex justify-content-between border-bottom border-white border-opacity-10 pb-2">
+                    <span class="text-muted">Database Provider</span>
+                    <span class="text-light font-monospace">SQL Server EF Core</span>
+                </div>
+                <div class="d-flex justify-content-between border-bottom border-white border-opacity-10 pb-2">
+                    <span class="text-muted">Security Encryption</span>
+                    <span class="text-success font-monospace">Cookie Auth + CSRF</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Audit Log Activity Stream -->
+    <div class="col-lg-8">
+        <div class="glass-card p-4 h-100 reveal-up">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="text-white font-headings fw-bold m-0"><i class="fa-solid fa-clock-rotate-left text-gradient-cyan me-2"></i> Recent Audit Activity</h4>
+                <a asp-action="AuditLogs" class="btn btn-cyber-outline py-1 px-3" style="font-size:0.8rem;">View All Logs</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-dark table-hover table-borderless m-0" style="background:transparent;">
+                    <thead>
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.85rem;" class="text-muted">
+                            <th>Timestamp</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (recentLogs == null || !recentLogs.Any())
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">No recent activity recorded.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var log in recentLogs)
+                            {
+                                <tr style="border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:middle; font-size:0.9rem;">
+                                    <td class="text-muted font-monospace">@log.Timestamp.ToString("HH:mm:ss")</td>
+                                    <td><span class="badge bg-primary bg-opacity-20 text-primary font-headings">@log.Action</span></td>
+                                    <td class="text-light">@log.Details</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Recent Messages List -->
+    <div class="col-lg-8">
+        <div class="glass-card p-4 h-100 reveal-up">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="text-white font-headings fw-bold m-0"><i class="fa-solid fa-envelope text-gradient-cyan me-2"></i> Recent User Inquiries</h4>
+                <a asp-action="Messages" class="btn btn-cyber-outline py-1 px-3" style="font-size:0.8rem;">View All Messages</a>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-dark table-hover table-borderless m-0" style="background:transparent;">
+                    <thead>
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.85rem;" class="text-muted">
+                            <th>Sender</th>
+                            <th>Subject</th>
+                            <th>Received Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No messages received yet in the database.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var msg in Model)
+                            {
+                                <tr style="border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:middle; font-size:0.92rem;">
+                                    <td>
+                                        <div class="fw-semibold text-light">@msg.Name</div>
+                                        <small class="text-muted">@msg.Email</small>
+                                    </td>
+                                    <td>@msg.Subject</td>
+                                    <td>@msg.ReceivedDate.ToString("MMM dd, yyyy HH:mm")</td>
+                                    <td>
+                                        @if (msg.IsRead)
+                                        {
+                                            <span class="badge bg-success bg-opacity-20 text-success px-2 py-1">Reviewed</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning bg-opacity-20 text-warning px-2 py-1">New Message</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions Panel -->
+    <div class="col-lg-4">
+        <div class="glass-card p-4 h-100 d-flex flex-column gap-3 reveal-up">
+            <h4 class="text-white font-headings fw-bold mb-3"><i class="fa-solid fa-bolt text-gradient-cyan me-2"></i> Quick CMS Commands</h4>
+            
+            <a asp-action="PageBuilder" class="btn btn-cyber w-100 py-3 text-start d-flex align-items-center justify-content-between px-4">
+                <span><i class="fa-solid fa-cubes me-2"></i> Universal Page Builder</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+            <a asp-action="FormBuilder" class="btn btn-cyber-outline w-100 py-3 text-start d-flex align-items-center justify-content-between px-4">
+                <span><i class="fa-solid fa-rectangle-list me-2"></i> Custom Form Builder</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+            <a asp-action="Structure" class="btn btn-cyber-outline w-100 py-3 text-start d-flex align-items-center justify-content-between px-4">
+                <span><i class="fa-solid fa-layer-group me-2"></i> Homepage Layout</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+            <a asp-action="Settings" class="btn btn-cyber-outline w-100 py-3 text-start d-flex align-items-center justify-content-between px-4">
+                <span><i class="fa-solid fa-sliders me-2"></i> Edit 10 System Tabs</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+</div>

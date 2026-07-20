@@ -1,0 +1,139 @@
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Recycle Bin & Trash Manager";
+    var programs = (List<NedAcademyWebsite.Models.DegreeProgram>)ViewBag.Programs;
+    var faculty = (List<NedAcademyWebsite.Models.Faculty>)ViewBag.Faculty;
+    var news = (List<NedAcademyWebsite.Models.NewsItem>)ViewBag.News;
+    var media = (List<NedAcademyWebsite.Models.MediaAsset>)ViewBag.Media;
+}
+
+<div class="mb-5 reveal-up">
+    <h1 class="display-5 font-headings fw-bold m-0 text-white">Soft-Delete Recycle Bin</h1>
+    <p class="text-muted">Restore deleted programs, faculty profiles, articles, or media files within 30 days before permanent purging.</p>
+</div>
+
+<div class="row g-4 reveal-up">
+    <!-- Programs Trash -->
+    <div class="col-md-6">
+        <div class="glass-card p-4 h-100">
+            <h4 class="text-white font-headings fw-bold mb-3"><i class="fa-solid fa-graduation-cap text-gradient-cyan me-2"></i> Trashed Programs</h4>
+            @if (programs == null || !programs.Any())
+            {
+                <div class="text-muted py-3">No programs in trash.</div>
+            }
+            else
+            {
+                <div class="d-flex flex-column gap-2">
+                    @foreach (var item in programs)
+                    {
+                        <div class="d-flex align-items-center justify-content-between p-2 rounded" style="background:rgba(255,255,255,0.02);">
+                            <div>
+                                <div class="fw-semibold text-light">@item.Name</div>
+                                <small class="text-muted">Deleted: @(item.DeletedAt?.ToString("yyyy-MM-dd HH:mm") ?? "N/A")</small>
+                            </div>
+                            <form asp-action="RestoreItem" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="entity" value="Program" />
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-cyber-outline py-1 px-3" style="font-size:0.8rem;"><i class="fa-solid fa-rotate-left me-1"></i> Restore</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Faculty Trash -->
+    <div class="col-md-6">
+        <div class="glass-card p-4 h-100">
+            <h4 class="text-white font-headings fw-bold mb-3"><i class="fa-solid fa-users-line text-gradient-cyan me-2"></i> Trashed Faculty</h4>
+            @if (faculty == null || !faculty.Any())
+            {
+                <div class="text-muted py-3">No faculty profiles in trash.</div>
+            }
+            else
+            {
+                <div class="d-flex flex-column gap-2">
+                    @foreach (var item in faculty)
+                    {
+                        <div class="d-flex align-items-center justify-content-between p-2 rounded" style="background:rgba(255,255,255,0.02);">
+                            <div>
+                                <div class="fw-semibold text-light">@item.Name</div>
+                                <small class="text-muted">Deleted: @(item.DeletedAt?.ToString("yyyy-MM-dd HH:mm") ?? "N/A")</small>
+                            </div>
+                            <form asp-action="RestoreItem" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="entity" value="Faculty" />
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-cyber-outline py-1 px-3" style="font-size:0.8rem;"><i class="fa-solid fa-rotate-left me-1"></i> Restore</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- News Trash -->
+    <div class="col-md-6">
+        <div class="glass-card p-4 h-100">
+            <h4 class="text-white font-headings fw-bold mb-3"><i class="fa-solid fa-newspaper text-gradient-cyan me-2"></i> Trashed News</h4>
+            @if (news == null || !news.Any())
+            {
+                <div class="text-muted py-3">No news posts in trash.</div>
+            }
+            else
+            {
+                <div class="d-flex flex-column gap-2">
+                    @foreach (var item in news)
+                    {
+                        <div class="d-flex align-items-center justify-content-between p-2 rounded" style="background:rgba(255,255,255,0.02);">
+                            <div>
+                                <div class="fw-semibold text-light">@item.Title</div>
+                                <small class="text-muted">Deleted: @(item.DeletedAt?.ToString("yyyy-MM-dd HH:mm") ?? "N/A")</small>
+                            </div>
+                            <form asp-action="RestoreItem" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="entity" value="News" />
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-cyber-outline py-1 px-3" style="font-size:0.8rem;"><i class="fa-solid fa-rotate-left me-1"></i> Restore</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Media Trash -->
+    <div class="col-md-6">
+        <div class="glass-card p-4 h-100">
+            <h4 class="text-white font-headings fw-bold mb-3"><i class="fa-solid fa-photo-film text-gradient-cyan me-2"></i> Trashed Media Assets</h4>
+            @if (media == null || !media.Any())
+            {
+                <div class="text-muted py-3">No media files in trash.</div>
+            }
+            else
+            {
+                <div class="d-flex flex-column gap-2">
+                    @foreach (var item in media)
+                    {
+                        <div class="d-flex align-items-center justify-content-between p-2 rounded" style="background:rgba(255,255,255,0.02);">
+                            <div>
+                                <div class="fw-semibold text-light">@item.Title</div>
+                                <small class="text-muted">Deleted: @(item.DeletedAt?.ToString("yyyy-MM-dd HH:mm") ?? "N/A")</small>
+                            </div>
+                            <form asp-action="RestoreItem" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="entity" value="Media" />
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-cyber-outline py-1 px-3" style="font-size:0.8rem;"><i class="fa-solid fa-rotate-left me-1"></i> Restore</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

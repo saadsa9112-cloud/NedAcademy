@@ -1,0 +1,110 @@
+@{
+    ViewData["Title"] = "Distinguished Faculty Directory";
+}
+
+<!-- Premium Hero Banner -->
+<section class="py-5 position-relative" style="background: radial-gradient(circle at 10% 20%, rgba(0, 119, 255, 0.08) 0%, transparent 60%); border-bottom: 1px solid var(--glass-border); padding-top: 100px !important;">
+    <div class="container text-start">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-4 reveal-up">
+            <ol class="breadcrumb" style="margin: 0; background: transparent;">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-gradient-cyan text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Faculty</li>
+            </ol>
+        </nav>
+        
+        <h1 class="display-3 text-white fw-bold mb-3 reveal-up" style="letter-spacing: -0.02em;">Faculty Directory</h1>
+        <p class="text-muted fs-5 m-0 max-width-600 reveal-up" style="line-height: 1.6;">
+            Learn from dynamic researchers, industry fellows, and computational pioneers pushing boundaries.
+        </p>
+    </div>
+</section>
+
+@model IEnumerable<NedAcademyWebsite.Models.Faculty>
+@using NedAcademyWebsite.Models
+
+<!-- Filterable Faculty Grid -->
+<section class="py-5" style="margin-top: 50px; margin-bottom: 50px;">
+    <div class="container">
+        
+        <!-- Filter Controls -->
+        <div class="glass-card p-4 mb-5 reveal-up" style="background: rgba(15,23,42,0.3);">
+            <div class="d-flex flex-wrap gap-2 justify-content-start" id="facultyFilters">
+                <button class="btn btn-cyber-outline py-2 px-3 active filter-btn" data-filter="all" style="font-size: 0.85rem;">All Departments</button>
+                @if (ViewBag.Departments != null)
+                {
+                    foreach (var dept in (List<Department>)ViewBag.Departments)
+                    {
+                        <button class="btn btn-cyber-outline py-2 px-3 filter-btn" data-filter="@dept.Code.ToLower()" style="font-size: 0.85rem;">@dept.Name</button>
+                    }
+                }
+            </div>
+        </div>
+        
+        <!-- Profiles Grid -->
+        <div class="row g-4" id="facultyGrid">
+            @foreach (var faculty in Model)
+            {
+                var deptClass = faculty.Department?.Code.ToLower() ?? "general";
+                var borderStyle = faculty.Id % 2 == 0 ? "border-top: 3px solid var(--royal-blue);" : "border-top: 3px solid var(--cyan);";
+                var textGrad = faculty.Id % 2 == 0 ? "text-gradient-blue" : "text-gradient-cyan";
+                var gradientStyle = faculty.Id % 2 == 0 ? "rgba(0, 119, 255, 0.15)" : "rgba(0, 242, 254, 0.15)";
+                
+                <div class="col-lg-6 col-xl-4 col-md-6 faculty-card" data-dept="@deptClass">
+                    <div class="glass-card text-start h-100 reveal-up d-flex flex-column justify-content-between" style="@borderStyle">
+                        <div>
+                            <!-- Avatar placeholder with initials -->
+                            <div class="d-flex align-items-center justify-content-center mb-4 rounded-3 text-white font-headings" style="width: 100%; height: 200px; background: linear-gradient(135deg, var(--card-bg) 0%, @gradientStyle 100%); border: 1px solid var(--glass-border); font-size: 2.8rem; font-weight:700;">
+                                @faculty.PhotoPath
+                            </div>
+                            <h4 class="text-light mb-1" style="font-weight: 700;">@faculty.Name</h4>
+                            <span class="@textGrad fw-bold font-headings text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.05em;">@faculty.Designation</span>
+                            
+                            <hr style="border-color: rgba(255,255,255,0.08); margin: 15px 0;" />
+                            
+                            <div class="mb-2" style="font-size: 0.9rem;">
+                                <span class="text-muted d-block">Qualifications:</span>
+                                <span class="text-light">@faculty.Qualification</span>
+                            </div>
+                            <div class="mb-2" style="font-size: 0.9rem;">
+                                <span class="text-muted d-block">Research:</span>
+                                <span class="text-light">@faculty.ResearchAreas</span>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="mailto:@faculty.Email" class="btn btn-cyber-outline w-100 font-headings" style="font-size: 0.85rem;"><i class="fa-solid fa-envelope me-2"></i> Email Contact</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const cards = document.querySelectorAll('.faculty-card');
+
+            filterButtons.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    filterButtons.forEach((b) => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    const filter = btn.getAttribute('data-filter');
+
+                    cards.forEach((card) => {
+                        const dept = card.getAttribute('data-dept');
+                        if (filter === 'all' || dept === filter) {
+                            card.classList.remove('d-none');
+                        } else {
+                            card.classList.add('d-none');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}

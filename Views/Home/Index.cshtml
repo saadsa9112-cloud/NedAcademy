@@ -1,0 +1,201 @@
+@model NedAcademyWebsite.Models.SystemSetting
+@using NedAcademyWebsite.Models
+@{
+    ViewData["Title"] = "Pioneering the Future of Education";
+    var progCount = ViewBag.ProgramsCount ?? 15;
+    var facCount = ViewBag.FacultyCount ?? 30;
+    var resCount = ViewBag.ResearchCount ?? 18;
+}
+
+<!-- 1. Premium Hero Section -->
+<section class="hero-section position-relative d-flex align-items-center" style="min-height: 92vh; background: radial-gradient(circle at 80% 20%, rgba(0, 242, 254, 0.12) 0%, transparent 50%), radial-gradient(circle at 10% 80%, rgba(0, 119, 255, 0.1) 0%, transparent 50%); padding: 120px 0 80px;">
+    <!-- Abstract grid background -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0;"></div>
+    
+    <div class="container position-relative" style="z-index: 1;">
+        <div class="row align-items-center gy-5">
+            <div class="col-lg-7 text-start">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-4" style="background: rgba(0, 242, 254, 0.06); border: 1px solid rgba(0, 242, 254, 0.15);">
+                    <span class="d-inline-block rounded-circle bg-danger" style="width: 8px; height: 8px; animation: pulse 1.5s infinite;"></span>
+                    <span class="text-uppercase font-headings fw-bold text-gradient-cyan" style="font-size: 0.78rem; letter-spacing: 0.1em;">Admissions Open - Fall 2026</span>
+                </div>
+                <h1 class="display-3 text-white mb-4" style="font-weight: 800; line-height: 1.15; letter-spacing: -0.03em;">
+                    @if (Model.HeroTitle.Contains("Frontier of Learning"))
+                    {
+                        @Html.Raw(Model.HeroTitle.Replace("Frontier of Learning", "<span class=\"text-gradient-cyan\">Frontier of Learning</span>"))
+                    }
+                    else
+                    {
+                        @Model.HeroTitle
+                    }
+                </h1>
+                <p class="text-muted fs-5 mb-5 pe-lg-5" style="line-height: 1.6;">
+                    @Model.HeroSubtitle
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a asp-controller="Home" asp-action="Programs" class="btn btn-cyber">Explore Programs</a>
+                    <a asp-controller="Home" asp-action="Admissions" class="btn btn-cyber-outline">Admission Guide</a>
+                </div>
+            </div>
+            
+            <div class="col-lg-5">
+                <!-- Premium Floating Interactive Visual Widget -->
+                <div class="position-relative d-flex justify-content-center align-items-center">
+                    <div class="position-absolute rounded-circle" style="width: 320px; height: 320px; background: radial-gradient(circle, rgba(0, 119, 255, 0.2) 0%, transparent 70%); filter: blur(30px); z-index: 0; animation: pulse 4s ease-in-out infinite;"></div>
+                    <div class="glass-card p-4 text-start position-relative reveal-up" style="width: 100%; max-width: 420px; border-top: 3px solid var(--cyan); z-index: 1; box-shadow: 0 30px 60px rgba(0,0,0,0.5);">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <span class="badge bg-primary px-3 py-2 text-uppercase font-headings" style="font-size: 0.7rem; letter-spacing: 0.05em;">Academy Focus</span>
+                            <i class="fa-solid fa-bolt text-warning" style="font-size: 1.2rem;"></i>
+                        </div>
+                        <h4 class="text-light mb-3" style="font-weight: 700;">Accelerated Innovation</h4>
+                        <p class="text-muted mb-4" style="font-size: 0.92rem; line-height: 1.5;">
+                            Our ecosystem connects dynamic coding labs with actual industry projects, enabling learners to build commercial-grade systems from day one.
+                        </p>
+                        <div class="p-3 rounded-3 mb-4" style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted" style="font-size: 0.85rem;">Project-First Curriculum</span>
+                                <span class="text-gradient-cyan fw-bold" style="font-size: 0.85rem;">Active</span>
+                            </div>
+                            <div class="progress" style="height: 6px; background: rgba(255,255,255,0.05);">
+                                <div class="progress-bar" style="width: 100%; background: linear-gradient(90deg, var(--cyan), var(--royal-blue));"></div>
+                            </div>
+                        </div>
+                        <a asp-controller="Home" asp-action="About" class="text-gradient-cyan text-decoration-none fw-bold d-inline-flex align-items-center gap-2" style="font-size: 0.9rem;">
+                            Learn Our Vision <i class="fa-solid fa-arrow-right-long"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. Interactive University Statistics -->
+<section class="py-5" style="border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); background: rgba(15,23,42,0.2);">
+    <div class="container">
+        <div class="row g-4 justify-content-center text-center">
+            <div class="col-lg-3 col-md-6">
+                <div class="p-3">
+                    <h2 class="display-4 text-gradient-cyan fw-bold stat-number" data-count="100" data-suffix="%">100%</h2>
+                    <p class="text-muted font-headings text-uppercase tracking-wider mt-2" style="font-size: 0.82rem; letter-spacing: 0.1em;">Core Focus Alignment</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="p-3">
+                    <h2 class="display-4 text-gradient-blue fw-bold stat-number" data-count="@progCount" data-suffix="+">@(progCount)+</h2>
+                    <p class="text-muted font-headings text-uppercase tracking-wider mt-2" style="font-size: 0.82rem; letter-spacing: 0.1em;">Degree Programs</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="p-3">
+                    <h2 class="display-4 text-gradient-cyan fw-bold stat-number" data-count="@facCount" data-suffix="+">@(facCount)+</h2>
+                    <p class="text-muted font-headings text-uppercase tracking-wider mt-2" style="font-size: 0.82rem; letter-spacing: 0.1em;">Distinguished Faculty</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="p-3">
+                    <h2 class="display-4 text-gradient-blue fw-bold stat-number" data-count="@resCount" data-suffix="+">@(resCount)+</h2>
+                    <p class="text-muted font-headings text-uppercase tracking-wider mt-2" style="font-size: 0.82rem; letter-spacing: 0.1em;">Research Projects</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 3. Why Choose Our University -->
+<section class="py-5" style="margin-top: 60px;">
+    <div class="container">
+        <div class="text-center mb-5 max-width-600 mx-auto">
+            <h2 class="display-5 text-white mb-3" style="font-weight: 700;">Why Choose NED Academy</h2>
+            <p class="text-muted">Designed specifically to bridge academic knowledge with high-value technical careers.</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-card p-4 h-100 text-start reveal-up" style="border-top: 3px solid var(--cyan);">
+                    <div class="rounded-3 p-3 mb-4 d-inline-block bg-primary bg-opacity-10 text-gradient-cyan">
+                        <i class="fa-solid fa-code fa-2x"></i>
+                    </div>
+                    <h4 class="text-light mb-3" style="font-weight: 700;">Systems & Systems Engineering</h4>
+                    <p class="text-muted" style="font-size: 0.92rem; line-height: 1.6;">
+                        Learn lower-level memory management, distributed routing algorithms, and container optimization instead of basic website scripts.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-card p-4 h-100 text-start reveal-up" style="border-top: 3px solid var(--royal-blue);">
+                    <div class="rounded-3 p-3 mb-4 d-inline-block bg-primary bg-opacity-10 text-gradient-blue">
+                        <i class="fa-solid fa-microchip fa-2x"></i>
+                    </div>
+                    <h4 class="text-light mb-3" style="font-weight: 700;">HPC & GPU Compute Cluster</h4>
+                    <p class="text-muted" style="font-size: 0.92rem; line-height: 1.6;">
+                        Gain direct access to dedicated compute nodes and multi-GPU arrays for deep learning training, CUDA programming, and data engineering.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-card p-4 h-100 text-start reveal-up" style="border-top: 3px solid var(--cyan);">
+                    <div class="rounded-3 p-3 mb-4 d-inline-block bg-primary bg-opacity-10 text-gradient-cyan">
+                        <i class="fa-solid fa-shield-halved fa-2x"></i>
+                    </div>
+                    <h4 class="text-light mb-3" style="font-weight: 700;">Adversarial Security Sandbox</h4>
+                    <p class="text-muted" style="font-size: 0.92rem; line-height: 1.6;">
+                        Test firmware security, perform threat modeling, and build defensive key architectures in isolated cybersecurity environments.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. Conversion Call To Action -->
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="glass-card p-5 text-center reveal-up position-relative overflow-hidden" style="border: 1px solid var(--cyan); background: radial-gradient(circle at 50% 0%, rgba(0, 242, 254, 0.15) 0%, rgba(3, 7, 18, 0.8) 70%);">
+            <div class="max-width-600 mx-auto position-relative" style="z-index: 1;">
+                <span class="badge bg-primary px-3 py-2 text-uppercase font-headings mb-3" style="font-size: 0.75rem; letter-spacing: 0.1em;">Fall 2026 Admissions</span>
+                <h2 class="display-4 text-white mb-3" style="font-weight: 800;">Shape The Future With Us</h2>
+                <p class="text-muted fs-5 mb-4 pe-lg-3" style="line-height: 1.6;">
+                    Take the first step toward a high-impact technical career. Applications are reviewed on a rolling evaluation basis.
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a asp-controller="Home" asp-action="Admissions" class="btn btn-cyber">Apply Online Now</a>
+                    <a asp-controller="Home" asp-action="Contact" class="btn btn-cyber-outline">Talk to Advisor</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Count Animation using GSAP
+            if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+                gsap.registerPlugin(ScrollTrigger);
+
+                gsap.utils.toArray('.stat-number').forEach((stat) => {
+                    const target = parseFloat(stat.getAttribute('data-count'));
+                    const suffix = stat.getAttribute('data-suffix') || '';
+                    const obj = { val: 0 };
+
+                    gsap.to(obj, {
+                        val: target,
+                        duration: 1.8,
+                        ease: 'power2.out',
+                        scrollTrigger: {
+                            trigger: stat,
+                            start: 'top 95%',
+                            toggleActions: 'play none none none'
+                        },
+                        onUpdate: function() {
+                            stat.textContent = Math.floor(obj.val) + suffix;
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+}

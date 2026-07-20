@@ -1,0 +1,180 @@
+@{
+    ViewData["Title"] = "About Our Enterprise Institution";
+}
+
+<!-- Premium Hero Banner -->
+<section class="py-5 position-relative" style="background: radial-gradient(circle at 10% 20%, rgba(0, 119, 255, 0.08) 0%, transparent 60%); border-bottom: 1px solid var(--glass-border); padding-top: 100px !important;">
+    <div class="container text-start">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-4 reveal-up">
+            <ol class="breadcrumb" style="margin: 0; background: transparent;">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-gradient-cyan text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">About Us</li>
+            </ol>
+        </nav>
+        
+        <h1 class="display-3 text-white fw-bold mb-3 reveal-up" style="letter-spacing: -0.02em;">Pioneering Future Education</h1>
+        <p class="text-muted fs-5 m-0 max-width-600 reveal-up" style="line-height: 1.6;">
+            NED Academy was created to revolutionize technical learning by integrating commercial systems engineering directly into academic paths.
+        </p>
+    </div>
+</section>
+
+<!-- Manifesto & Patron Speech Split -->
+<section class="py-5" style="margin-top: 50px;">
+    <div class="container text-start">
+        <div class="row align-items-center gy-5">
+            <div class="col-lg-6">
+                <div class="reveal-up">
+                    <span class="badge bg-primary px-3 py-2 text-uppercase font-headings mb-3" style="font-size: 0.75rem; letter-spacing: 0.1em;">Institution Manifesto</span>
+                    <h2 class="display-5 text-white mb-4" style="font-weight: 700; line-height: 1.2;">Built for Engineers Who Create Systems</h2>
+                    <p class="text-muted fs-5 mb-4" style="line-height: 1.6;">
+                        @Model.AboutManifesto
+                    </p>
+                    <div class="p-4 rounded-3 mb-4" style="background: rgba(0, 242, 254, 0.03); border: 1px solid rgba(0, 242, 254, 0.15);">
+                        <h5 class="text-gradient-cyan mb-2" style="font-weight: 700;">Hafiz Muhammad Saad</h5>
+                        <p class="text-muted m-0" style="font-size: 0.9rem;">Founder & Patron-in-Chief</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="glass-card p-5 reveal-up position-relative overflow-hidden" style="border-top: 3px solid var(--cyan);">
+                    <div class="position-absolute top-0 end-0 p-4 opacity-10">
+                        <i class="fa-solid fa-quote-right display-1 text-light"></i>
+                    </div>
+                    <h4 class="text-light mb-3" style="font-weight: 700;">Our Educational Creed</h4>
+                    <p class="text-muted mb-4" style="font-size: 1.05rem; line-height: 1.7; font-style: italic;">
+                        "We refuse to teach abstract programming without showing how compilers execute machine code, how databases organize page slots, or how servers handle concurrent TCP loops. Theory without hardware context is incomplete."
+                    </p>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle text-center d-flex align-items-center justify-content-center text-white font-headings" 
+                             style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--cyan), var(--royal-blue)); font-weight: 700;">
+                            HS
+                        </div>
+                        <div>
+                            <h6 class="text-light m-0" style="font-weight: 600;">Hafiz Muhammad Saad</h6>
+                            <small class="text-muted">Patron & Systems Architect</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Vision & Mission Side-by-Side -->
+<section id="vision" class="py-5" style="margin-top: 50px; background: rgba(15,23,42,0.2); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);">
+    <div class="container text-start">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="glass-card p-5 h-100 reveal-up" style="border-left: 4px solid var(--cyan);">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-3 mb-4" style="width: 50px; height: 50px; background: rgba(0,242,254,0.08);">
+                        <i class="fa-solid fa-eye text-gradient-cyan" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <h3 class="display-6 text-white mb-3" style="font-weight: 700;">Our Vision</h3>
+                    <p class="text-muted fs-5" style="line-height: 1.7;">
+                        @Model.AboutVision
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="glass-card p-5 h-100 reveal-up" style="border-left: 4px solid var(--royal-blue);">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-3 mb-4" style="width: 50px; height: 50px; background: rgba(0,119,255,0.08);">
+                        <i class="fa-solid fa-bullseye text-gradient-blue" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <h3 class="display-6 text-white mb-3" style="font-weight: 700;">Our Mission</h3>
+                    <p class="text-muted fs-5" style="line-height: 1.7;">
+                        @Model.AboutMission
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Strategic Roadmap Timeline -->
+<section class="py-5" style="margin-top: 60px; background: rgba(15,23,42,0.15); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);">
+    <div class="container">
+        <div class="text-center mb-5 max-width-600 mx-auto">
+            <h2 class="display-5 text-white mb-3" style="font-weight: 700;">Strategic Roadmap</h2>
+            <p class="text-muted">A clear, milestones-based plan detailing our academic phases and tech integration programs.</p>
+        </div>
+        
+        <div class="row position-relative">
+            <!-- Central Line -->
+            <div class="position-absolute d-none d-lg-block" style="top: 0; bottom: 0; left: 50%; width: 2px; background: var(--glass-border); transform: translateX(-50%);"></div>
+            
+            <!-- Milestone 1 -->
+            <div class="col-lg-6 text-lg-end text-start mb-5 position-relative">
+                <div class="pe-lg-5 reveal-up">
+                    <span class="roadmap-badge mb-3">2026 - Inception & Launch</span>
+                    <h4 class="text-light" style="font-weight: 600;">Core Academic Framework</h4>
+                    <p class="text-muted" style="font-size: 0.95rem; line-height: 1.6;">Establishment of undergraduate computer labs, initial technical cohort admissions, and integration of the core engineering curriculum.</p>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-5 d-none d-lg-block"></div>
+            
+            <!-- Milestone 2 -->
+            <div class="col-lg-6 mb-5 d-none d-lg-block"></div>
+            <div class="col-lg-6 text-start mb-5 position-relative">
+                <div class="ps-lg-5 reveal-up">
+                    <span class="roadmap-badge-blue mb-3">2027 - Innovation Hub</span>
+                    <h4 class="text-light" style="font-weight: 600;">Incubation Wing & Cloud Cluster</h4>
+                    <p class="text-muted" style="font-size: 0.95rem; line-height: 1.6;">Setting up student-led start-up accelerators, providing compute servers for deep learning models, and initiating research grants.</p>
+                </div>
+            </div>
+
+            <!-- Milestone 3 -->
+            <div class="col-lg-6 text-lg-end text-start mb-5 position-relative">
+                <div class="pe-lg-5 reveal-up">
+                    <span class="roadmap-badge mb-3">2028 - Collaboration Scale</span>
+                    <h4 class="text-light" style="font-weight: 600;">Global Industry Alliances</h4>
+                    <p class="text-muted" style="font-size: 0.95rem; line-height: 1.6;">Unveiling global remote internship pipelines with partners in Silicon Valley and Europe, allowing senior-year student exchanges.</p>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-5 d-none d-lg-block"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Values Section -->
+<section class="py-5" style="margin-top: 50px; margin-bottom: 50px;">
+    <div class="container">
+        <div class="text-center mb-5 max-width-600 mx-auto">
+            <h2 class="display-5 text-white mb-3" style="font-weight: 700;">Values We Live By</h2>
+            <p class="text-muted">The core operational rules that dictate class structures, grading rubrics, and research methods.</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="glass-card text-start h-100 reveal-up">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-3 mb-4" style="width: 45px; height: 45px; background: rgba(0,242,254,0.08);">
+                        <i class="fa-solid fa-terminal text-gradient-cyan" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <h4 class="text-light mb-3" style="font-weight: 600; font-size: 1.25rem;">Rigor Over Repetition</h4>
+                    <p class="text-muted" style="font-size: 0.92rem; line-height: 1.6;">We value depth of logic and clean structures. No copy-pasting code; students design components from basic building blocks to understand implementation.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card text-start h-100 reveal-up">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-3 mb-4" style="width: 45px; height: 45px; background: rgba(0,119,255,0.08);">
+                        <i class="fa-solid fa-users-viewfinder text-gradient-blue" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <h4 class="text-light mb-3" style="font-weight: 600; font-size: 1.25rem;">Radical Collaboration</h4>
+                    <p class="text-muted" style="font-size: 0.92rem; line-height: 1.6;">Engineering is a team sport. Student groups operate in Agile-like squads, performing standups, retrospectives, and code review sprints.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card text-start h-100 reveal-up">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-3 mb-4" style="width: 45px; height: 45px; background: rgba(0,242,254,0.08);">
+                        <i class="fa-solid fa-shield-halved text-gradient-cyan" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <h4 class="text-light mb-3" style="font-weight: 600; font-size: 1.25rem;">Ethical Responsibility</h4>
+                    <p class="text-muted" style="font-size: 0.92rem; line-height: 1.6;">With massive compute capabilities comes responsibility. Security research protocols operate under strict ethical vulnerability disclosure guidelines.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

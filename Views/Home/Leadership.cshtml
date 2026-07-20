@@ -1,0 +1,103 @@
+@model IEnumerable<NedAcademyWebsite.Models.Leadership>
+@{
+    ViewData["Title"] = "Academy Leadership & Governance";
+    var founder = Model.FirstOrDefault(l => l.Rank == 1 || l.Designation.Contains("Founder"));
+    var boardMembers = Model.Where(l => l.Id != (founder?.Id ?? 0)).ToList();
+}
+
+<!-- Premium Hero Banner -->
+<section class="py-5 position-relative" style="background: radial-gradient(circle at 10% 20%, rgba(0, 119, 255, 0.08) 0%, transparent 60%); border-bottom: 1px solid var(--glass-border); padding-top: 100px !important;">
+    <div class="container text-start">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-4 reveal-up">
+            <ol class="breadcrumb" style="margin: 0; background: transparent;">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-gradient-cyan text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="About" class="text-gradient-cyan text-decoration-none">About Us</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Leadership</li>
+            </ol>
+        </nav>
+        
+        <h1 class="display-3 text-white fw-bold mb-3 reveal-up" style="letter-spacing: -0.02em;">Leadership & Governance</h1>
+        <p class="text-muted fs-5 m-0 max-width-600 reveal-up" style="line-height: 1.6;">
+            Guided by scholars, researchers, and technical architects steering our strategic curriculum directions.
+        </p>
+    </div>
+</section>
+
+<!-- Leadership Directors Grid -->
+<section class="py-5" style="margin-top: 50px; margin-bottom: 50px;">
+    <div class="container">
+        
+        @if (founder != null)
+        {
+            <!-- Founder & Patron-in-Chief Segment -->
+            <div class="row justify-content-center mb-5">
+                <div class="col-lg-10">
+                    <div class="glass-card p-5 reveal-up" style="border-top: 4px solid var(--cyan); background: radial-gradient(ellipse at bottom, rgba(0, 242, 254, 0.05) 0%, rgba(15,23,42,0.45) 80%);">
+                        <div class="row align-items-center gy-4 text-start">
+                            <div class="col-md-4 text-center">
+                                <!-- Avatar placeholder with initials -->
+                                <div class="d-inline-flex align-items-center justify-content-center rounded-circle text-white font-headings" style="width: 180px; height: 180px; background: linear-gradient(135deg, var(--card-bg) 0%, rgba(0, 242, 254, 0.25) 100%); border: 2px solid var(--glass-border); font-size: 3.5rem; font-weight:800; text-shadow: 0 0 15px rgba(0, 242, 254, 0.6);">
+                                    @founder.PhotoPath
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <span class="badge bg-primary px-3 py-2 text-uppercase font-headings mb-2" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight:600;">Founder Statement</span>
+                                <h2 class="text-light mb-1" style="font-weight: 800; font-size: 2rem;">@founder.Name</h2>
+                                <span class="text-gradient-cyan fw-bold font-headings text-uppercase d-block mb-3" style="font-size: 0.9rem; letter-spacing: 0.05em;">@founder.Designation</span>
+                                <p class="text-muted" style="font-size: 1rem; line-height: 1.6;">
+                                    "@founder.Biography"
+                                </p>
+                                <div class="d-flex gap-3 mt-4">
+                                    <a href="mailto:@founder.Email" class="btn btn-cyber font-headings" style="font-size: 0.85rem;"><i class="fa-solid fa-envelope me-2"></i> Message Founder</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="text-center mb-5 max-width-600 mx-auto">
+            <h2 class="display-5 text-white mb-3" style="font-weight: 700;">Academic Directors Board</h2>
+            <p class="text-muted">A dedicated board overseeing admissions, syllabus standards, and industrial engineering alignment.</p>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            @foreach (var leader in boardMembers)
+            {
+                var borderStyle = leader.Rank % 2 == 0 ? "border-top: 3px solid var(--royal-blue);" : "border-top: 3px solid var(--cyan);";
+                var gradientStyle = leader.Rank % 2 == 0 ? "rgba(0, 119, 255, 0.15)" : "rgba(0, 242, 254, 0.15)";
+                var textGradStyle = leader.Rank % 2 == 0 ? "text-gradient-blue" : "text-gradient-cyan";
+                <div class="col-lg-6 col-xl-4 col-md-6">
+                    <div class="glass-card text-start h-100 reveal-up d-flex flex-column justify-content-between" style="@borderStyle">
+                        <div>
+                            <!-- Avatar placeholder with initials -->
+                            <div class="d-flex align-items-center justify-content-center mb-4 rounded-3 text-white font-headings" style="width: 100%; height: 220px; background: linear-gradient(135deg, var(--card-bg) 0%, @gradientStyle 100%); border: 1px solid var(--glass-border); font-size: 3rem; font-weight:700; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);">
+                                @leader.PhotoPath
+                            </div>
+                            <h4 class="text-light mb-1" style="font-weight: 700;">@leader.Name</h4>
+                            <span class="@textGradStyle fw-bold font-headings text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.05em;">@leader.Designation</span>
+                            
+                            <hr style="border-color: rgba(255,255,255,0.08); margin: 15px 0;" />
+                            
+                            <div class="mb-3">
+                                <span class="text-muted d-block" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Qualifications:</span>
+                                <span class="text-light" style="font-size: 0.92rem;">@leader.Qualification</span>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <span class="text-muted d-block" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Profile Biography:</span>
+                                <span class="text-light" style="font-size: 0.92rem;">@leader.Biography</span>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="mailto:@leader.Email" class="btn btn-cyber-outline w-100 font-headings" style="font-size: 0.85rem;"><i class="fa-solid fa-envelope me-2"></i> Contact Director</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+

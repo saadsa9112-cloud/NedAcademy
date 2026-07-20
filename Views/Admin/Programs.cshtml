@@ -1,0 +1,259 @@
+@model IEnumerable<NedAcademyWebsite.Models.DegreeProgram>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Enterprise Degree Programs Management";
+    var depts = (List<NedAcademyWebsite.Models.Department>)ViewBag.Departments;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 reveal-up">
+    <div>
+        <h1 class="display-5 font-headings fw-bold m-0 text-white">Degree Programs</h1>
+        <p class="text-muted m-0">Manage university academic curriculums, eligibility rules, and brochure downloads.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-cyber font-headings px-4 py-2" data-bs-toggle="modal" data-bs-target="#createModal">
+            <i class="fa-solid fa-plus me-1"></i> Add Program
+        </button>
+    </div>
+</div>
+
+<!-- Metrics Cards Bar -->
+<div class="row g-3 mb-4 reveal-up">
+    <div class="col-md-3">
+        <div class="glass-card p-3 d-flex align-items-center justify-content-between" style="border-left: 4px solid var(--cyan);">
+            <div>
+                <small class="text-muted text-uppercase font-headings" style="font-size:0.7rem; font-weight:700;">Total Programs</small>
+                <h3 class="text-white font-headings fw-bold m-0">@Model.Count()</h3>
+            </div>
+            <i class="fa-solid fa-graduation-cap fa-2x text-gradient-cyan"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="glass-card p-3 d-flex align-items-center justify-content-between" style="border-left: 4px solid var(--royal-blue);">
+            <div>
+                <small class="text-muted text-uppercase font-headings" style="font-size:0.7rem; font-weight:700;">Undergraduate</small>
+                <h3 class="text-white font-headings fw-bold m-0">@Model.Count(p => p.DegreeLevel == "Undergraduate")</h3>
+            </div>
+            <i class="fa-solid fa-book-bookmark fa-2x text-gradient-blue"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="glass-card p-3 d-flex align-items-center justify-content-between" style="border-left: 4px solid var(--cyan);">
+            <div>
+                <small class="text-muted text-uppercase font-headings" style="font-size:0.7rem; font-weight:700;">Postgraduate</small>
+                <h3 class="text-white font-headings fw-bold m-0">@Model.Count(p => p.DegreeLevel == "Postgraduate")</h3>
+            </div>
+            <i class="fa-solid fa-user-graduate fa-2x text-gradient-cyan"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="glass-card p-3 d-flex align-items-center justify-content-between" style="border-left: 4px solid var(--royal-blue);">
+            <div>
+                <small class="text-muted text-uppercase font-headings" style="font-size:0.7rem; font-weight:700;">Published</small>
+                <h3 class="text-white font-headings fw-bold m-0">@Model.Count(p => p.IsPublished)</h3>
+            </div>
+            <i class="fa-solid fa-circle-check fa-2x text-success"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Controls & View Toggle Bar -->
+<div class="glass-card p-3 mb-4 reveal-up d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div class="d-flex align-items-center gap-2">
+        <input type="text" id="programSearch" class="form-control py-1 font-headings" placeholder="Search program title..." style="width:240px; font-size:0.85rem;" />
+    </div>
+
+    <!-- Dual View Toggle Buttons -->
+    <ul class="nav nav-pills gap-1 font-headings" id="viewToggleTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="btn btn-sm btn-cyber-outline active px-3" id="cards-tab" data-bs-toggle="pill" data-bs-target="#cardsView" type="button" role="tab">
+                <i class="fa-solid fa-grip me-1"></i> Grid View
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="btn btn-sm btn-cyber-outline px-3" id="table-tab" data-bs-toggle="pill" data-bs-target="#tableView" type="button" role="tab">
+                <i class="fa-solid fa-table-list me-1"></i> Data Table
+            </button>
+        </li>
+    </ul>
+</div>
+
+<div class="tab-content" id="programViewsContent">
+    
+    <!-- Grid View Tab -->
+    <div class="tab-pane fade show active" id="cardsView" role="tabpanel">
+        <div class="row g-4">
+            @if (!Model.Any())
+            {
+                <div class="col-12 text-center py-5">
+                    <div class="glass-card p-5 max-width-600 mx-auto text-muted">
+                        <i class="fa-solid fa-folder-open fa-3x mb-3 text-muted"></i>
+                        <h4 class="text-light">No Programs Found</h4>
+                        <p>Click 'Add Program' above to register degree curriculums.</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <div class="col-xl-4 col-md-6 program-card-item">
+                        <div class="glass-card h-100 d-flex flex-column justify-content-between overflow-hidden" style="border-top: 3px solid var(--cyan);">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge bg-primary px-2 py-1 font-headings text-uppercase">@item.Code</span>
+                                    <span class="badge bg-success bg-opacity-20 text-success px-2 py-1 font-headings">@item.DegreeLevel</span>
+                                </div>
+                                <h4 class="text-white font-headings fw-bold mb-2">@item.Name</h4>
+                                <p class="text-muted text-truncate mb-3" style="font-size:0.88rem;">@item.Description</p>
+                                
+                                <div class="d-flex flex-column gap-1 mb-3" style="font-size:0.82rem;">
+                                    <span class="text-muted"><i class="fa-solid fa-clock text-gradient-cyan me-1"></i> <strong>Duration:</strong> @item.Duration</span>
+                                    <span class="text-muted"><i class="fa-solid fa-building text-gradient-cyan me-1"></i> <strong>Dept:</strong> @(item.Department?.Name ?? "General")</span>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-top border-white border-opacity-10 d-flex justify-content-end gap-2">
+                                <form asp-action="DeleteProgram" method="post" onsubmit="return confirm('Move program to Recycle Bin?');" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="btn btn-outline-danger py-1 px-3" style="font-size:0.8rem;">
+                                        <i class="fa-solid fa-trash-can me-1"></i> Trash
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Data Table Tab -->
+    <div class="tab-pane fade" id="tableView" role="tabpanel">
+        <div class="glass-card p-4">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover table-borderless m-0" style="background:transparent; vertical-align:middle;">
+                    <thead>
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.85rem;" class="text-muted text-uppercase font-headings">
+                            <th>Code</th>
+                            <th>Program Title</th>
+                            <th>Department</th>
+                            <th>Level</th>
+                            <th>Duration</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr style="border-bottom:1px solid rgba(255,255,255,0.03); font-size:0.95rem;">
+                                <td><span class="badge bg-primary px-2 py-1 font-headings">@item.Code</span></td>
+                                <td class="fw-semibold text-light">@item.Name</td>
+                                <td><span class="badge bg-secondary font-headings">@(item.Department?.Code ?? "General")</span></td>
+                                <td><span class="badge bg-info px-2 py-1 font-headings">@item.DegreeLevel</span></td>
+                                <td class="text-muted">@item.Duration</td>
+                                <td class="text-end">
+                                    <form asp-action="DeleteProgram" method="post" onsubmit="return confirm('Move program to Recycle Bin?');" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-outline-danger py-1 px-3" style="font-size:0.8rem;">
+                                            <i class="fa-solid fa-trash-can me-1"></i> Trash
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content glass-card border-0 p-4" style="background:#090f20; color:#fff;">
+            <div class="modal-header border-0 p-0 mb-4 justify-content-between">
+                <h4 class="modal-title font-headings fw-bold">Add Degree Program</h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="CreateProgram" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-0 d-flex flex-column gap-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Program Name</label>
+                            <input type="text" name="Name" class="form-control" placeholder="e.g. BS Software Engineering" required />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Program Code</label>
+                            <input type="text" name="Code" class="form-control text-uppercase" placeholder="BS-SE" required />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Degree Level</label>
+                            <select name="DegreeLevel" class="form-select" required>
+                                <option value="Undergraduate">Undergraduate</option>
+                                <option value="Postgraduate">Postgraduate</option>
+                                <option value="Certification">Certification</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Department</label>
+                            <select name="DepartmentId" class="form-select" required>
+                                @foreach (var d in depts)
+                                {
+                                    <option value="@d.Id">@d.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Duration</label>
+                            <input type="text" name="Duration" class="form-control" placeholder="4 Years (8 Semesters)" required />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Eligibility Criteria</label>
+                        <input type="text" name="Eligibility" class="form-control" placeholder="e.g. HSC (Pre-Eng) min 60%" required />
+                    </div>
+
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Program Description</label>
+                        <textarea name="Description" rows="3" class="form-control" placeholder="Brief outline..." required></textarea>
+                    </div>
+
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Learning Outcomes (One per line)</label>
+                        <textarea name="LearningOutcomes" rows="3" class="form-control" required></textarea>
+                    </div>
+
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Career Opportunities (One per line)</label>
+                        <textarea name="CareerOpportunities" rows="3" class="form-control" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-0 mt-4">
+                    <button type="button" class="btn btn-cyber-outline" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-cyber">Save Program</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('programSearch').addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            document.querySelectorAll('.program-card-item').forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(val) ? 'block' : 'none';
+            });
+        });
+    </script>
+}

@@ -1,0 +1,216 @@
+@model IEnumerable<NedAcademyWebsite.Models.ContactMessage>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Manage User Inquiries";
+}
+
+<div class="mb-5 reveal-up">
+    <h1 class="display-5 font-headings fw-bold m-0 text-white">Inquiries Inbox</h1>
+    <p class="text-muted">Review, reply, archive, or remove user contact queries from the database.</p>
+</div>
+
+<div class="glass-card p-4 reveal-up">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover table-borderless m-0" style="background:transparent; vertical-align:middle;">
+            <thead>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.85rem;" class="text-muted text-uppercase font-headings">
+                    <th>Received Date</th>
+                    <th>Sender Info</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">Inbox is currently empty.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        var rowClass = item.IsRead ? "text-muted" : "fw-bold text-light";
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.03); font-size:0.95rem;" class="@rowClass" id="msg-row-@item.Id">
+                            <td class="text-muted">@item.ReceivedDate.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>
+                                <div>@item.Name</div>
+                                <small class="text-muted font-monospace">@item.Email</small>
+                            </td>
+                            <td>@item.Subject</td>
+                            <td>
+                                <span id="status-badge-@item.Id" class="badge @(item.IsRead ? "bg-success bg-opacity-20 text-success" : "bg-warning bg-opacity-20 text-warning") px-2 py-1">
+                                    @(item.IsRead ? "Reviewed" : "New Inbound")
+                                </span>
+                                @if (item.IsArchived)
+                                {
+                                    <span class="badge bg-secondary px-2 py-1 ms-1" id="archive-badge-@item.Id">Archived</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <button class="btn btn-cyber py-1 px-3" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#viewModal" 
+                                            data-id="@item.Id" 
+                                            data-name="@item.Name" 
+                                            data-email="@item.Email" 
+                                            data-subject="@item.Subject" 
+                                            data-message="@item.Message" 
+                                            data-date="@item.ReceivedDate.ToString("yyyy-MM-dd HH:mm")" 
+                                            onclick="markAsRead(@item.Id)"
+                                            style="font-size:0.8rem;">
+                                        <i class="fa-solid fa-envelope-open me-1"></i> Read
+                                    </button>
+
+                                    <button class="btn btn-cyber-outline py-1 px-3" 
+                                            id="archive-btn-@item.Id" 
+                                            onclick="toggleArchive(@item.Id)" 
+                                            style="font-size:0.8rem;">
+                                        <i class="fa-solid fa-box-archive me-1"></i> @(item.IsArchived ? "Unarchive" : "Archive")
+                                    </button>
+                                    
+                                    <form asp-action="DeleteMessage" method="post" onsubmit="return confirm('Permanently remove this message registry?');" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-outline-danger py-1 px-3" style="font-size:0.8rem;">
+                                            <i class="fa-solid fa-trash-can me-1"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- View Message Modal -->
+<div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card border-0 p-4" style="background:#090f20; color:#fff;">
+            <div class="modal-header border-0 p-0 mb-4 justify-content-between">
+                <h4 class="modal-title font-headings fw-bold">Inquiry Details</h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 d-flex flex-column gap-3">
+                <div class="row g-2" style="font-size: 0.9rem;">
+                    <div class="col-4 text-muted font-headings text-uppercase fw-bold" style="font-size:0.75rem;">Sender:</div>
+                    <div class="col-8 text-light fw-semibold" id="viewName"></div>
+                    
+                    <div class="col-4 text-muted font-headings text-uppercase fw-bold" style="font-size:0.75rem;">Email Address:</div>
+                    <div class="col-8 font-monospace text-gradient-cyan" id="viewEmail"></div>
+
+                    <div class="col-4 text-muted font-headings text-uppercase fw-bold" style="font-size:0.75rem;">Received Date:</div>
+                    <div class="col-8 text-muted" id="viewDate"></div>
+
+                    <div class="col-4 text-muted font-headings text-uppercase fw-bold" style="font-size:0.75rem;">Subject:</div>
+                    <div class="col-8 text-light fw-bold" id="viewSubject"></div>
+                </div>
+
+                <hr style="border-color: rgba(255,255,255,0.06); margin: 10px 0;" />
+
+                <div>
+                    <label class="text-muted font-headings mb-1" style="font-size:0.75rem; font-weight:600; text-transform:uppercase;">Message Payload</label>
+                    <div class="p-3 rounded-3" style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); font-size:0.95rem; line-height:1.6; white-space:pre-wrap;" id="viewMessage"></div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-0 mt-4">
+                <a href="" id="replyMailLink" class="btn btn-cyber"><i class="fa-solid fa-reply me-1"></i> Send Reply Mail</a>
+                <button type="button" class="btn btn-cyber-outline" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const viewModal = document.getElementById('viewModal');
+        if (viewModal) {
+            viewModal.addEventListener('show.bs.modal', (e) => {
+                const trigger = e.relatedTarget;
+                const name = trigger.getAttribute('data-name');
+                const email = trigger.getAttribute('data-email');
+                const subject = trigger.getAttribute('data-subject');
+                const message = trigger.getAttribute('data-message');
+                const date = trigger.getAttribute('data-date');
+                
+                document.getElementById('viewName').textContent = name;
+                document.getElementById('viewEmail').textContent = email;
+                document.getElementById('viewSubject').textContent = subject;
+                document.getElementById('viewMessage').textContent = message;
+                document.getElementById('viewDate').textContent = date;
+                document.getElementById('replyMailLink').href = `mailto:${email}?subject=RE: ${encodeURIComponent(subject)}`;
+            });
+        }
+
+        function markAsRead(id) {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('__RequestVerificationToken', token);
+
+            fetch('/Admin/MarkMessageRead', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const row = document.getElementById(`msg-row-${id}`);
+                    if (row) {
+                        row.classList.remove('fw-bold', 'text-light');
+                        row.classList.add('text-muted');
+                    }
+                    const badge = document.getElementById(`status-badge-${id}`);
+                    if (badge) {
+                        badge.textContent = 'Reviewed';
+                        badge.classList.remove('bg-warning', 'text-warning');
+                        badge.classList.add('bg-success', 'text-success');
+                    }
+                }
+            });
+        }
+
+        function toggleArchive(id) {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('__RequestVerificationToken', token);
+
+            fetch('/Admin/ArchiveMessage', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const btn = document.getElementById(`archive-btn-${id}`);
+                    btn.innerHTML = `<i class="fa-solid fa-box-archive me-1"></i> ${data.archived ? 'Unarchive' : 'Archive'}`;
+                    
+                    const row = document.getElementById(`msg-row-${id}`);
+                    const badgeCell = row.querySelector('td:nth-child(4)');
+                    
+                    let archiveBadge = document.getElementById(`archive-badge-${id}`);
+                    if (data.archived) {
+                        if (!archiveBadge) {
+                            const newBadge = document.createElement('span');
+                            newBadge.className = 'badge bg-secondary px-2 py-1 ms-1';
+                            newBadge.id = `archive-badge-${id}`;
+                            newBadge.textContent = 'Archived';
+                            badgeCell.appendChild(newBadge);
+                        }
+                    } else {
+                        if (archiveBadge) {
+                            archiveBadge.remove();
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+}

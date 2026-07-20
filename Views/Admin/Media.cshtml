@@ -1,0 +1,143 @@
+@model IEnumerable<NedAcademyWebsite.Models.MediaAsset>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Media Library & Upload Center";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-5 reveal-up">
+    <div>
+        <h1 class="display-5 font-headings fw-bold m-0 text-white">Media Assets Library</h1>
+        <p class="text-muted m-0">Upload static image assets, faculty photos, PDFs, or program brochures with folder categorization.</p>
+    </div>
+    <div>
+        <button class="btn btn-cyber font-headings px-4 py-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+            <i class="fa-solid fa-cloud-arrow-up me-1"></i> Upload Asset
+        </button>
+    </div>
+</div>
+
+<div class="row g-4 reveal-up">
+    @if (!Model.Any())
+    {
+        <div class="col-12 text-center py-5">
+            <div class="glass-card p-5 max-width-600 mx-auto text-muted">
+                <i class="fa-regular fa-folder-open fa-3x mb-3 text-muted"></i>
+                <h4 class="text-light" style="font-weight:600;">Media Asset Library is Empty</h4>
+                <p>Upload files using the button above to begin filling your media asset library.</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        foreach (var item in Model)
+        {
+            <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="glass-card h-100 d-flex flex-column justify-content-between overflow-hidden" style="border-top: 3px solid var(--cyan);">
+                    <div>
+                        <!-- Thumbnail/Preview -->
+                        <div class="position-relative d-flex align-items-center justify-content-center bg-dark" style="height:160px;">
+                            @if (item.FileType == "Image")
+                            {
+                                <img src="@item.FilePath" class="w-100 h-100" style="object-fit:cover;" />
+                            }
+                            else if (item.FileType == "Video")
+                            {
+                                <i class="fa-regular fa-circle-play fa-3x text-gradient-cyan"></i>
+                            }
+                            else
+                            {
+                                <i class="fa-regular fa-file-pdf fa-3x text-danger"></i>
+                            }
+                            <span class="badge bg-black bg-opacity-70 position-absolute bottom-0 end-0 m-2 font-headings" style="font-size:0.65rem;">@item.Category</span>
+                        </div>
+                        
+                        <!-- Details -->
+                        <div class="p-3">
+                            <h5 class="text-light text-truncate fw-semibold m-0" style="font-size:1rem;">@item.Title</h5>
+                            <small class="text-muted d-block mt-1 font-monospace" style="font-size:0.75rem;">@item.FileName</small>
+                            <small class="text-muted d-block mt-1">Uploaded: @item.UploadDate.ToString("yyyy-MM-dd")</small>
+                            <small class="text-muted d-block mt-1">Size: @(Math.Round(item.SizeBytes / 1024.0 / 1024.0, 2)) MB</small>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="p-3 pt-0 d-flex flex-column gap-2" style="border-top:1px solid rgba(255,255,255,0.03);">
+                        <div class="input-group">
+                            <input type="text" value="@item.FilePath" class="form-control font-monospace" style="font-size:0.75rem; padding:6px 10px;" readonly id="path-@item.Id" />
+                            <button class="btn btn-cyber-outline" onclick="copyPath(@item.Id)" style="padding:6px 12px; font-size:0.75rem;" title="Copy File Path">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+
+                        <form asp-action="DeleteMedia" method="post" onsubmit="return confirm('Move file to Recycle Bin?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-outline-danger w-100 py-1" style="font-size:0.8rem;">
+                                <i class="fa-solid fa-trash-can me-1"></i> Soft Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card border-0 p-4" style="background:#090f20; color:#fff;">
+            <div class="modal-header border-0 p-0 mb-4 justify-content-between">
+                <h4 class="modal-title font-headings fw-bold">Upload Media Asset</h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="UploadMedia" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-0 d-flex flex-column gap-3">
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Asset Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="e.g. Hero Campus Banner" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Folder Category</label>
+                        <select name="category" class="form-select" required>
+                            <option value="General">General</option>
+                            <option value="Gallery">Gallery</option>
+                            <option value="Hero">Hero Banners</option>
+                            <option value="Faculty">Faculty Photos</option>
+                            <option value="Programs">Program Banners</option>
+                            <option value="Brochures">Curriculum PDFs</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Select Local File</label>
+                        <input type="file" name="file" class="form-control" required />
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-0 mt-4">
+                    <button type="button" class="btn btn-cyber-outline" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-cyber">Upload Asset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyPath(id) {
+        var copyText = document.getElementById("path-" + id);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: 'File path copied to clipboard!',
+            showConfirmButton: false,
+            timer: 2000,
+            background: '#0b1329',
+            color: '#fff'
+        });
+    }
+</script>

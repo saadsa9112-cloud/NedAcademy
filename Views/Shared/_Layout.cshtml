@@ -1,0 +1,313 @@
+@inject NedAcademyWebsite.Services.ISettingService SettingService
+@{
+    var settings = await SettingService.GetSettingsAsync();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - @settings.UniversityName | @settings.Slogan</title>
+    
+    <!-- Meta Tags for SEO -->
+    <meta name="description" content="Welcome to @settings.UniversityName, a futuristic and innovative university representing excellence, research, and the future of education. Discover our programs, research labs, and vibrant campus life." />
+    <meta name="keywords" content="@settings.UniversityName, University, Technology, Education, Research, Future, Innovation, Engineering, Programs" />
+    <meta name="author" content="@settings.UniversityName" />
+
+    <!-- Google Fonts Integration -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Custom CSS Styles -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/NedAcademyWebsite.styles.css" asp-append-version="true" />
+    
+    <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('light-theme');
+                document.addEventListener('DOMContentLoaded', () => {
+                    document.body.classList.add('light-theme');
+                });
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Ultra-Fast Preloader -->
+    <div id="preloader">
+        <div class="loader-wrapper">
+            <div class="loader-ring"></div>
+            <div class="loader-text">@settings.UniversityName</div>
+        </div>
+    </div>
+    <script>
+        // Ultra-Fast Preloader Dismissal (<150ms for lightning speed)
+        function hidePreloader() {
+            const p = document.getElementById('preloader');
+            if (p && p.style.display !== 'none') {
+                p.style.opacity = '0';
+                p.style.transition = 'opacity 0.2s ease';
+                setTimeout(() => { p.style.display = 'none'; p.style.visibility = 'hidden'; }, 200);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => setTimeout(hidePreloader, 100));
+        window.addEventListener('load', hidePreloader);
+        setTimeout(hidePreloader, 350);
+    </script>
+
+    <!-- Refined Header Navigation -->
+    <header class="main-header" id="mainHeader">
+        <div class="container h-100">
+            <nav class="navbar navbar-expand-lg p-0 h-100 align-items-center justify-content-between">
+                <!-- Brand Logo Section -->
+                <a class="navbar-brand-custom" asp-controller="Home" asp-action="Index" aria-label="@settings.UniversityName Homepage">
+                    <div class="navbar-brand-logo">@settings.UniversityName[0]</div>
+                    <span class="brand-text">@settings.UniversityName</span>
+                </a>
+
+                <!-- Mobile Menu Toggler -->
+                <button class="navbar-toggler-custom" type="button" id="mobileMenuToggler" aria-label="Toggle Navigation Menu" aria-expanded="false" aria-controls="navMenu">
+                    <i class="fa-solid fa-bars-staggered"></i>
+                </button>
+
+                <!-- Navigation Links & Action Controls -->
+                <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+                    <ul class="custom-nav-menu" id="navMenu">
+                        <li class="nav-item-custom">
+                            <a class="nav-link-custom @(currentAction == "Index" && currentController == "Home" ? "active" : "")" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        
+                        <!-- Mega Menu: About -->
+                        <li class="nav-item-custom mega-dropdown">
+                            <a class="nav-link-custom @(currentAction == "About" || currentAction == "Leadership" || currentAction == "Facilities" || currentAction == "Gallery" ? "active" : "")" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                About <i class="fa-solid fa-chevron-down ms-1 mega-dropdown-chevron"></i>
+                            </a>
+                            <div class="mega-menu-content">
+                                <div class="row g-4">
+                                    <div class="col-lg-4">
+                                        <h6 class="mega-menu-title"><i class="fa-solid fa-compass me-1"></i> Our Identity</h6>
+                                        <ul class="mega-menu-list">
+                                            <li><a class="mega-menu-link" asp-controller="Home" asp-action="About"><i class="fa-solid fa-building-columns"></i> About NED Academy</a></li>
+                                            <li><a class="mega-menu-link" asp-controller="Home" asp-action="Leadership"><i class="fa-solid fa-user-tie"></i> Leadership & Governance</a></li>
+                                            <li><a class="mega-menu-link" asp-controller="Home" asp-action="About" asp-fragment="vision"><i class="fa-solid fa-eye"></i> Mission & Vision</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <h6 class="mega-menu-title"><i class="fa-solid fa-map-location-dot me-1"></i> The Campus</h6>
+                                        <ul class="mega-menu-list">
+                                            <li><a class="mega-menu-link" asp-controller="Home" asp-action="Facilities"><i class="fa-solid fa-microscope"></i> Campus Facilities</a></li>
+                                            <li><a class="mega-menu-link" asp-controller="Home" asp-action="Gallery"><i class="fa-solid fa-images"></i> Campus Gallery</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="glass-card p-4 h-100 d-flex flex-column justify-content-center align-items-start" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);">
+                                            <h6 class="text-gradient-cyan mb-2" style="font-size: 1.05rem; font-weight: 700;">Future of Learning</h6>
+                                            <p class="text-muted m-0" style="font-size: 0.85rem; line-height: 1.5;">NED Academy represents academic rigor, systems engineering, and pioneering research labs.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        
+                        <!-- Mega Menu: Academics -->
+                        <li class="nav-item-custom mega-dropdown">
+                            <a class="nav-link-custom @(currentAction == "Programs" || currentAction == "Faculty" || currentAction == "Research" || currentAction == "Downloads" ? "active" : "")" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                Academics <i class="fa-solid fa-chevron-down ms-1 mega-dropdown-chevron"></i>
+                            </a>
+                            <div class="mega-menu-content">
+                                <div class="row g-4">
+                                    <div class="col-lg-4">
+                                        <h6 class="mega-menu-title"><i class="fa-solid fa-graduation-cap me-1"></i> Programs</h6>
+                                        <ul class="mega-menu-list">
+                                            <li><a class="mega-menu-link" asp-controller="Home" asp-action="Programs"><i class="fa-solid fa-laptop-code"></i> All Degree Programs</a></li>
+                                            <li><a class="mega-menu-link" asp-controller="Home" asp-action="Faculty"><i class="fa-solid fa-users-gear"></i> Faculty Directory</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <h6 class="mega-menu-title"><i class="fa-solid fa-flask-vial me-1"></i> Research & Labs</h6>
+                                        <ul class="mega-menu-list">
+                                            <li><a class="mega-menu-link" asp-controller="Home" asp-action="Research"><i class="fa-solid fa-atom"></i> Active Research Labs</a></li>
+                                            <li><a class="mega-menu-link" asp-controller="Home" asp-action="Downloads"><i class="fa-solid fa-file-arrow-down"></i> Academic Downloads</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="glass-card p-4 h-100 d-flex flex-column justify-content-center align-items-start" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);">
+                                            <h6 class="text-gradient-blue mb-2" style="font-size: 1.05rem; font-weight: 700;">Degree Curriculums</h6>
+                                            <p class="text-muted m-0" style="font-size: 0.85rem; line-height: 1.5;">Explore accredited undergraduate & postgraduate degrees designed for high-performance tech careers.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- Admissions -->
+                        <li class="nav-item-custom">
+                            <a class="nav-link-custom @(currentAction == "Admissions" ? "active" : "")" asp-controller="Home" asp-action="Admissions">Admissions</a>
+                        </li>
+
+                        <!-- News & Events -->
+                        <li class="nav-item-custom">
+                            <a class="nav-link-custom @(currentAction == "News" ? "active" : "")" asp-controller="Home" asp-action="News">News & Events</a>
+                        </li>
+
+                        <!-- FAQs -->
+                        <li class="nav-item-custom">
+                            <a class="nav-link-custom @(currentAction == "FAQs" ? "active" : "")" asp-controller="Home" asp-action="FAQs">FAQs</a>
+                        </li>
+
+                        <!-- Contact -->
+                        <li class="nav-item-custom">
+                            <a class="nav-link-custom @(currentAction == "Contact" ? "active" : "")" asp-controller="Home" asp-action="Contact">Contact</a>
+                        </li>
+
+                        <!-- Admin Portal Link (Glass Capsule Button) -->
+                        <li class="nav-item-custom">
+                            <a class="nav-admin-btn" asp-controller="Admin" asp-action="Index">
+                                <i class="fa-solid fa-lock me-1"></i> Admin Portal
+                            </a>
+                        </li>
+
+                        <!-- Theme Toggle Button -->
+                        <li class="nav-item-custom ms-lg-1">
+                            <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle Light/Dark Theme">
+                                <i class="fa-solid fa-moon"></i>
+                            </button>
+                        </li>
+
+                        <!-- Apply Now CTA Button -->
+                        <li class="nav-item-custom ms-lg-2 mt-3 mt-lg-0">
+                            <a class="btn nav-cta-btn" asp-controller="Home" asp-action="Admissions">
+                                Apply Now <i class="fa-solid fa-arrow-right-long ms-1"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Visually Separated Sub-Header Breadcrumb Section -->
+    @if (ViewData["Title"] != null && currentAction != "Index")
+    {
+        <div class="subpage-breadcrumb-bar">
+            <div class="container d-flex align-items-center justify-content-between">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-gradient-cyan text-decoration-none"><i class="fa-solid fa-house me-1" style="font-size:0.75rem;"></i> Home</a></li>
+                        <li class="breadcrumb-item active text-muted" aria-current="page">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+                <span class="text-muted font-headings d-none d-md-inline-block" style="font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;">
+                    <i class="fa-solid fa-shield-halved me-1 text-gradient-cyan"></i> @settings.UniversityName | OFFICIAL PORTAL
+                </span>
+            </div>
+        </div>
+    }
+
+    <!-- Main Content Body -->
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row g-4 mb-5">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <div class="footer-brand mb-3 d-flex align-items-center gap-2">
+                        <div class="navbar-brand-logo d-inline-flex" style="width: 34px; height: 34px; font-size: 0.9rem; border-radius: 8px;">@settings.UniversityName[0]</div>
+                        <span class="footer-brand-title">@settings.UniversityName</span>
+                    </div>
+                    <p class="text-muted mb-4" style="font-size: 0.92rem; line-height: 1.6;">
+                        @settings.Slogan
+                    </p>
+                    <div class="d-flex gap-3 align-items-center">
+                        @if (!string.IsNullOrEmpty(settings.SocialFacebook))
+                        {
+                            <a href="@settings.SocialFacebook" target="_blank" class="footer-social-link" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        }
+                        @if (!string.IsNullOrEmpty(settings.SocialX))
+                        {
+                            <a href="@settings.SocialX" target="_blank" class="footer-social-link" title="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
+                        }
+                        @if (!string.IsNullOrEmpty(settings.SocialLinkedIn))
+                        {
+                            <a href="@settings.SocialLinkedIn" target="_blank" class="footer-social-link" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                        }
+                        @if (!string.IsNullOrEmpty(settings.SocialYouTube))
+                        {
+                            <a href="@settings.SocialYouTube" target="_blank" class="footer-social-link" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-6">
+                    <h6 class="text-white font-headings text-uppercase mb-3" style="font-size: 0.85rem; letter-spacing: 0.1em; font-weight: 700;">Navigation</h6>
+                    <ul class="list-unstyled d-flex flex-column gap-2" style="font-size: 0.9rem;">
+                        <li><a asp-controller="Home" asp-action="About" class="text-muted text-decoration-none hover-cyan">About Us</a></li>
+                        <li><a asp-controller="Home" asp-action="Programs" class="text-muted text-decoration-none hover-cyan">Degree Programs</a></li>
+                        <li><a asp-controller="Home" asp-action="Faculty" class="text-muted text-decoration-none hover-cyan">Faculty Members</a></li>
+                        <li><a asp-controller="Home" asp-action="Leadership" class="text-muted text-decoration-none hover-cyan">Leadership</a></li>
+                        <li><a asp-controller="Home" asp-action="Admissions" class="text-muted text-decoration-none hover-cyan">Admissions</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-6">
+                    <h6 class="text-white font-headings text-uppercase mb-3" style="font-size: 0.85rem; letter-spacing: 0.1em; font-weight: 700;">Resources</h6>
+                    <ul class="list-unstyled d-flex flex-column gap-2" style="font-size: 0.9rem;">
+                        <li><a asp-controller="Home" asp-action="Research" class="text-muted text-decoration-none hover-cyan">Research Labs</a></li>
+                        <li><a asp-controller="Home" asp-action="Facilities" class="text-muted text-decoration-none hover-cyan">Campus Facilities</a></li>
+                        <li><a asp-controller="Home" asp-action="Gallery" class="text-muted text-decoration-none hover-cyan">Visual Gallery</a></li>
+                        <li><a asp-controller="Home" asp-action="Downloads" class="text-muted text-decoration-none hover-cyan">Downloads</a></li>
+                        <li><a asp-controller="Home" asp-action="FAQs" class="text-muted text-decoration-none hover-cyan">FAQs</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4">
+                    <h6 class="text-white font-headings text-uppercase mb-3" style="font-size: 0.85rem; letter-spacing: 0.1em; font-weight: 700;">Contact Coordinates</h6>
+                    <ul class="list-unstyled d-flex flex-column gap-3" style="font-size: 0.9rem;">
+                        <li class="d-flex gap-3 align-items-start">
+                            <i class="fa-solid fa-location-dot text-gradient-cyan mt-1"></i>
+                            <span class="text-muted">@settings.Address</span>
+                        </li>
+                        <li class="d-flex gap-3 align-items-center">
+                            <i class="fa-solid fa-envelope text-gradient-cyan"></i>
+                            <span class="text-muted">@settings.ContactEmail</span>
+                        </li>
+                        <li class="d-flex gap-3 align-items-center">
+                            <i class="fa-solid fa-phone text-gradient-cyan"></i>
+                            <span class="text-muted">@settings.ContactPhone</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-4 border-top border-white border-opacity-10 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3" style="font-size: 0.85rem;">
+                <p class="text-muted m-0">&copy; @DateTime.Now.Year @settings.FooterCopyrightText</p>
+                <div class="d-flex gap-4">
+                    <a asp-controller="Home" asp-action="Privacy" class="text-muted text-decoration-none hover-cyan">Privacy Policy</a>
+                    <a href="#" class="text-muted text-decoration-none hover-cyan">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap & jQuery JS -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

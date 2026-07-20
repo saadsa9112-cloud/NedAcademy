@@ -1,0 +1,112 @@
+@{
+    ViewData["Title"] = "Student Life - Campus Culture & Leadership";
+}
+
+<!-- Premium Hero Banner -->
+<section class="py-5 position-relative" style="background: radial-gradient(circle at 10% 20%, rgba(0, 119, 255, 0.08) 0%, transparent 60%); border-bottom: 1px solid var(--glass-border); padding-top: 100px !important;">
+    <div class="container text-start">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-4 reveal-up">
+            <ol class="breadcrumb" style="margin: 0; background: transparent;">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-gradient-cyan text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Student Life</li>
+            </ol>
+        </nav>
+        
+        <h1 class="display-3 text-white fw-bold mb-3 reveal-up" style="letter-spacing: -0.02em;">Student Life</h1>
+        <p class="text-muted fs-5 m-0 max-width-600 reveal-up" style="line-height: 1.6;">
+            A vibrant, student-led ecosystem fostering initiative, wellness, engineering clubs, and ethical leadership.
+        </p>
+    </div>
+</section>
+
+<!-- Student Clubs & Societies -->
+<section class="py-5" style="margin-top: 50px;">
+    <div class="container text-start">
+        <div class="text-center mb-5 max-width-600 mx-auto">
+            <h2 class="display-5 text-white mb-3" style="font-weight: 700;">Clubs & Societies</h2>
+            <p class="text-muted">Student-run wings that coordinate workshops, hackathons, coding sprints, and theatrical shows.</p>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Club 1 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-card h-100 reveal-up d-flex flex-column justify-content-between" style="border-top: 2px solid var(--cyan);">
+                    <div>
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-3 mb-4" style="width: 45px; height: 45px; background: rgba(0,242,254,0.08);">
+                            <i class="fa-solid fa-laptop-code text-gradient-cyan" style="font-size: 1.2rem;"></i>
+                        </div>
+                        <h4 class="text-light mb-3" style="font-weight: 600;">Computing & Algorithms Guild</h4>
+                        <p class="text-muted" style="font-size: 0.92rem; line-height: 1.6;">
+                            Organizes competitive programming cycles, system optimization webinars, and annual open-source contribution sprints.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Club 2 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-card h-100 reveal-up d-flex flex-column justify-content-between" style="border-top: 2px solid var(--royal-blue);">
+                    <div>
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-3 mb-4" style="width: 45px; height: 45px; background: rgba(0,119,255,0.08);">
+                            <i class="fa-solid fa-robot text-gradient-blue" style="font-size: 1.2rem;"></i>
+                        </div>
+                        <h4 class="text-light mb-3" style="font-weight: 600;">Robotics & Smart Systems Club</h4>
+                        <p class="text-muted" style="font-size: 0.92rem; line-height: 1.6;">
+                            Provides a sandbox for firmware development, micro-controller building, smart systems automation, and mesh-net modeling.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Club 3 -->
+            <div class="col-lg-4 col-md-12">
+                <div class="glass-card h-100 reveal-up d-flex flex-column justify-content-between" style="border-top: 2px solid var(--cyan);">
+                    <div>
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-3 mb-4" style="width: 45px; height: 45px; background: rgba(0,242,254,0.08);">
+                            <i class="fa-solid fa-masks-theater text-gradient-cyan" style="font-size: 1.2rem;"></i>
+                        </div>
+                        <h4 class="text-light mb-3" style="font-weight: 600;">Creative & Theatrical Arts Society</h4>
+                        <p class="text-muted" style="font-size: 0.92rem; line-height: 1.6;">
+                            Encourages expression through literature, dramatics, campus publication reviews, debate panels, and cultural evenings.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sports & Council Split Section -->
+<section id="sports" class="py-5" style="margin-top: 50px; background: rgba(15,23,42,0.15); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);">
+    <div class="container text-start">
+        <div class="row gy-5">
+            <!-- Left Column: Sports & Wellness -->
+            <div class="col-lg-6">
+                <h3 class="display-6 text-white mb-4" style="font-weight: 700;">Sports & Wellness</h3>
+                <p class="text-muted mb-4" style="line-height: 1.7;">
+                    Physical health is vital for creative focus. NED Academy features access to high-end indoor sports arenas, outdoor tracks, and wellness centers offering:
+                </p>
+                <ul class="list-unstyled d-flex flex-column gap-3 text-muted" style="font-size: 0.95rem;">
+                    <li><i class="fa-solid fa-circle-check text-gradient-cyan me-2"></i> Annual inter-departmental basketball and football leagues</li>
+                    <li><i class="fa-solid fa-circle-check text-gradient-cyan me-2"></i> Indoor badminton courts and table tennis setups</li>
+                    <li><i class="fa-solid fa-circle-check text-gradient-cyan me-2"></i> Dedicated wellness counselors and stress management circles</li>
+                </ul>
+            </div>
+            
+            <!-- Right Column: Student Council -->
+            <div id="council" class="col-lg-6 ps-lg-5">
+                <h3 class="display-6 text-white mb-4" style="font-weight: 700;">Student Council</h3>
+                <p class="text-muted mb-4">
+                    The Student Council is a democratically elected student panel that represents student issues, coordinates funding with directors, and plans campus events:
+                </p>
+                <div class="glass-card p-4 reveal-up" style="border-left: 3px solid var(--cyan);">
+                    <h5 class="text-light" style="font-weight:600;"><i class="fa-solid fa-handshake-angle text-gradient-cyan me-2"></i> Community Engagement</h5>
+                    <p class="text-muted m-0" style="font-size: 0.92rem; line-height: 1.5;">
+                        Our council coordinates weekly civic coding sprints where students write custom code blocks for local community organizations, clinics, and libraries.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

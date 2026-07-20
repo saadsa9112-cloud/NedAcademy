@@ -1,0 +1,208 @@
+is_global = true
+build_property.TargetFramework = net10.0
+build_property.TargetFramework = net10.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v10.0
+build_property.EntryPointFilePath = 
+build_property.RootNamespace = NedAcademyWebsite
+build_property.RootNamespace = NedAcademyWebsite
+build_property.ProjectDir = C:\Users\saads\Desktop\NedAcademyWebsite\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 10.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\saads\Desktop\NedAcademyWebsite
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 10.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/AuditLogs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQXVkaXRMb2dzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Backups.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQmFja3Vwcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Departments.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGVwYXJ0bWVudHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Downloads.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRG93bmxvYWRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Facilities.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRmFjaWxpdGllcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Faculty.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRmFjdWx0eS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/FAQs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRkFRcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/FormBuilder.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRm9ybUJ1aWxkZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Leadership.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTGVhZGVyc2hpcC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTG9naW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Media.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWVkaWEuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Messages.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWVzc2FnZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Navigation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTmF2aWdhdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/News.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTmV3cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/PageBuilder.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cUGFnZUJ1aWxkZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Programs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cUHJvZ3JhbXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/RecycleBin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cUmVjeWNsZUJpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Research.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cUmVzZWFyY2guY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Settings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cU2V0dGluZ3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/Structure.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cU3RydWN0dXJlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Admin/_AdminLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cX0FkbWluTGF5b3V0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/About.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBYm91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/Academics.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBY2FkZW1pY3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/Admissions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBZG1pc3Npb25zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/Contact.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxDb250YWN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/Downloads.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxEb3dubG9hZHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/Facilities.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxGYWNpbGl0aWVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/Faculty.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxGYWN1bHR5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/FAQs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxGQVFzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/Gallery.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxHYWxsZXJ5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/Leadership.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxMZWFkZXJzaGlwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/News.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxOZXdzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/Programs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcm9ncmFtcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/Research.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxSZXNlYXJjaC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/Scholarships.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxTY2hvbGFyc2hpcHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Home/StudentLife.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxTdHVkZW50TGlmZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/saads/Desktop/NedAcademyWebsite/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-8jvdziuo6e

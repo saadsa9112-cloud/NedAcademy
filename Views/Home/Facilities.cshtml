@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "State-of-the-Art Campus Facilities";
+}
+
+<!-- Premium Hero Banner -->
+<section class="py-5 position-relative" style="background: radial-gradient(circle at 10% 20%, rgba(0, 119, 255, 0.08) 0%, transparent 60%); border-bottom: 1px solid var(--glass-border); padding-top: 100px !important;">
+    <div class="container text-start">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-4 reveal-up">
+            <ol class="breadcrumb" style="margin: 0; background: transparent;">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-gradient-cyan text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Campus Facilities</li>
+            </ol>
+        </nav>
+        
+        <h1 class="display-3 text-white fw-bold mb-3 reveal-up" style="letter-spacing: -0.02em;">Campus Facilities</h1>
+        <p class="text-muted fs-5 m-0 max-width-600 reveal-up" style="line-height: 1.6;">
+            Explore our technology-driven infrastructure engineered for advanced research, learning, and student welfare.
+        </p>
+    </div>
+</section>
+
+@model IEnumerable<NedAcademyWebsite.Models.CampusFacility>
+@using NedAcademyWebsite.Models
+
+<!-- Facilities Cards Showcase -->
+<section class="py-5" style="margin-top: 50px; margin-bottom: 50px;">
+    <div class="container text-start">
+        <div class="row g-4">
+            
+            @{
+                int index = 0;
+                foreach (var facility in Model)
+                {
+                    var borderStyle = index % 2 == 0 ? "border-top: 2px solid var(--cyan);" : "border-top: 2px solid var(--royal-blue);";
+                    var iconBg = index % 2 == 0 ? "rgba(0, 242, 254, 0.08)" : "rgba(0, 119, 255, 0.08)";
+                    var textGrad = index % 2 == 0 ? "text-gradient-cyan" : "text-gradient-blue";
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="glass-card h-100 reveal-up d-flex flex-column justify-content-between" style="@borderStyle">
+                            <div>
+                                <div class="d-inline-flex align-items-center justify-content-center rounded-3 mb-4" style="width: 45px; height: 45px; background: @iconBg; border: 1px solid var(--glass-border);">
+                                    <i class="fa-solid @facility.IconClass @textGrad" style="font-size: 1.2rem;"></i>
+                                </div>
+                                <h4 class="text-light mb-3" style="font-weight: 600;">@facility.Title</h4>
+                                <p class="text-muted" style="font-size: 0.9rem; line-height: 1.5; margin: 0;">@facility.Description</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    index++;
+                }
+            }
+            
+        </div>
+    </div>
+</section>

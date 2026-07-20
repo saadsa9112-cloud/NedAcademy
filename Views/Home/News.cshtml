@@ -1,0 +1,85 @@
+@{
+    ViewData["Title"] = "News & Upcoming Events Hub";
+}
+
+<!-- Premium Hero Banner -->
+<section class="py-5 position-relative" style="background: radial-gradient(circle at 10% 20%, rgba(0, 119, 255, 0.08) 0%, transparent 60%); border-bottom: 1px solid var(--glass-border); padding-top: 100px !important;">
+    <div class="container text-start">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-4 reveal-up">
+            <ol class="breadcrumb" style="margin: 0; background: transparent;">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-gradient-cyan text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">News & Events</li>
+            </ol>
+        </nav>
+        
+        <h1 class="display-3 text-white fw-bold mb-3 reveal-up" style="letter-spacing: -0.02em;">News & Events</h1>
+        <p class="text-muted fs-5 m-0 max-width-600 reveal-up" style="line-height: 1.6;">
+            Stay updated with our computational breakthroughs, research publications, hackathons, and campus calendars.
+        </p>
+    </div>
+</section>
+
+@model IEnumerable<NedAcademyWebsite.Models.NewsItem>
+@using NedAcademyWebsite.Models
+
+<!-- Split Feed: News & Events -->
+<section class="py-5" style="margin-top: 50px; margin-bottom: 50px;">
+    <div class="container text-start">
+        <div class="row g-5">
+            
+            <!-- Left Side: Latest News -->
+            <div class="col-lg-7">
+                <h3 class="display-6 text-white mb-4" style="font-weight: 700;">Latest News</h3>
+                
+                <div class="d-flex flex-column gap-4">
+                    @foreach (var news in Model)
+                    {
+                        var badgeClass = news.Category.ToLower() == "partnership" ? "bg-success" : "bg-primary";
+                        <div class="glass-card p-4 reveal-up">
+                            <span class="text-muted font-headings" style="font-size: 0.8rem;"><i class="fa-solid fa-calendar-day me-1"></i> @news.PublishDate.ToString("MMMM dd, yyyy")</span>
+                            <h4 class="text-light mt-2 mb-3" style="font-weight: 600; font-size: 1.3rem;">@news.Title</h4>
+                            <p class="text-muted mb-3" style="font-size: 0.92rem; line-height: 1.6;">
+                                @news.Content
+                            </p>
+                            <span class="badge @badgeClass px-3 py-1 font-headings text-uppercase" style="font-size: 0.65rem; letter-spacing:0.05em;">@news.Category</span>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <!-- Right Side: Upcoming Events -->
+            <div class="col-lg-5 ps-lg-4">
+                <h3 class="display-6 text-white mb-4" style="font-weight: 700;">Upcoming Events</h3>
+                
+                <div class="d-flex flex-column gap-3">
+                    @if (ViewBag.Events != null)
+                    {
+                        int index = 0;
+                        foreach (var ev in (List<EventItem>)ViewBag.Events)
+                        {
+                            var dateBg = index % 2 == 0 ? "bg-primary" : "background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.2);";
+                            var dateColor = index % 2 == 0 ? "text-white" : "text-gradient-cyan";
+                            var dateMuted = index % 2 == 0 ? "text-white-50" : "text-gradient-cyan";
+                            
+                            <div class="glass-card p-4 reveal-up d-flex gap-3 align-items-start">
+                                <div class="d-flex flex-column align-items-center justify-content-center text-center rounded-3" style="width: 60px; height: 60px; flex-shrink: 0; @dateBg">
+                                    <span class="fw-bold font-headings @dateColor" style="font-size: 1.15rem; line-height: 1;">@ev.Date.ToString("dd")</span>
+                                    <span class="text-uppercase font-headings @dateMuted" style="font-size: 0.7rem; font-weight:600;">@ev.Date.ToString("MMM")</span>
+                                </div>
+                                <div>
+                                    <h5 class="text-light mb-1" style="font-weight: 600; font-size: 1.1rem;">@ev.Title</h5>
+                                    <p class="text-muted m-0" style="font-size: 0.85rem;"><i class="fa-solid fa-clock me-1"></i> @ev.TimeString</p>
+                                    <p class="text-muted m-0" style="font-size: 0.85rem;"><i class="fa-solid fa-location-dot me-1"></i> @ev.Venue</p>
+                                </div>
+                            </div>
+                            index++;
+                        }
+                    }
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+

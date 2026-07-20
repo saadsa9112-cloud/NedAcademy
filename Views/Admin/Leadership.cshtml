@@ -1,0 +1,219 @@
+@model IEnumerable<NedAcademyWebsite.Models.Leadership>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Manage Leadership Directory";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-5 reveal-up">
+    <div>
+        <h1 class="display-5 font-headings fw-bold m-0 text-white">Manage Leadership</h1>
+        <p class="text-muted m-0">Create, update, or remove Academy directors and board members profiles.</p>
+    </div>
+    <div>
+        <button class="btn btn-cyber font-headings px-4 py-2" data-bs-toggle="modal" data-bs-target="#createModal">
+            <i class="fa-solid fa-plus me-1"></i> Add Leader
+        </button>
+    </div>
+</div>
+
+<div class="glass-card p-4 reveal-up">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover table-borderless m-0" style="background:transparent; vertical-align:middle;">
+            <thead>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.85rem;" class="text-muted text-uppercase font-headings">
+                    <th>Photo Path/Initials</th>
+                    <th>Name</th>
+                    <th>Designation</th>
+                    <th>Qualification</th>
+                    <th>Sort Rank</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No leadership board profiles registered yet.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.03); font-size:0.95rem;">
+                            <td>
+                                <div class="rounded-circle text-center d-flex align-items-center justify-content-center text-white font-headings" 
+                                     style="width:45px; height:45px; background:linear-gradient(135deg, rgba(0, 242, 254, 0.1) 0%, rgba(0, 119, 255, 0.15) 100%); border:1px solid var(--glass-border); font-size:1.1rem; font-weight:700;">
+                                    @item.PhotoPath
+                                </div>
+                            </td>
+                            <td class="fw-semibold text-light">@item.Name</td>
+                            <td class="text-muted">@item.Designation</td>
+                            <td class="text-muted" style="max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">@item.Qualification</td>
+                            <td class="text-muted">@item.Rank</td>
+                            <td class="text-end">
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <button class="btn btn-cyber-outline py-1 px-3" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editModal" 
+                                            data-id="@item.Id" 
+                                            data-name="@item.Name" 
+                                            data-designation="@item.Designation" 
+                                            data-qualification="@item.Qualification" 
+                                            data-email="@item.Email" 
+                                            data-biography="@item.Biography" 
+                                            data-photopath="@item.PhotoPath" 
+                                            data-rank="@item.Rank" 
+                                            style="font-size:0.8rem;">
+                                        <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+                                    </button>
+                                    
+                                    <form asp-action="DeleteLeadership" method="post" onsubmit="return confirm('Confirm deletion of this leadership board profile?');" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-outline-danger py-1 px-3" style="font-size:0.8rem;">
+                                            <i class="fa-solid fa-trash-can me-1"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content glass-card border-0 p-4" style="background:#090f20; color:#fff;">
+            <div class="modal-header border-0 p-0 mb-4 justify-content-between">
+                <h4 class="modal-title font-headings fw-bold">Add Board Member</h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="CreateLeadership" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-0 d-flex flex-column gap-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Full Name</label>
+                            <input type="text" name="Name" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Email Contact</label>
+                            <input type="email" name="Email" class="form-control" required />
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Designation Title</label>
+                            <input type="text" name="Designation" class="form-control" placeholder="e.g. Dean of Planning Board" required />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Avatar/Initials</label>
+                            <input type="text" name="PhotoPath" class="form-control" placeholder="e.g. NA" maxlength="5" required />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Sort Rank (1=Founder)</label>
+                            <input type="number" name="Rank" class="form-control" value="2" required />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Qualifications</label>
+                        <input type="text" name="Qualification" class="form-control" placeholder="e.g. Ph.D. in Governance (Loughborough, UK)" required />
+                    </div>
+
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Founder Statement / Profile Biography</label>
+                        <textarea name="Biography" rows="4" class="form-control" placeholder="Founder speech or description..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-0 mt-4">
+                    <button type="button" class="btn btn-cyber-outline" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-cyber">Save Board Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content glass-card border-0 p-4" style="background:#090f20; color:#fff;">
+            <div class="modal-header border-0 p-0 mb-4 justify-content-between">
+                <h4 class="modal-title font-headings fw-bold">Edit Board Profile</h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="EditLeadership" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" id="editId" />
+                <div class="modal-body p-0 d-flex flex-column gap-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Full Name</label>
+                            <input type="text" name="Name" id="editName" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Email Contact</label>
+                            <input type="email" name="Email" id="editEmail" class="form-control" required />
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Designation Title</label>
+                            <input type="text" name="Designation" id="editDesignation" class="form-control" required />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Avatar/Initials</label>
+                            <input type="text" name="PhotoPath" id="editPhotoPath" class="form-control" required />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Sort Rank</label>
+                            <input type="number" name="Rank" id="editRank" class="form-control" required />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Qualifications</label>
+                        <input type="text" name="Qualification" id="editQualification" class="form-control" required />
+                    </div>
+
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Founder Statement / Profile Biography</label>
+                        <textarea name="Biography" id="editBiography" rows="4" class="form-control" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-0 mt-4">
+                    <button type="button" class="btn btn-cyber-outline" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-cyber">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const editModal = document.getElementById('editModal');
+        if (editModal) {
+            editModal.addEventListener('show.bs.modal', (e) => {
+                const trigger = e.relatedTarget;
+                
+                document.getElementById('editId').value = trigger.getAttribute('data-id');
+                document.getElementById('editName').value = trigger.getAttribute('data-name');
+                document.getElementById('editDesignation').value = trigger.getAttribute('data-designation');
+                document.getElementById('editQualification').value = trigger.getAttribute('data-qualification');
+                document.getElementById('editEmail').value = trigger.getAttribute('data-email');
+                document.getElementById('editBiography').value = trigger.getAttribute('data-biography');
+                document.getElementById('editPhotoPath').value = trigger.getAttribute('data-photopath');
+                document.getElementById('editRank').value = trigger.getAttribute('data-rank');
+            });
+        }
+    </script>
+}

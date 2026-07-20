@@ -1,0 +1,352 @@
+@model IEnumerable<NedAcademyWebsite.Models.NewsItem>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Manage News & Events Feed";
+    var events = (List<NedAcademyWebsite.Models.EventItem>)ViewBag.Events;
+}
+
+<div class="mb-5 reveal-up">
+    <h1 class="display-5 font-headings fw-bold m-0 text-white">News & Events Hub</h1>
+    <p class="text-muted">Broadcast campus alerts, achievements, research publications, or calendar milestones.</p>
+</div>
+
+<!-- Tabs Controls -->
+<ul class="nav nav-pills gap-2 mb-4 font-headings reveal-up" id="hubTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="btn btn-cyber-outline active px-4 py-2" id="news-tab" data-bs-toggle="pill" data-bs-target="#newsPanel" type="button" role="tab" aria-selected="true">
+            <i class="fa-solid fa-newspaper me-1"></i> News Feed
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="btn btn-cyber-outline px-4 py-2" id="events-tab" data-bs-toggle="pill" data-bs-target="#eventsPanel" type="button" role="tab" aria-selected="false">
+            <i class="fa-solid fa-calendar-days me-1"></i> Scheduled Events
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="hubTabsContent">
+    
+    <!-- News Panel -->
+    <div class="tab-pane fade show active" id="newsPanel" role="tabpanel" aria-labelledby="news-tab">
+        <div class="glass-card p-4 reveal-up">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="text-white font-headings fw-bold m-0">Active News Articles</h4>
+                <button class="btn btn-cyber py-2 px-3" data-bs-toggle="modal" data-bs-target="#createNewsModal">
+                    <i class="fa-solid fa-plus me-1"></i> Publish News
+                </button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-dark table-hover table-borderless m-0" style="background:transparent; vertical-align:middle;">
+                    <thead>
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.85rem;" class="text-muted text-uppercase font-headings">
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Headline Title</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No news updates published yet.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr style="border-bottom:1px solid rgba(255,255,255,0.03); font-size:0.95rem;">
+                                    <td class="text-muted">@item.PublishDate.ToString("yyyy-MM-dd")</td>
+                                    <td><span class="badge bg-primary px-2 py-1 font-headings">@item.Category</span></td>
+                                    <td class="fw-semibold text-light">@item.Title</td>
+                                    <td class="text-end">
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <button class="btn btn-cyber-outline py-1 px-3" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#editNewsModal" 
+                                                    data-id="@item.Id" 
+                                                    data-title="@item.Title" 
+                                                    data-content="@item.Content" 
+                                                    data-date="@item.PublishDate.ToString("yyyy-MM-dd")" 
+                                                    data-category="@item.Category" 
+                                                    style="font-size:0.8rem;">
+                                                <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+                                            </button>
+                                            
+                                            <form asp-action="DeleteNews" method="post" onsubmit="return confirm('Confirm deletion of this news post?');" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn btn-outline-danger py-1 px-3" style="font-size:0.8rem;">
+                                                    <i class="fa-solid fa-trash-can me-1"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Events Panel -->
+    <div class="tab-pane fade" id="eventsPanel" role="tabpanel" aria-labelledby="events-tab">
+        <div class="glass-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="text-white font-headings fw-bold m-0">Scheduled Calendar Events</h4>
+                <button class="btn btn-cyber py-2 px-3" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                    <i class="fa-solid fa-plus me-1"></i> Schedule Event
+                </button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-dark table-hover table-borderless m-0" style="background:transparent; vertical-align:middle;">
+                    <thead>
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.85rem;" class="text-muted text-uppercase font-headings">
+                            <th>Date</th>
+                            <th>Timing</th>
+                            <th>Event Name</th>
+                            <th>Venue</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (events == null || !events.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">No scheduled events on database registry.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in events)
+                            {
+                                <tr style="border-bottom:1px solid rgba(255,255,255,0.03); font-size:0.95rem;">
+                                    <td class="text-muted">@item.Date.ToString("yyyy-MM-dd")</td>
+                                    <td class="text-muted">@item.TimeString</td>
+                                    <td class="fw-semibold text-light">@item.Title</td>
+                                    <td><span class="badge bg-secondary font-headings">@item.Venue</span></td>
+                                    <td class="text-end">
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <button class="btn btn-cyber-outline py-1 px-3" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#editEventModal" 
+                                                    data-id="@item.Id" 
+                                                    data-title="@item.Title" 
+                                                    data-date="@item.Date.ToString("yyyy-MM-dd")" 
+                                                    data-time="@item.TimeString" 
+                                                    data-venue="@item.Venue" 
+                                                    data-desc="@item.Description" 
+                                                    style="font-size:0.8rem;">
+                                                <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+                                            </button>
+                                            
+                                            <form asp-action="DeleteEvent" method="post" onsubmit="return confirm('Confirm cancellation of this event?');" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn btn-outline-danger py-1 px-3" style="font-size:0.8rem;">
+                                                    <i class="fa-solid fa-trash-can me-1"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create News Modal -->
+<div class="modal fade" id="createNewsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card border-0 p-4" style="background:#090f20; color:#fff;">
+            <div class="modal-header border-0 p-0 mb-4 justify-content-between">
+                <h4 class="modal-title font-headings fw-bold">Publish News Post</h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="CreateNews" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-0 d-flex flex-column gap-3">
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">News Category</label>
+                        <input type="text" name="Category" class="form-control" placeholder="e.g. Research, Infrastructure, Partnership" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Headline Title</label>
+                        <input type="text" name="Title" class="form-control" placeholder="News Headline" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Publish Date</label>
+                        <input type="date" name="PublishDate" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Article Content</label>
+                        <textarea name="Content" rows="5" class="form-control" placeholder="Write full details..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-0 mt-4">
+                    <button type="button" class="btn btn-cyber-outline" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-cyber">Publish Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit News Modal -->
+<div class="modal fade" id="editNewsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card border-0 p-4" style="background:#090f20; color:#fff;">
+            <div class="modal-header border-0 p-0 mb-4 justify-content-between">
+                <h4 class="modal-title font-headings fw-bold">Edit News Update</h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="EditNews" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" id="editNewsId" />
+                <div class="modal-body p-0 d-flex flex-column gap-3">
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">News Category</label>
+                        <input type="text" name="Category" id="editNewsCategory" class="form-control" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Headline Title</label>
+                        <input type="text" name="Title" id="editNewsTitle" class="form-control" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Publish Date</label>
+                        <input type="date" name="PublishDate" id="editNewsDate" class="form-control" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Article Content</label>
+                        <textarea name="Content" id="editNewsContent" rows="5" class="form-control" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-0 mt-4">
+                    <button type="button" class="btn btn-cyber-outline" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-cyber">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Create Event Modal -->
+<div class="modal fade" id="createEventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card border-0 p-4" style="background:#090f20; color:#fff;">
+            <div class="modal-header border-0 p-0 mb-4 justify-content-between">
+                <h4 class="modal-title font-headings fw-bold">Schedule Campus Event</h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="CreateEvent" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-0 d-flex flex-column gap-3">
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Event Title</label>
+                        <input type="text" name="Title" class="form-control" placeholder="AI Symposium" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Event Date</label>
+                        <input type="date" name="Date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Timing String</label>
+                        <input type="text" name="TimeString" class="form-control" placeholder="e.g. 10:00 AM - 04:00 PM" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Venue Location</label>
+                        <input type="text" name="Venue" class="form-control" placeholder="Main Auditorium" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Short Description</label>
+                        <textarea name="Description" rows="3" class="form-control" placeholder="Details..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-0 mt-4">
+                    <button type="button" class="btn btn-cyber-outline" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-cyber">Schedule Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Event Modal -->
+<div class="modal fade" id="editEventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card border-0 p-4" style="background:#090f20; color:#fff;">
+            <div class="modal-header border-0 p-0 mb-4 justify-content-between">
+                <h4 class="modal-title font-headings fw-bold">Edit Event Details</h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="EditEvent" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" id="editEventId" />
+                <div class="modal-body p-0 d-flex flex-column gap-3">
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Event Title</label>
+                        <input type="text" name="Title" id="editEventTitle" class="form-control" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Event Date</label>
+                        <input type="date" name="Date" id="editEventDate" class="form-control" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Timing String</label>
+                        <input type="text" name="TimeString" id="editEventTime" class="form-control" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Venue Location</label>
+                        <input type="text" name="Venue" id="editEventVenue" class="form-control" required />
+                    </div>
+                    <div>
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Short Description</label>
+                        <textarea name="Description" id="editEventDesc" rows="3" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-0 mt-4">
+                    <button type="button" class="btn btn-cyber-outline" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-cyber">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const editNewsModal = document.getElementById('editNewsModal');
+        if (editNewsModal) {
+            editNewsModal.addEventListener('show.bs.modal', (e) => {
+                const trigger = e.relatedTarget;
+                document.getElementById('editNewsId').value = trigger.getAttribute('data-id');
+                document.getElementById('editNewsTitle').value = trigger.getAttribute('data-title');
+                document.getElementById('editNewsContent').value = trigger.getAttribute('data-content');
+                document.getElementById('editNewsDate').value = trigger.getAttribute('data-date');
+                document.getElementById('editNewsCategory').value = trigger.getAttribute('data-category');
+            });
+        }
+
+        const editEventModal = document.getElementById('editEventModal');
+        if (editEventModal) {
+            editEventModal.addEventListener('show.bs.modal', (e) => {
+                const trigger = e.relatedTarget;
+                document.getElementById('editEventId').value = trigger.getAttribute('data-id');
+                document.getElementById('editEventTitle').value = trigger.getAttribute('data-title');
+                document.getElementById('editEventDate').value = trigger.getAttribute('data-date');
+                document.getElementById('editEventTime').value = trigger.getAttribute('data-time');
+                document.getElementById('editEventVenue').value = trigger.getAttribute('data-venue');
+                document.getElementById('editEventDesc').value = trigger.getAttribute('data-desc');
+            });
+        }
+    </script>
+}

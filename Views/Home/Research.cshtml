@@ -1,0 +1,134 @@
+@{
+    ViewData["Title"] = "Research Labs & Computational Innovation";
+}
+
+<!-- Premium Hero Banner -->
+<section class="py-5 position-relative" style="background: radial-gradient(circle at 10% 20%, rgba(0, 119, 255, 0.08) 0%, transparent 60%); border-bottom: 1px solid var(--glass-border); padding-top: 100px !important;">
+    <div class="container text-start">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-4 reveal-up">
+            <ol class="breadcrumb" style="margin: 0; background: transparent;">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-gradient-cyan text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Research & Innovation</li>
+            </ol>
+        </nav>
+        
+        <h1 class="display-3 text-white fw-bold mb-3 reveal-up" style="letter-spacing: -0.02em;">Research & Innovation</h1>
+        <p class="text-muted fs-5 m-0 max-width-600 reveal-up" style="line-height: 1.6;">
+            Bridging fundamental computing architectures with active industry engineering implementations.
+        </p>
+    </div>
+</section>
+
+@model IEnumerable<NedAcademyWebsite.Models.ResearchItem>
+@using NedAcademyWebsite.Models
+
+<!-- Research Lab Cards Grid -->
+<section class="py-5" style="margin-top: 50px;">
+    <div class="container text-start">
+        <div class="text-center mb-5 max-width-600 mx-auto">
+            <h2 class="display-5 text-white mb-3" style="font-weight: 700;">Futuristic Research Labs</h2>
+            <p class="text-muted">State-of-the-art facilities equipped for cluster simulation, hardware analysis, and systems validation.</p>
+        </div>
+        
+        <div class="row g-4">
+            @{
+                var labs = Model.Where(r => r.Category.ToLower() == "lab").ToList();
+                int labIndex = 0;
+                foreach (var lab in labs)
+                {
+                    var borderStyle = labIndex % 2 == 0 ? "border-top: 3px solid var(--cyan);" : "border-top: 3px solid var(--royal-blue);";
+                    var iconClass = labIndex % 3 == 0 ? "fa-microchip" : (labIndex % 3 == 1 ? "fa-shield-halved" : "fa-network-wired");
+                    var textGrad = labIndex % 2 == 0 ? "text-gradient-cyan" : "text-gradient-blue";
+                    var iconBg = labIndex % 2 == 0 ? "rgba(0, 242, 254, 0.08)" : "rgba(0, 119, 255, 0.08)";
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="glass-card h-100 reveal-up d-flex flex-column justify-content-between" style="@borderStyle">
+                            <div>
+                                <div class="d-inline-flex align-items-center justify-content-center rounded-3 mb-4" style="width: 50px; height: 50px; background: @iconBg; border: 1px solid var(--glass-border);">
+                                    <i class="fa-solid @iconClass @textGrad" style="font-size: 1.3rem;"></i>
+                                </div>
+                                <h4 class="text-light mb-3" style="font-weight: 600;">@lab.Title</h4>
+                                <p class="text-muted" style="font-size: 0.92rem; line-height: 1.6; margin: 0;">
+                                    @lab.Description
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    labIndex++;
+                }
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Active Research Projects -->
+<section class="py-5" style="margin-top: 50px; background: rgba(15,23,42,0.15); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);">
+    <div class="container text-start">
+        <div class="text-center mb-5 max-width-600 mx-auto">
+            <h2 class="display-5 text-white mb-3" style="font-weight: 700;">Active Projects</h2>
+            <p class="text-muted">A look at some of our current academic projects addressing core system inefficiencies.</p>
+        </div>
+        
+        <div class="row g-4">
+            @{
+                var projects = Model.Where(r => r.Category.ToLower() == "project").ToList();
+                int projIndex = 0;
+                foreach (var project in projects)
+                {
+                    var textGrad = projIndex % 2 == 0 ? "text-gradient-cyan" : "text-gradient-blue";
+                    var categoryName = projIndex % 2 == 0 ? "Infrastructure Automation" : "Machine Intelligence";
+                    
+                    <div class="col-md-6">
+                        <div class="glass-card p-4 h-100 reveal-up">
+                            <span class="@textGrad font-headings fw-bold mb-2 d-block" style="font-size: 0.8rem; text-transform: uppercase;">@categoryName</span>
+                            <h4 class="text-light mb-3" style="font-weight: 600;">@project.Title</h4>
+                            <p class="text-muted" style="font-size: 0.92rem; line-height: 1.6;">
+                                @project.Description
+                            </p>
+                        </div>
+                    </div>
+                    projIndex++;
+                }
+            }
+        </div>
+    </div>
+</section>
+
+
+<!-- Industry Alliances -->
+<section class="py-5 mb-5" style="margin-top: 50px;">
+    <div class="container text-start">
+        <div class="text-center mb-5 max-width-600 mx-auto">
+            <h2 class="display-5 text-white mb-3" style="font-weight: 700;">Industry Partnerships</h2>
+            <p class="text-muted">We collaborate with global entities to provide infrastructure credits and remote internship paths.</p>
+        </div>
+        
+        <div class="row g-4 text-center justify-content-center align-items-center">
+            <!-- Partnership 1 -->
+            <div class="col-lg-3 col-md-6 col-6">
+                <div class="glass-card p-4 d-flex align-items-center justify-content-center font-headings text-uppercase text-muted" style="min-height: 100px; font-weight:700; letter-spacing: 0.1em; font-size: 1rem; border-color: rgba(255,255,255,0.04);">
+                    Cloud Infrastructure
+                </div>
+            </div>
+            <!-- Partnership 2 -->
+            <div class="col-lg-3 col-md-6 col-6">
+                <div class="glass-card p-4 d-flex align-items-center justify-content-center font-headings text-uppercase text-muted" style="min-height: 100px; font-weight:700; letter-spacing: 0.1em; font-size: 1rem; border-color: rgba(255,255,255,0.04);">
+                    Silicon Systems
+                </div>
+            </div>
+            <!-- Partnership 3 -->
+            <div class="col-lg-3 col-md-6 col-6">
+                <div class="glass-card p-4 d-flex align-items-center justify-content-center font-headings text-uppercase text-muted" style="min-height: 100px; font-weight:700; letter-spacing: 0.1em; font-size: 1rem; border-color: rgba(255,255,255,0.04);">
+                    Cyber Hardening
+                </div>
+            </div>
+            <!-- Partnership 4 -->
+            <div class="col-lg-3 col-md-6 col-6">
+                <div class="glass-card p-4 d-flex align-items-center justify-content-center font-headings text-uppercase text-muted" style="min-height: 100px; font-weight:700; letter-spacing: 0.1em; font-size: 1rem; border-color: rgba(255,255,255,0.04);">
+                    Grid Solutions
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

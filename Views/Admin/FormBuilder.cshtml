@@ -1,0 +1,137 @@
+@model IEnumerable<NedAcademyWebsite.Models.CustomForm>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Dynamic Form Builder Engine";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-5 reveal-up">
+    <div>
+        <h1 class="display-5 font-headings fw-bold m-0 text-white">Dynamic Form Builder</h1>
+        <p class="text-muted m-0">Build, configure, and customize dynamic form inputs for Admissions and Inquiries without writing code.</p>
+    </div>
+</div>
+
+@foreach (var form in Model)
+{
+    <div class="glass-card p-4 mb-4 reveal-up">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="text-white font-headings fw-bold m-0">@form.FormName</h3>
+                <small class="text-muted font-monospace">Form Key: @form.FormKey | @form.Fields.Count Active Inputs</small>
+            </div>
+            <button class="btn btn-cyber py-2 px-3 font-headings" data-bs-toggle="modal" data-bs-target="#createFieldModal-@form.Id">
+                <i class="fa-solid fa-plus me-1"></i> Add Custom Field
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-dark table-hover table-borderless m-0" style="background:transparent; vertical-align:middle;">
+                <thead>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.85rem;" class="text-muted text-uppercase font-headings">
+                        <th>Sort</th>
+                        <th>Field Label</th>
+                        <th>Type</th>
+                        <th>Key Name</th>
+                        <th>Required</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!form.Fields.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">No custom form fields registered. Click 'Add Custom Field' above.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var f in form.Fields.OrderBy(x => x.SortOrder))
+                        {
+                            <tr style="border-bottom:1px solid rgba(255,255,255,0.03); font-size:0.95rem;">
+                                <td class="text-muted font-monospace">#@f.SortOrder</td>
+                                <td class="fw-semibold text-light">@f.FieldLabel</td>
+                                <td><span class="badge bg-primary px-2 py-1 font-headings">@f.FieldType</span></td>
+                                <td class="font-monospace text-muted" style="font-size:0.85rem;">@f.FieldName</td>
+                                <td>
+                                    @if (f.IsRequired)
+                                    {
+                                        <span class="badge bg-danger bg-opacity-20 text-danger px-2 py-1">Required</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary bg-opacity-20 text-muted px-2 py-1">Optional</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <form asp-action="DeleteFormField" method="post" onsubmit="return confirm('Remove this custom field?');" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@f.Id" />
+                                        <button type="submit" class="btn btn-outline-danger py-1 px-3" style="font-size:0.8rem;">
+                                            <i class="fa-solid fa-trash-can me-1"></i> Remove
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add Field Modal -->
+        <div class="modal fade" id="createFieldModal-@form.Id" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content glass-card border-0 p-4" style="background:#090f20; color:#fff;">
+                    <div class="modal-header border-0 p-0 mb-4 justify-content-between">
+                        <h4 class="modal-title font-headings fw-bold">Add Custom Form Field</h4>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form asp-action="CreateFormField" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="CustomFormId" value="@form.Id" />
+                        <div class="modal-body p-0 d-flex flex-column gap-3">
+                            <div>
+                                <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Field Label</label>
+                                <input type="text" name="FieldLabel" class="form-control" placeholder="e.g. CNIC / Passport Number" required />
+                            </div>
+                            <div>
+                                <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Field Key Name</label>
+                                <input type="text" name="FieldName" class="form-control font-monospace" placeholder="e.g. CNICNumber" required />
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Field Input Type</label>
+                                    <select name="FieldType" class="form-select" required>
+                                        <option value="Text">Text Input</option>
+                                        <option value="Number">Number Input</option>
+                                        <option value="Email">Email Input</option>
+                                        <option value="Dropdown">Dropdown List</option>
+                                        <option value="FileUpload">File Upload</option>
+                                        <option value="Checkbox">Checkbox</option>
+                                        <option value="Date">Date Picker</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Sort Order</label>
+                                    <input type="number" name="SortOrder" class="form-control" value="10" required />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Dropdown Options CSV (If Dropdown)</label>
+                                <input type="text" name="OptionsCsv" class="form-control" placeholder="e.g. BS, MS, PhD" />
+                            </div>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" name="IsRequired" value="true" id="req-@form.Id" />
+                                <label class="form-check-label text-light font-headings" for="req-@form.Id">Mark Field as Required</label>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 p-0 mt-4">
+                            <button type="button" class="btn btn-cyber-outline" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-cyber">Save Custom Field</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}

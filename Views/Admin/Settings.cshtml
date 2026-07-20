@@ -1,0 +1,236 @@
+@model NedAcademyWebsite.Models.SystemSetting
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "10-Grouped System Settings Console";
+}
+
+<div class="mb-5 reveal-up">
+    <h1 class="display-5 font-headings fw-bold m-0 text-white">System Settings Console</h1>
+    <p class="text-muted">Configure university metadata, branding, hero CMS banners, footer copyrights, contact coordinates, and social media.</p>
+</div>
+
+<form asp-action="Settings" method="post" class="reveal-up">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <!-- 10 Grouped Navigation Pills -->
+    <ul class="nav nav-pills gap-2 mb-4 font-headings" id="settingsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="btn btn-cyber-outline active py-2 px-3" id="tab-general-btn" data-bs-toggle="pill" data-bs-target="#tab-general" type="button" role="tab">
+                <i class="fa-solid fa-sliders me-1"></i> 1. General
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="btn btn-cyber-outline py-2 px-3" id="tab-branding-btn" data-bs-toggle="pill" data-bs-target="#tab-branding" type="button" role="tab">
+                <i class="fa-solid fa-paintbrush me-1"></i> 2. Branding
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="btn btn-cyber-outline py-2 px-3" id="tab-hero-btn" data-bs-toggle="pill" data-bs-target="#tab-hero" type="button" role="tab">
+                <i class="fa-solid fa-star me-1"></i> 3. Homepage & Hero
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="btn btn-cyber-outline py-2 px-3" id="tab-contact-btn" data-bs-toggle="pill" data-bs-target="#tab-contact" type="button" role="tab">
+                <i class="fa-solid fa-address-book me-1"></i> 4. Contact
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="btn btn-cyber-outline py-2 px-3" id="tab-about-btn" data-bs-toggle="pill" data-bs-target="#tab-about" type="button" role="tab">
+                <i class="fa-solid fa-building-columns me-1"></i> 5. About & Speech
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="btn btn-cyber-outline py-2 px-3" id="tab-footer-btn" data-bs-toggle="pill" data-bs-target="#tab-footer" type="button" role="tab">
+                <i class="fa-solid fa-align-bottom me-1"></i> 6. Footer
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="btn btn-cyber-outline py-2 px-3" id="tab-social-btn" data-bs-toggle="pill" data-bs-target="#tab-social" type="button" role="tab">
+                <i class="fa-solid fa-share-nodes me-1"></i> 7. Social Media
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="btn btn-cyber-outline py-2 px-3" id="tab-theme-btn" data-bs-toggle="pill" data-bs-target="#tab-theme" type="button" role="tab">
+                <i class="fa-solid fa-palette me-1"></i> 8. Theme Options
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="btn btn-cyber-outline py-2 px-3" id="tab-analytics-btn" data-bs-toggle="pill" data-bs-target="#tab-analytics" type="button" role="tab">
+                <i class="fa-solid fa-chart-line me-1"></i> 9. Analytics
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="btn btn-cyber-outline py-2 px-3" id="tab-maintenance-btn" data-bs-toggle="pill" data-bs-target="#tab-maintenance" type="button" role="tab">
+                <i class="fa-solid fa-shield-halved me-1"></i> 10. Maintenance
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tabs Content Container -->
+    <div class="glass-card p-4">
+        <div class="tab-content" id="settingsTabContent">
+            
+            <!-- Tab 1: General -->
+            <div class="tab-pane fade show active" id="tab-general" role="tabpanel">
+                <h4 class="text-gradient-cyan font-headings fw-bold mb-3">General Configuration</h4>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">University Name</label>
+                        <input asp-for="UniversityName" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">University Slogan</label>
+                        <input asp-for="Slogan" class="form-control" required />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Branding -->
+            <div class="tab-pane fade" id="tab-branding" role="tabpanel">
+                <h4 class="text-gradient-cyan font-headings fw-bold mb-3">Branding & Assets</h4>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Main Logo Path</label>
+                        <input asp-for="LogoPath" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Dark Theme Logo Path</label>
+                        <input asp-for="LogoDarkPath" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Favicon Icon Path</label>
+                        <input asp-for="FaviconPath" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Homepage & Hero -->
+            <div class="tab-pane fade" id="tab-hero" role="tabpanel">
+                <h4 class="text-gradient-cyan font-headings fw-bold mb-3">Homepage & Hero Section CMS</h4>
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Hero Header Title</label>
+                        <input asp-for="HeroTitle" class="form-control" required />
+                    </div>
+                    <div class="col-md-12">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Hero Sub-caption Paragraph</label>
+                        <textarea asp-for="HeroSubtitle" rows="3" class="form-control" required></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Hero Video Loop URL</label>
+                        <input asp-for="HeroVideoPath" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Hero Banner Image URL</label>
+                        <input asp-for="HeroImagePath" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4: Contact -->
+            <div class="tab-pane fade" id="tab-contact" role="tabpanel">
+                <h4 class="text-gradient-cyan font-headings fw-bold mb-3">Contact Coordinates & Coordinates</h4>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Helpline Email</label>
+                        <input asp-for="ContactEmail" type="email" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Helpline Phone</label>
+                        <input asp-for="ContactPhone" class="form-control" required />
+                    </div>
+                    <div class="col-md-12">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Campus Address</label>
+                        <input asp-for="Address" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Maps Latitude</label>
+                        <input asp-for="MapsLatitude" type="number" step="any" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Maps Longitude</label>
+                        <input asp-for="MapsLongitude" type="number" step="any" class="form-control" required />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 5: About & Speech -->
+            <div class="tab-pane fade" id="tab-about" role="tabpanel">
+                <h4 class="text-gradient-cyan font-headings fw-bold mb-3">About Us Manifestos & Vision Statements</h4>
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Founder & Patron Manifesto Speech</label>
+                        <textarea asp-for="AboutManifesto" rows="4" class="form-control"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Corporate Vision</label>
+                        <textarea asp-for="AboutVision" rows="4" class="form-control"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Corporate Mission</label>
+                        <textarea asp-for="AboutMission" rows="4" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 6: Footer -->
+            <div class="tab-pane fade" id="tab-footer" role="tabpanel">
+                <h4 class="text-gradient-cyan font-headings fw-bold mb-3">Footer Configuration</h4>
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Copyright Text</label>
+                        <input asp-for="FooterCopyrightText" class="form-control" required />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 7: Social Media -->
+            <div class="tab-pane fade" id="tab-social" role="tabpanel">
+                <h4 class="text-gradient-cyan font-headings fw-bold mb-3">Social Links</h4>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">Facebook URL</label>
+                        <input asp-for="SocialFacebook" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">X (Twitter) URL</label>
+                        <input asp-for="SocialX" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">LinkedIn URL</label>
+                        <input asp-for="SocialLinkedIn" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted font-headings mb-1" style="font-size:0.8rem; font-weight:600; text-transform:uppercase;">YouTube URL</label>
+                        <input asp-for="SocialYouTube" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 8: Theme Options -->
+            <div class="tab-pane fade" id="tab-theme" role="tabpanel">
+                <h4 class="text-gradient-cyan font-headings fw-bold mb-3">Theme Options</h4>
+                <p class="text-muted">High-contrast light & obsidian dark theme parameters are active globally.</p>
+            </div>
+
+            <!-- Tab 9: Analytics -->
+            <div class="tab-pane fade" id="tab-analytics" role="tabpanel">
+                <h4 class="text-gradient-cyan font-headings fw-bold mb-3">Analytics & Tracking</h4>
+                <p class="text-muted">Configure Google Analytics or custom site performance tracking scripts.</p>
+            </div>
+
+            <!-- Tab 10: Maintenance -->
+            <div class="tab-pane fade" id="tab-maintenance" role="tabpanel">
+                <h4 class="text-gradient-cyan font-headings fw-bold mb-3">Maintenance Mode Control</h4>
+                <p class="text-muted">Public portal is active and online.</p>
+            </div>
+        </div>
+
+        <div class="mt-4 pt-3" style="border-top:1px solid rgba(255,255,255,0.06);">
+            <button type="submit" class="btn btn-cyber px-5 py-2 font-headings text-uppercase" style="font-size:0.85rem;">
+                <i class="fa-solid fa-cloud-arrow-up me-2"></i> Save All Settings
+            </button>
+        </div>
+    </div>
+</form>
