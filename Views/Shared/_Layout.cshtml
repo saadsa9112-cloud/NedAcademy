@@ -172,26 +172,56 @@
                             <a class="nav-link-custom @(currentAction == "Contact" ? "active" : "")" asp-controller="Home" asp-action="Contact">Contact</a>
                         </li>
 
-                        <!-- Admin Portal Link (Glass Capsule Button) -->
-                        <li class="nav-item-custom">
-                            <a class="nav-admin-btn" asp-controller="Admin" asp-action="Index">
-                                <i class="fa-solid fa-lock me-1"></i> Admin Portal
-                            </a>
-                        </li>
+                        @{
+                            int? loggedApplicantId = Context.Session.GetInt32("ApplicantId");
+                        }
 
-                        <!-- Theme Toggle Button -->
-                        <li class="nav-item-custom ms-lg-1">
-                            <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle Light/Dark Theme">
-                                <i class="fa-solid fa-moon"></i>
-                            </button>
-                        </li>
+                        @if (loggedApplicantId.HasValue)
+                        {
+                            <!-- Authenticated Applicant: Compact Portal Link -->
+                            <li class="nav-item-custom">
+                                <a class="nav-admin-btn" asp-controller="Admission" asp-action="Dashboard">
+                                    <i class="fa-solid fa-gauge me-1"></i> My Portal
+                                </a>
+                            </li>
 
-                        <!-- Apply Now CTA Button -->
-                        <li class="nav-item-custom ms-lg-2 mt-3 mt-lg-0">
-                            <a class="btn nav-cta-btn" asp-controller="Home" asp-action="Admissions">
-                                Apply Now <i class="fa-solid fa-arrow-right-long ms-1"></i>
-                            </a>
-                        </li>
+                            <!-- Theme Toggle Button -->
+                            <li class="nav-item-custom ms-lg-1">
+                                <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle Light/Dark Theme">
+                                    <i class="fa-solid fa-moon"></i>
+                                </button>
+                            </li>
+
+                            <!-- Apply Now CTA Button -->
+                            <li class="nav-item-custom ms-lg-2 mt-3 mt-lg-0">
+                                <a class="btn nav-cta-btn" asp-controller="Admission" asp-action="Dashboard">
+                                    Go to Portal <i class="fa-solid fa-arrow-right-long ms-1"></i>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <!-- Admin Portal Link (Glass Capsule Button) -->
+                            <li class="nav-item-custom">
+                                <a class="nav-admin-btn" asp-controller="Admin" asp-action="Index">
+                                    <i class="fa-solid fa-lock me-1"></i> Admin Portal
+                                </a>
+                            </li>
+
+                            <!-- Theme Toggle Button -->
+                            <li class="nav-item-custom ms-lg-1">
+                                <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle Light/Dark Theme">
+                                    <i class="fa-solid fa-moon"></i>
+                                </button>
+                            </li>
+
+                            <!-- Apply Now CTA Button -->
+                            <li class="nav-item-custom ms-lg-2 mt-3 mt-lg-0">
+                                <a class="btn nav-cta-btn" asp-controller="Admission" asp-action="Index">
+                                    Apply Now <i class="fa-solid fa-arrow-right-long ms-1"></i>
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </nav>

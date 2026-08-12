@@ -1,0 +1,127 @@
+@using NedAcademyWebsite.Models
+@{
+    Layout = "_ApplicantLayout";
+    ViewData["Title"] = "Help & Support";
+
+    var applicant = ViewBag.Applicant as Applicant;
+    var tickets = ViewBag.Tickets as IEnumerable<SupportTicket> ?? new List<SupportTicket>();
+}
+
+<div class="container-fluid p-0">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="portal-content-title">Admission Support Center</h1>
+            <p class="portal-content-subtitle">Frequently Asked Questions, Admission Help Guides, and Support Tickets.</p>
+        </div>
+        <button class="portal-btn portal-btn-cyan" data-bs-toggle="modal" data-bs-target="#newTicketModal">
+            <i class="fa-solid fa-headset me-1"></i> Open Support Ticket
+        </button>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="portal-alert portal-alert-success mb-4">
+            <i class="fa-solid fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- Support Tickets Section -->
+    <div class="portal-card mb-4">
+        <div class="portal-card-header">
+            <div class="portal-card-title"><i class="fa-solid fa-ticket me-2"></i> Your Support Tickets</div>
+        </div>
+        <div class="portal-card-body">
+            @if (tickets.Any())
+            {
+                <div class="table-responsive">
+                    <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+                        <thead>
+                            <tr style="border-bottom:1px solid var(--portal-border);">
+                                <th style="padding:10px 12px; color:var(--portal-text-muted);">Ticket #</th>
+                                <th style="padding:10px 12px; color:var(--portal-text-muted);">Category</th>
+                                <th style="padding:10px 12px; color:var(--portal-text-muted);">Subject</th>
+                                <th style="padding:10px 12px; color:var(--portal-text-muted);">Priority</th>
+                                <th style="padding:10px 12px; color:var(--portal-text-muted);">Status</th>
+                                <th style="padding:10px 12px; color:var(--portal-text-muted);">Created Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var t in tickets)
+                            {
+                                <tr style="border-bottom:1px solid var(--portal-border-light);">
+                                    <td style="padding:12px; color:var(--portal-text); font-weight:700;">@t.TicketNumber</td>
+                                    <td style="padding:12px; color:var(--portal-text-secondary);">@t.Category</td>
+                                    <td style="padding:12px; color:var(--portal-text); font-weight:600;">@t.Subject</td>
+                                    <td style="padding:12px;"><span class="portal-badge portal-badge-info">@t.Priority</span></td>
+                                    <td style="padding:12px;"><span class="portal-badge portal-badge-active">@t.Status</span></td>
+                                    <td style="padding:12px; color:var(--portal-text-muted);">@t.CreatedAt.ToString("dd MMM yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="portal-empty-state">
+                    <div class="portal-empty-icon"><i class="fa-solid fa-circle-question"></i></div>
+                    <div class="portal-empty-title">No Active Tickets</div>
+                    <div class="portal-empty-desc mb-3">If you encounter any technical issues or need admission assistance, create a support ticket.</div>
+                    <button class="portal-btn portal-btn-cyan" data-bs-toggle="modal" data-bs-target="#newTicketModal">
+                        <i class="fa-solid fa-headset me-1"></i> Open Support Ticket Now
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Support Ticket Modal -->
+<div class="modal fade" id="newTicketModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="background:var(--portal-surface); border:1px solid var(--portal-border); color:var(--portal-text);">
+            <div class="modal-header" style="border-bottom:1px solid var(--portal-border);">
+                <h5 class="modal-title font-headings" style="font-size:1.1rem; font-weight:700;"><i class="fa-solid fa-headset me-2 text-cyan"></i> Open New Support Ticket</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Admission" asp-action="CreateTicket" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="portal-form-label">Ticket Category <span class="required">*</span></label>
+                            <select name="category" class="portal-form-select" required>
+                                <option value="Application">Application Inquiry</option>
+                                <option value="Document">Document Verification</option>
+                                <option value="Payment">Fee Voucher & Payment</option>
+                                <option value="Technical">Technical Portal Issue</option>
+                                <option value="General" selected>General Question</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="portal-form-label">Priority Level <span class="required">*</span></label>
+                            <select name="priority" class="portal-form-select" required>
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                                <option value="Urgent">Urgent</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="portal-form-label">Subject <span class="required">*</span></label>
+                            <input type="text" name="subject" class="portal-form-control" placeholder="Brief summary of your issue" required />
+                        </div>
+                        <div class="col-12">
+                            <label class="portal-form-label">Detailed Description <span class="required">*</span></label>
+                            <textarea name="description" rows="5" class="portal-form-control" placeholder="Please provide detailed information..." required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top:1px solid var(--portal-border);">
+                    <button type="button" class="portal-btn portal-btn-outline" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="portal-btn portal-btn-cyan"><i class="fa-solid fa-paper-plane me-1"></i> Submit Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

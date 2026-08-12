@@ -1,129 +1,524 @@
+@model NedAcademyWebsite.Models.SystemSetting
+@using NedAcademyWebsite.Models
 @{
-    ViewData["Title"] = "Admissions - Fall 2026 Guidelines";
+    ViewData["Title"] = "Online Admissions 2026 - NED Academy";
+    var activeSession = ViewBag.ActiveSession as AdmissionSession;
+    var offeredPrograms = ViewBag.OfferedPrograms as IEnumerable<AdmissionSessionProgram> ?? new List<AdmissionSessionProgram>();
+    var admissionFaqs = ViewBag.AdmissionFaqs as IEnumerable<FAQItem> ?? new List<FAQItem>();
+    string sessionTitle = activeSession?.Title ?? "Fall 2026 Admissions";
+    string deadlineStr = activeSession != null ? activeSession.ApplicationDeadline.ToString("MMMM dd, yyyy") : "October 15, 2026";
+    string feeStr = activeSession != null ? $"PKR {activeSession.ProcessingFeeAmount:N0}" : "PKR 2,500";
 }
 
-<!-- Premium Hero Banner -->
-<section class="py-5 position-relative" style="background: radial-gradient(circle at 10% 20%, rgba(0, 119, 255, 0.08) 0%, transparent 60%); border-bottom: 1px solid var(--glass-border); padding-top: 100px !important;">
-    <div class="container text-start">
-        <!-- Breadcrumbs -->
-        <nav aria-label="breadcrumb" class="mb-4 reveal-up">
-            <ol class="breadcrumb" style="margin: 0; background: transparent;">
-                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-gradient-cyan text-decoration-none">Home</a></li>
-                <li class="breadcrumb-item active text-muted" aria-current="page">Admissions</li>
-            </ol>
-        </nav>
-        
-        <h1 class="display-3 text-white fw-bold mb-3 reveal-up" style="letter-spacing: -0.02em;">Admission Guidelines</h1>
-        <p class="text-muted fs-5 m-0 max-width-600 reveal-up" style="line-height: 1.6;">
-            Learn about our selective admission stages, documentation checklists, and application steps.
-        </p>
-    </div>
-</section>
-
-<!-- Admissions Steps Timeline -->
-<section class="py-5" style="margin-top: 50px;">
-    <div class="container text-start">
-        <div class="text-center mb-5 max-width-600 mx-auto">
-            <h2 class="display-5 text-white mb-3" style="font-weight: 700;">Admissions Process</h2>
-            <p class="text-muted">A clear, merit-driven evaluation pipeline designed to verify quantitative and analytical capabilities.</p>
-        </div>
-        
-        <div class="row g-4 justify-content-center">
-            <!-- Step 1 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="glass-card text-start h-100 reveal-up d-flex flex-column justify-content-between" style="border-top: 2px solid var(--cyan);">
-                    <div>
-                        <span class="text-gradient-cyan font-headings fw-bold mb-2 d-block" style="font-size: 1.3rem;">01</span>
-                        <h5 class="text-light mb-2" style="font-weight: 600;">Online Registration</h5>
-                        <p class="text-muted" style="font-size: 0.88rem; line-height: 1.5; margin: 0;">Submit academic documents, transcripts, and basic particulars through our online portal.</p>
-                    </div>
+<!-- 1. HERO SECTION -->
+<section class="hero-section position-relative d-flex align-items-center" style="min-height: 85vh; background: radial-gradient(circle at 80% 20%, rgba(0, 242, 254, 0.12) 0%, transparent 50%), radial-gradient(circle at 10% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%); padding: 110px 0 70px;">
+    <!-- Background Grid Effect -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0;"></div>
+    
+    <div class="container position-relative" style="z-index: 1;">
+        <div class="row align-items-center gy-5">
+            <div class="col-lg-7 text-start">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-4" style="background: rgba(0, 242, 254, 0.06); border: 1px solid rgba(0, 242, 254, 0.2);">
+                    <span class="d-inline-block rounded-circle bg-success" style="width: 8px; height: 8px; animation: pulse 1.5s infinite;"></span>
+                    <span class="text-uppercase font-headings fw-bold text-gradient-cyan" style="font-size: 0.78rem; letter-spacing: 0.1em;">@sessionTitle - Now Open</span>
+                </div>
+                <h1 class="display-3 text-white mb-4" style="font-weight: 800; line-height: 1.15; letter-spacing: -0.03em;">
+                    Pioneering Your <span class="text-gradient-cyan">Academic Journey</span>
+                </h1>
+                <p class="text-muted fs-5 mb-5 pe-lg-4" style="line-height: 1.6;">
+                    Welcome to NED Academy Online Admission Portal. Explore accredited undergraduate & postgraduate engineering programs, review eligibility criteria, and begin your digital application.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a asp-controller="Admission" asp-action="Index" class="btn btn-cyber">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Start Online Admission
+                    </a>
+                    <a asp-controller="Home" asp-action="Downloads" class="btn btn-cyber-outline">
+                        <i class="fa-solid fa-file-arrow-down me-1"></i> Download Prospectus
+                    </a>
                 </div>
             </div>
             
-            <!-- Step 2 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="glass-card text-start h-100 reveal-up d-flex flex-column justify-content-between" style="border-top: 2px solid var(--royal-blue);">
-                    <div>
-                        <span class="text-gradient-blue font-headings fw-bold mb-2 d-block" style="font-size: 1.3rem;">02</span>
-                        <h5 class="text-light mb-2" style="font-weight: 600;">Entrance Test</h5>
-                        <p class="text-muted" style="font-size: 0.88rem; line-height: 1.5; margin: 0;">Attempt the quantitative math and logical programming diagnostic test.</p>
+            <div class="col-lg-5">
+                <!-- Admission Quick Stats Card -->
+                <div class="glass-card p-4 text-start reveal-up position-relative" style="border-top: 3px solid var(--cyan); box-shadow: 0 30px 60px rgba(0,0,0,0.6);">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="badge bg-primary px-3 py-2 text-uppercase font-headings" style="font-size: 0.7rem; letter-spacing: 0.05em;">Admission Summary</span>
+                        <i class="fa-solid fa-calendar-check text-gradient-cyan" style="font-size: 1.3rem;"></i>
                     </div>
-                </div>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="glass-card text-start h-100 reveal-up d-flex flex-column justify-content-between" style="border-top: 2px solid var(--cyan);">
-                    <div>
-                        <span class="text-gradient-cyan font-headings fw-bold mb-2 d-block" style="font-size: 1.3rem;">03</span>
-                        <h5 class="text-light mb-2" style="font-weight: 600;">Panel Interview</h5>
-                        <p class="text-muted" style="font-size: 0.88rem; line-height: 1.5; margin: 0;">Present your prior project models and discuss system career interests before an academic board.</p>
+                    <div class="d-flex flex-column gap-3 mb-4">
+                        <div class="d-flex justify-content-between border-bottom pb-2 border-secondary border-opacity-25">
+                            <span class="text-muted" style="font-size: 0.9rem;">Active Session</span>
+                            <span class="text-white fw-bold" style="font-size: 0.9rem;">@sessionTitle</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom pb-2 border-secondary border-opacity-25">
+                            <span class="text-muted" style="font-size: 0.9rem;">Application Deadline</span>
+                            <span class="text-warning fw-bold" style="font-size: 0.9rem;">@deadlineStr</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom pb-2 border-secondary border-opacity-25">
+                            <span class="text-muted" style="font-size: 0.9rem;">Application Processing Fee</span>
+                            <span class="text-gradient-cyan fw-bold" style="font-size: 0.9rem;">@feeStr</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted" style="font-size: 0.9rem;">Evaluation Mode</span>
+                            <span class="text-success fw-bold" style="font-size: 0.9rem;">Rolling Online Review</span>
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Step 4 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="glass-card text-start h-100 reveal-up d-flex flex-column justify-content-between" style="border-top: 2px solid var(--royal-blue);">
-                    <div>
-                        <span class="text-gradient-blue font-headings fw-bold mb-2 d-block" style="font-size: 1.3rem;">04</span>
-                        <h5 class="text-light mb-2" style="font-weight: 600;">Final Enrollment</h5>
-                        <p class="text-muted" style="font-size: 0.88rem; line-height: 1.5; margin: 0;">Deposit registration credentials, verify original records, and reserve your cohort place.</p>
-                    </div>
+                    <a href="#admission-journey" class="btn btn-cyber-outline w-100 text-center justify-content-center">
+                        View Admission Process <i class="fa-solid fa-arrow-down-long ms-1"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Eligibility & Checklist Documents Split -->
-<section id="eligibility" class="py-5" style="margin-top: 50px; background: rgba(15,23,42,0.15); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);">
-    <div class="container text-start">
-        <div class="row gy-5">
-            <!-- Left Column: Eligibility -->
-            <div class="col-lg-6">
-                <h3 class="display-6 text-white mb-4" style="font-weight: 700;">Eligibility Thresholds</h3>
-                <div class="d-flex flex-column gap-3">
-                    <div class="glass-card p-4 reveal-up">
-                        <h5 class="text-light" style="font-weight:600;"><i class="fa-solid fa-graduation-cap text-gradient-cyan me-2"></i> HS Certificate (Pre-Engineering)</h5>
-                        <p class="text-muted m-0" style="font-size: 0.92rem; line-height: 1.5;">Minimum 60% aggregate marks. Math, Physics, and Chemistry modules are mandatory prerequisites.</p>
-                    </div>
-                    <div class="glass-card p-4 reveal-up">
-                        <h5 class="text-light" style="font-weight:600;"><i class="fa-solid fa-laptop-code text-gradient-blue me-2"></i> GCE A-Levels Equivalent</h5>
-                        <p class="text-muted m-0" style="font-size: 0.92rem; line-height: 1.5;">Three principal passes in Mathematics, Physics, and Chemistry. Equivalence certificate from IBCC is required.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Right Column: Document Checklist -->
-            <div class="col-lg-6 ps-lg-5">
-                <h3 class="display-6 text-white mb-4" style="font-weight: 700;">Required Documents</h3>
-                <p class="text-muted mb-4">Please prepare digital and physical copies of the following documents before final assessment enrollment:</p>
-                
-                <ul class="list-unstyled d-flex flex-column gap-3 text-muted" style="font-size: 0.95rem;">
-                    <li><i class="fa-solid fa-circle-nodes text-gradient-cyan me-2"></i> Intermediate (or A-Level) Marksheets & Certificate copies</li>
-                    <li><i class="fa-solid fa-circle-nodes text-gradient-cyan me-2"></i> Matriculation (or O-Level) Certificate copy</li>
-                    <li><i class="fa-solid fa-circle-nodes text-gradient-cyan me-2"></i> Applicant's National Identity Card (CNIC/B-Form) copy</li>
-                    <li><i class="fa-solid fa-circle-nodes text-gradient-cyan me-2"></i> Guardian's National Identity Card copy</li>
-                    <li><i class="fa-solid fa-circle-nodes text-gradient-cyan me-2"></i> Equivalent cert from IBCC (if qualifying outside domestic boards)</li>
-                    <li><i class="fa-solid fa-circle-nodes text-gradient-cyan me-2"></i> Portfolio summary or code repository link (optional but highly recommended)</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Admissions Open Promo / CTA -->
-<section class="py-5 mb-5 reveal-up" style="margin-top: 80px;">
+<!-- 2. ADMISSION JOURNEY TIMELINE -->
+<section id="admission-journey" class="py-5" style="border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); background: rgba(15,23,42,0.3);">
     <div class="container text-center">
-        <div class="glass-card p-5" style="border-top: 3px solid var(--cyan); background: radial-gradient(ellipse at bottom, rgba(0, 242, 254, 0.08) 0%, transparent 60%);">
-            <h3 class="text-light mb-3" style="font-weight:700;">Take the First Step Today</h3>
-            <p class="text-muted max-width-600 mx-auto mb-4" style="font-size: 0.95rem; line-height: 1.6;">
-                Review schedules, download brochures, and set up your admission assessment portal profile.
-            </p>
-            <div class="d-flex justify-content-center gap-3 flex-wrap">
-                <a href="https://portal.nedacademy.edu" class="btn btn-cyber" target="_blank">Proceed to Online Portal</a>
-                <a asp-controller="Home" asp-action="Downloads" class="btn btn-cyber-outline">Download Prospectus</a>
+        <div class="text-center mb-5 max-width-600 mx-auto">
+            <span class="badge bg-primary px-3 py-2 text-uppercase font-headings mb-2" style="font-size: 0.72rem; letter-spacing: 0.1em;">Step-by-Step Guide</span>
+            <h2 class="display-5 text-white mb-3" style="font-weight: 800;">Admission Journey</h2>
+            <p class="text-muted">A streamlined, 6-step online application experience designed for clarity and efficiency.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="glass-card p-3 text-center h-100 reveal-up" style="border-top: 2px solid var(--cyan);">
+                    <div class="rounded-circle p-3 mb-3 d-inline-flex bg-primary bg-opacity-10 text-gradient-cyan" style="width: 54px; height: 54px; align-items: center; justify-content: center;">
+                        <span class="fw-bold font-headings">1</span>
+                    </div>
+                    <h6 class="text-light fw-bold mb-1" style="font-size: 0.9rem;">Create Account</h6>
+                    <p class="text-muted m-0" style="font-size: 0.78rem;">Register profile with CNIC & Email</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="glass-card p-3 text-center h-100 reveal-up" style="border-top: 2px solid var(--royal-blue);">
+                    <div class="rounded-circle p-3 mb-3 d-inline-flex bg-primary bg-opacity-10 text-gradient-blue" style="width: 54px; height: 54px; align-items: center; justify-content: center;">
+                        <span class="fw-bold font-headings">2</span>
+                    </div>
+                    <h6 class="text-light fw-bold mb-1" style="font-size: 0.9rem;">Fill Application</h6>
+                    <p class="text-muted m-0" style="font-size: 0.78rem;">Personal & Academic history</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="glass-card p-3 text-center h-100 reveal-up" style="border-top: 2px solid var(--cyan);">
+                    <div class="rounded-circle p-3 mb-3 d-inline-flex bg-primary bg-opacity-10 text-gradient-cyan" style="width: 54px; height: 54px; align-items: center; justify-content: center;">
+                        <span class="fw-bold font-headings">3</span>
+                    </div>
+                    <h6 class="text-light fw-bold mb-1" style="font-size: 0.9rem;">Upload Documents</h6>
+                    <p class="text-muted m-0" style="font-size: 0.78rem;">Scanned marksheets & photo</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="glass-card p-3 text-center h-100 reveal-up" style="border-top: 2px solid var(--royal-blue);">
+                    <div class="rounded-circle p-3 mb-3 d-inline-flex bg-primary bg-opacity-10 text-gradient-blue" style="width: 54px; height: 54px; align-items: center; justify-content: center;">
+                        <span class="fw-bold font-headings">4</span>
+                    </div>
+                    <h6 class="text-light fw-bold mb-1" style="font-size: 0.9rem;">Fee Voucher</h6>
+                    <p class="text-muted m-0" style="font-size: 0.78rem;">Pay processing fee & attach proof</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="glass-card p-3 text-center h-100 reveal-up" style="border-top: 2px solid var(--cyan);">
+                    <div class="rounded-circle p-3 mb-3 d-inline-flex bg-primary bg-opacity-10 text-gradient-cyan" style="width: 54px; height: 54px; align-items: center; justify-content: center;">
+                        <span class="fw-bold font-headings">5</span>
+                    </div>
+                    <h6 class="text-light fw-bold mb-1" style="font-size: 0.9rem;">Board Review</h6>
+                    <p class="text-muted m-0" style="font-size: 0.78rem;">Document & Merit evaluation</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="glass-card p-3 text-center h-100 reveal-up" style="border-top: 2px solid #22c55e;">
+                    <div class="rounded-circle p-3 mb-3 d-inline-flex bg-success bg-opacity-10 text-success" style="width: 54px; height: 54px; align-items: center; justify-content: center;">
+                        <span class="fw-bold font-headings"><i class="fa-solid fa-check"></i></span>
+                    </div>
+                    <h6 class="text-light fw-bold mb-1" style="font-size: 0.9rem;">Final Decision</h6>
+                    <p class="text-muted m-0" style="font-size: 0.78rem;">Admission Offer Letter issued</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 3. AVAILABLE PROGRAMS (DYNAMIC CMS CARDS) -->
+<section id="available-programs" class="py-5 my-5">
+    <div class="container">
+        <div class="text-center mb-5 max-width-600 mx-auto">
+            <span class="badge bg-primary px-3 py-2 text-uppercase font-headings mb-2" style="font-size: 0.72rem; letter-spacing: 0.1em;">Offered Degrees</span>
+            <h2 class="display-5 text-white mb-3" style="font-weight: 800;">Available Programs</h2>
+            <p class="text-muted">Select your target program to review eligibility and initiate your application.</p>
+        </div>
+
+        @if (offeredPrograms.Any())
+        {
+            <div class="row g-4">
+                @foreach (var sp in offeredPrograms)
+                {
+                    var prog = sp.DegreeProgram;
+                    if (prog == null) continue;
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between text-start reveal-up" style="border-top: 3px solid var(--cyan);">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-info bg-opacity-20 text-gradient-cyan px-2 py-1 font-headings" style="font-size: 0.72rem;">@prog.Department?.Name</span>
+                                    <span class="badge bg-secondary px-2 py-1 font-headings" style="font-size: 0.72rem;">@prog.Duration</span>
+                                </div>
+                                <h4 class="text-white mb-2" style="font-weight: 700;">@prog.Name</h4>
+                                <p class="text-muted mb-3" style="font-size: 0.88rem; line-height: 1.5;">@prog.Overview</p>
+                                
+                                <div class="p-3 rounded-3 mb-4" style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);">
+                                    <div class="d-flex justify-content-between mb-1" style="font-size: 0.82rem;">
+                                        <span class="text-muted">Eligibility:</span>
+                                        <span class="text-light fw-bold">Min @sp.MinimumEligibilityMarksPercentage% Marks</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between" style="font-size: 0.82rem;">
+                                        <span class="text-muted">Available Seats:</span>
+                                        <span class="text-gradient-cyan fw-bold">@sp.AvailableSeats / @sp.CapacitySeats Seats</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <a asp-controller="Home" asp-action="Programs" class="btn btn-cyber-outline btn-sm w-100 justify-content-center">Details</a>
+                                <a asp-controller="Admission" asp-action="Index" asp-route-program="@prog.Slug" class="btn btn-cyber btn-sm w-100 justify-content-center">Apply Now</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="glass-card p-5 text-center">
+                <i class="fa-solid fa-graduation-cap text-gradient-cyan fa-3x mb-3"></i>
+                <h4 class="text-white">Admissions Cycle Updating</h4>
+                <p class="text-muted mb-0">The list of active programs for the upcoming cycle is being published by the Academic Board. Please check back shortly.</p>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- 4. ADMISSION REQUIREMENTS -->
+<section class="py-5" style="background: rgba(15,23,42,0.2); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);">
+    <div class="container">
+        <div class="text-center mb-5 max-width-600 mx-auto">
+            <h2 class="display-6 text-white mb-3" style="font-weight: 700;">Required Documents</h2>
+            <p class="text-muted">Ensure all mandatory scanned documents are ready before beginning your application.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-card p-4 text-start h-100 reveal-up">
+                    <div class="rounded-3 p-3 mb-3 d-inline-block bg-primary bg-opacity-10 text-gradient-cyan">
+                        <i class="fa-solid fa-id-card fa-2x"></i>
+                    </div>
+                    <h5 class="text-light fw-bold mb-2">CNIC / B-Form</h5>
+                    <p class="text-muted m-0" style="font-size: 0.88rem; line-height: 1.5;">Valid National Identity Card or B-Form copy for applicant and father/guardian.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-card p-4 text-start h-100 reveal-up">
+                    <div class="rounded-3 p-3 mb-3 d-inline-block bg-primary bg-opacity-10 text-gradient-blue">
+                        <i class="fa-solid fa-file-certificate fa-2x"></i>
+                    </div>
+                    <h5 class="text-light fw-bold mb-2">Matriculation Marksheet</h5>
+                    <p class="text-muted m-0" style="font-size: 0.88rem; line-height: 1.5;">Official Secondary School Certificate (SSC / O-Level) transcript & diploma.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-card p-4 text-start h-100 reveal-up">
+                    <div class="rounded-3 p-3 mb-3 d-inline-block bg-primary bg-opacity-10 text-gradient-cyan">
+                        <i class="fa-solid fa-scroll fa-2x"></i>
+                    </div>
+                    <h5 class="text-light fw-bold mb-2">Intermediate Marksheet</h5>
+                    <p class="text-muted m-0" style="font-size: 0.88rem; line-height: 1.5;">Higher Secondary Certificate (HSSC / A-Level) transcript or hope certificate.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-card p-4 text-start h-100 reveal-up">
+                    <div class="rounded-3 p-3 mb-3 d-inline-block bg-primary bg-opacity-10 text-gradient-blue">
+                        <i class="fa-solid fa-user-gear fa-2x"></i>
+                    </div>
+                    <h5 class="text-light fw-bold mb-2">Passport Photographs</h5>
+                    <p class="text-muted m-0" style="font-size: 0.88rem; line-height: 1.5;">Recent passport-sized photographs with white background (JPEG/PNG format).</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-card p-4 text-start h-100 reveal-up">
+                    <div class="rounded-3 p-3 mb-3 d-inline-block bg-primary bg-opacity-10 text-gradient-cyan">
+                        <i class="fa-solid fa-globe fa-2x"></i>
+                    </div>
+                    <h5 class="text-light fw-bold mb-2">Equivalence Certificate</h5>
+                    <p class="text-muted m-0" style="font-size: 0.88rem; line-height: 1.5;">IBCC equivalence certificate for foreign qualifications (A-Levels / American Diploma).</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-card p-4 text-start h-100 reveal-up">
+                    <div class="rounded-3 p-3 mb-3 d-inline-block bg-primary bg-opacity-10 text-gradient-blue">
+                        <i class="fa-solid fa-shield-halved fa-2x"></i>
+                    </div>
+                    <h5 class="text-light fw-bold mb-2">Character Certificate</h5>
+                    <p class="text-muted m-0" style="font-size: 0.88rem; line-height: 1.5;">Character certificate issued by the last attended educational institution.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 5. ADMISSION SCHEDULE & IMPORTANT DATES -->
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="text-center mb-5 max-width-600 mx-auto">
+            <h2 class="display-6 text-white mb-3" style="font-weight: 700;">Key Admission Dates</h2>
+            <p class="text-muted">Mark your calendar for crucial milestones of the Fall 2026 intake.</p>
+        </div>
+
+        <div class="glass-card p-4 text-start reveal-up" style="border-top: 3px solid var(--cyan);">
+            <div class="table-responsive">
+                <table class="table text-light align-middle m-0" style="background: transparent;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--glass-border);">
+                            <th class="font-headings text-gradient-cyan py-3">Event / Milestone</th>
+                            <th class="font-headings text-gradient-cyan py-3">Target Date</th>
+                            <th class="font-headings text-gradient-cyan py-3">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--glass-border);">
+                            <td class="fw-bold py-3"><i class="fa-solid fa-circle-play text-success me-2"></i> Online Admissions Open</td>
+                            <td class="text-muted">August 01, 2026</td>
+                            <td><span class="badge bg-success bg-opacity-20 text-success">Active Now</span></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--glass-border);">
+                            <td class="fw-bold py-3"><i class="fa-solid fa-hourglass-half text-warning me-2"></i> Application Submission Deadline</td>
+                            <td class="text-warning fw-bold">@deadlineStr</td>
+                            <td><span class="badge bg-warning bg-opacity-20 text-warning">Upcoming</span></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--glass-border);">
+                            <td class="fw-bold py-3"><i class="fa-solid fa-pen-nib text-gradient-cyan me-2"></i> Aptitude & Entry Assessment</td>
+                            <td class="text-muted">October 22 - 24, 2026</td>
+                            <td><span class="badge bg-secondary">Scheduled</span></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--glass-border);">
+                            <td class="fw-bold py-3"><i class="fa-solid fa-list-check text-gradient-blue me-2"></i> First Merit List Publication</td>
+                            <td class="text-muted">November 02, 2026</td>
+                            <td><span class="badge bg-secondary">Scheduled</span></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold py-3"><i class="fa-solid fa-chalkboard-user text-gradient-cyan me-2"></i> Orientation & Class Commencement</td>
+                            <td class="text-muted">November 16, 2026</td>
+                            <td><span class="badge bg-secondary">Scheduled</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 6. TUITION & SCHOLARSHIPS -->
+<section class="py-5" style="background: rgba(15,23,42,0.2); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);">
+    <div class="container">
+        <div class="text-center mb-5 max-width-600 mx-auto">
+            <h2 class="display-6 text-white mb-3" style="font-weight: 700;">Tuition & Financial Support</h2>
+            <p class="text-muted">Transparent fee structures backed by comprehensive merit and need-based financial aid.</p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-card p-4 text-center h-100 reveal-up" style="border-top: 2px solid var(--cyan);">
+                    <h6 class="text-muted font-headings text-uppercase mb-2" style="font-size: 0.8rem;">Application Fee</h6>
+                    <h3 class="text-gradient-cyan fw-bold mb-3">@feeStr</h3>
+                    <p class="text-muted m-0" style="font-size: 0.85rem;">One-time non-refundable online processing voucher fee.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-card p-4 text-center h-100 reveal-up" style="border-top: 2px solid var(--royal-blue);">
+                    <h6 class="text-muted font-headings text-uppercase mb-2" style="font-size: 0.8rem;">Admission Fee</h6>
+                    <h3 class="text-gradient-blue fw-bold mb-3">PKR 25,000</h3>
+                    <p class="text-muted m-0" style="font-size: 0.85rem;">One-time registration fee payable upon admission confirmation.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12">
+                <div class="glass-card p-4 text-center h-100 reveal-up" style="border-top: 2px solid #22c55e;">
+                    <h6 class="text-muted font-headings text-uppercase mb-2" style="font-size: 0.8rem;">Semester Tuition</h6>
+                    <h3 class="text-success fw-bold mb-3">PKR 85,000</h3>
+                    <p class="text-muted m-0" style="font-size: 0.85rem;">Average per-semester tuition fee for undergraduate engineering streams.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scholarships Cards -->
+        <h4 class="text-white font-headings text-center mb-4">Available Scholarships</h4>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="glass-card p-4 text-start h-100 reveal-up">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <i class="fa-solid fa-award text-gradient-cyan fa-2x"></i>
+                        <span class="badge bg-primary px-2 py-1">Up to 100%</span>
+                    </div>
+                    <h5 class="text-white fw-bold mb-2">Merit Scholarship</h5>
+                    <p class="text-muted m-0" style="font-size: 0.85rem; line-height: 1.5;">Awarded to top rankers in entry test and board examinations.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="glass-card p-4 text-start h-100 reveal-up">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <i class="fa-solid fa-hand-holding-dollar text-gradient-blue fa-2x"></i>
+                        <span class="badge bg-info px-2 py-1 text-dark">Need-Based</span>
+                    </div>
+                    <h5 class="text-white fw-bold mb-2">Financial Aid</h5>
+                    <p class="text-muted m-0" style="font-size: 0.85rem; line-height: 1.5;">Assistance for deserving candidates subject to financial evaluation.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="glass-card p-4 text-start h-100 reveal-up">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <i class="fa-solid fa-trophy text-warning fa-2x"></i>
+                        <span class="badge bg-warning text-dark px-2 py-1">Sports</span>
+                    </div>
+                    <h5 class="text-white fw-bold mb-2">Talent Grant</h5>
+                    <p class="text-muted m-0" style="font-size: 0.85rem; line-height: 1.5;">Special grants for national sports achievers and innovators.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="glass-card p-4 text-start h-100 reveal-up">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <i class="fa-solid fa-user-graduate text-gradient-cyan fa-2x"></i>
+                        <span class="badge bg-secondary px-2 py-1">Alumni</span>
+                    </div>
+                    <h5 class="text-white fw-bold mb-2">Kinship Discount</h5>
+                    <p class="text-muted m-0" style="font-size: 0.85rem; line-height: 1.5;">Tuition fee concession for siblings of current students & alumni.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 8. FREQUENTLY ASKED QUESTIONS -->
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="text-center mb-5 max-width-600 mx-auto">
+            <h2 class="display-6 text-white mb-3" style="font-weight: 700;">Frequently Asked Questions</h2>
+            <p class="text-muted">Common inquiries regarding online application submission and evaluation.</p>
+        </div>
+
+        <div class="accordion custom-accordion max-width-800 mx-auto" id="admissionFaqAccordion">
+            @if (admissionFaqs.Any())
+            {
+                int index = 0;
+                foreach (var faq in admissionFaqs)
+                {
+                    index++;
+                    string headingId = $"heading{index}";
+                    string collapseId = $"collapse{index}";
+                    bool isFirst = index == 1;
+
+                    <div class="accordion-item glass-card mb-3 reveal-up" style="border: 1px solid var(--glass-border); overflow: hidden;">
+                        <h2 class="accordion-header" id="@headingId">
+                            <button class="accordion-button @(isFirst ? "" : "collapsed") bg-transparent text-light font-headings" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="@(isFirst ? "true" : "false")" aria-controls="@collapseId" style="font-weight: 600;">
+                                <i class="fa-solid fa-circle-question text-gradient-cyan me-3"></i> @faq.Question
+                            </button>
+                        </h2>
+                        <div id="@collapseId" class="accordion-collapse collapse @(isFirst ? "show" : "")" aria-labelledby="@headingId" data-bs-parent="#admissionFaqAccordion">
+                            <div class="accordion-body text-muted" style="font-size: 0.92rem; line-height: 1.6;">
+                                @faq.Answer
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="accordion-item glass-card p-4 text-center">
+                    <p class="text-muted m-0">Dynamic FAQ items are currently being loaded from the database.</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- 9. CONTACT ADMISSION OFFICE -->
+<section class="py-5" style="background: rgba(15,23,42,0.2); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);">
+    <div class="container text-start">
+        <div class="row gy-5 align-items-center">
+            <div class="col-lg-6">
+                <span class="badge bg-primary px-3 py-2 text-uppercase font-headings mb-2" style="font-size: 0.72rem; letter-spacing: 0.1em;">Admissions Support</span>
+                <h2 class="display-6 text-white mb-4" style="font-weight: 700;">Get in Touch</h2>
+                <p class="text-muted mb-4 pe-lg-3" style="line-height: 1.6;">
+                    Have questions about program eligibility, document submission, or fee vouchers? Our admission counselors are here to guide you.
+                </p>
+
+                <div class="d-flex flex-column gap-3">
+                    <div class="d-flex align-items-center gap-3 glass-card p-3">
+                        <div class="rounded-circle p-3 bg-primary bg-opacity-10 text-gradient-cyan d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted font-headings text-uppercase d-block" style="font-size:0.75rem;">Admissions Helpline</small>
+                            <span class="text-white fw-bold">@Model.ContactPhone</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3 glass-card p-3">
+                        <div class="rounded-circle p-3 bg-primary bg-opacity-10 text-gradient-blue d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                            <i class="fa-solid fa-envelope"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted font-headings text-uppercase d-block" style="font-size:0.75rem;">Official Email</small>
+                            <span class="text-white fw-bold">admissions@@nedacademy.edu</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3 glass-card p-3">
+                        <div class="rounded-circle p-3 bg-primary bg-opacity-10 text-gradient-cyan d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted font-headings text-uppercase d-block" style="font-size:0.75rem;">Office Hours</small>
+                            <span class="text-white fw-bold">Monday - Friday | 08:30 AM - 04:30 PM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <!-- Location Map Card -->
+                <div class="glass-card p-4" style="border-top: 3px solid var(--cyan);">
+                    <h5 class="text-white fw-bold mb-3"><i class="fa-solid fa-location-dot text-gradient-cyan me-2"></i> Admissions Office Location</h5>
+                    <p class="text-muted mb-4" style="font-size: 0.88rem;">@Model.Address</p>
+                    <div class="rounded-3 overflow-hidden" style="height: 220px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center;">
+                        <div class="text-center p-3">
+                            <i class="fa-solid fa-map-location-dot text-gradient-cyan fa-3x mb-2"></i>
+                            <h6 class="text-white mb-1">NED University Main Campus</h6>
+                            <small class="text-muted">Latitude: @Model.MapsLatitude | Longitude: @Model.MapsLongitude</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 10. FINAL CALL TO ACTION BANNER -->
+<section class="py-5 my-5 reveal-up">
+    <div class="container text-center">
+        <div class="glass-card p-5 position-relative overflow-hidden" style="border: 1px solid var(--cyan); background: radial-gradient(circle at 50% 0%, rgba(0, 242, 254, 0.15) 0%, rgba(3, 7, 18, 0.85) 70%);">
+            <div class="max-width-700 mx-auto position-relative" style="z-index: 1;">
+                <span class="badge bg-primary px-3 py-2 text-uppercase font-headings mb-3" style="font-size: 0.75rem; letter-spacing: 0.1em;">Shape Your Technical Career</span>
+                <h2 class="display-4 text-white mb-3" style="font-weight: 800;">Ready to Begin Your Journey?</h2>
+                <p class="text-muted fs-5 mb-4 pe-lg-3" style="line-height: 1.6;">
+                    Applications for @sessionTitle are actively being processed. Submit your application online and take the first step toward engineering excellence.
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a asp-controller="Admission" asp-action="Index" class="btn btn-cyber">
+                        <i class="fa-solid fa-rocket me-1"></i> Start Online Admission
+                    </a>
+                    <a asp-controller="Home" asp-action="Downloads" class="btn btn-cyber-outline">
+                        <i class="fa-solid fa-file-arrow-down me-1"></i> Download Prospectus
+                    </a>
+                </div>
             </div>
         </div>
     </div>

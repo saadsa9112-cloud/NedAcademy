@@ -220,5 +220,8 @@ C:\Users\saads\Desktop\NedAcademyWebsite\bin\Debug\net10.0\runtimes\win-x64\nati
 C:\Users\saads\Desktop\NedAcademyWebsite\bin\Debug\net10.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\saads\Desktop\NedAcademyWebsite\obj\Debug\net10.0\NedAcademyWebsite.csproj.AssemblyReference.cache
 C:\Users\saads\Desktop\NedAcademyWebsite\obj\Debug\net10.0\NedAcade.3C872337.Up2Date
-C:\Users\saads\Desktop\NedAcademyWebsite\obj\Debug\net10.0\compressed\p3n1paoq7c-{0}-oiw5rmfzbb-oiw5rmfzbb.gz
 C:\Users\saads\Desktop\NedAcademyWebsite\obj\Debug\net10.0\compressed\6i0wfxqyiy-{0}-kxpse03eg1-kxpse03eg1.gz
+C:\Users\saads\Desktop\NedAcademyWebsite\obj\Debug\net10.0\NedAcademyWebsite.sourcelink.json
+C:\Users\saads\Desktop\NedAcademyWebsite\obj\Debug\net10.0\compressed\p3n1paoq7c-{0}-oiw5rmfzbb-oiw5rmfzbb.gz
+C:\Users\saads\Desktop\NedAcademyWebsite\obj\Debug\net10.0\compressed\w41bhgz5pq-{0}-rt0u42m9h2-rt0u42m9h2.gz
+C:\Users\saads\Desktop\NedAcademyWebsite\obj\Debug\net10.0\compressed\bcdz8wwtld-{0}-29l7m8os89-29l7m8os89.gz

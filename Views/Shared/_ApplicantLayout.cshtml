@@ -1,0 +1,224 @@
+@inject NedAcademyWebsite.Services.ISettingService SettingService
+@{
+    var settings = await SettingService.GetSettingsAsync();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    int? applicantId = Context.Session.GetInt32("ApplicantId");
+    string? applicantName = Context.Session.GetString("ApplicantName");
+    string applicantInitials = "A";
+    if (!string.IsNullOrEmpty(applicantName))
+    {
+        var parts = applicantName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        applicantInitials = parts.Length >= 2
+            ? $"{parts[0][0]}{parts[1][0]}"
+            : applicantName.Substring(0, Math.Min(2, applicantName.Length));
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Applicant Portal | @settings.UniversityName</title>
+
+    <meta name="description" content="@settings.UniversityName Applicant Portal — Manage your admission application, upload documents, track status, and complete your enrollment." />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Portal CSS (NOT site.css) -->
+    <link rel="stylesheet" href="~/css/portal.css" asp-append-version="true" />
+
+    <!-- Portal Theme Initializer -->
+    <script>
+        (function () {
+            var savedTheme = localStorage.getItem('portalTheme');
+            if (savedTheme === 'light') {
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.body.classList.add('portal-light');
+                });
+            }
+        })();
+    </script>
+</head>
+<body class="portal-page">
+
+    <!-- Portal Preloader -->
+    <div class="portal-preloader" id="portalPreloader">
+        <div class="portal-preloader-content">
+            <div class="portal-preloader-spinner"></div>
+            <div class="portal-preloader-text">Loading Portal...</div>
+        </div>
+    </div>
+
+    <!-- Mobile Overlay -->
+    <div class="portal-mobile-overlay"></div>
+
+    <!-- ═══════ SIDEBAR ═══════ -->
+    <aside class="portal-sidebar" role="navigation" aria-label="Portal Navigation">
+        <!-- Sidebar Brand -->
+        <a href="/" class="portal-sidebar-brand" title="@settings.UniversityName - Back to Website">
+            <div class="portal-sidebar-logo">@settings.UniversityName[0]</div>
+            <div class="portal-sidebar-brand-text">
+                <span class="portal-sidebar-brand-name">@settings.UniversityName</span>
+                <span class="portal-sidebar-brand-sub">Applicant Portal</span>
+            </div>
+        </a>
+
+        <!-- Sidebar Navigation -->
+        <nav class="portal-sidebar-nav">
+            <!-- Main Section -->
+            <div class="portal-nav-section">
+                <div class="portal-nav-section-title">Main</div>
+                <a href="@Url.Action("Dashboard", "Admission")" class="portal-nav-item @(currentAction == "Dashboard" ? "active" : "")">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span class="portal-nav-item-label">Dashboard</span>
+                </a>
+            </div>
+
+            <!-- Admission Section -->
+            <div class="portal-nav-section">
+                <div class="portal-nav-section-title">Admission</div>
+                <a href="@Url.Action("Apply", "Admission")" class="portal-nav-item @(currentAction == "Apply" ? "active" : "")">
+                    <i class="fa-solid fa-file-pen"></i>
+                    <span class="portal-nav-item-label">My Application</span>
+                </a>
+                <a href="@Url.Action("Documents", "Admission")" class="portal-nav-item @(currentAction == "Documents" ? "active" : "")">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span class="portal-nav-item-label">Documents</span>
+                </a>
+                <a href="@Url.Action("FeeVouchers", "Admission")" class="portal-nav-item @(currentAction == "FeeVouchers" ? "active" : "")">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span class="portal-nav-item-label">Fee & Payments</span>
+                </a>
+            </div>
+
+            <!-- Communication Section -->
+            <div class="portal-nav-section">
+                <div class="portal-nav-section-title">Communication</div>
+                <a href="@Url.Action("Messages", "Admission")" class="portal-nav-item @(currentAction == "Messages" ? "active" : "")">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span class="portal-nav-item-label">Messages</span>
+                </a>
+                <a href="@Url.Action("Notifications", "Admission")" class="portal-nav-item @(currentAction == "Notifications" ? "active" : "")">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="portal-nav-item-label">Notifications</span>
+                </a>
+            </div>
+
+            <!-- Account Section -->
+            <div class="portal-nav-section">
+                <div class="portal-nav-section-title">Account</div>
+                <a href="@Url.Action("Profile", "Admission")" class="portal-nav-item @(currentAction == "Profile" ? "active" : "")">
+                    <i class="fa-solid fa-user-circle"></i>
+                    <span class="portal-nav-item-label">My Profile</span>
+                </a>
+                <a href="@Url.Action("Settings", "Admission")" class="portal-nav-item @(currentAction == "Settings" ? "active" : "")">
+                    <i class="fa-solid fa-gear"></i>
+                    <span class="portal-nav-item-label">Settings</span>
+                </a>
+                <a href="@Url.Action("Help", "Admission")" class="portal-nav-item @(currentAction == "Help" ? "active" : "")">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span class="portal-nav-item-label">Help & Support</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="portal-sidebar-footer">
+            <a href="/" class="portal-nav-item">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span class="portal-nav-item-label">Back to Website</span>
+            </a>
+            <a href="@Url.Action("Logout", "Admission")" class="portal-nav-item" style="color: var(--portal-red);">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="portal-nav-item-label">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ═══════ TOPBAR ═══════ -->
+    <header class="portal-topbar" role="banner">
+        <div class="portal-topbar-left">
+            <!-- Sidebar Toggle -->
+            <button class="portal-topbar-toggle" id="portalSidebarToggle" aria-label="Toggle Sidebar">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <!-- Breadcrumb -->
+            <nav class="portal-breadcrumb" aria-label="Breadcrumb">
+                <a href="@Url.Action("Dashboard", "Admission")">Portal</a>
+                <span class="portal-breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
+                <span class="portal-breadcrumb-current">@ViewData["Title"]</span>
+            </nav>
+        </div>
+
+        <div class="portal-topbar-right">
+            <!-- Theme Toggle -->
+            <button class="portal-topbar-btn" id="portalThemeToggle" aria-label="Toggle Theme">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+
+            <!-- Notifications -->
+            <a href="@Url.Action("Notifications", "Admission")" class="portal-topbar-btn text-white text-decoration-none" aria-label="Notifications" title="Notifications">
+                <i class="fa-solid fa-bell"></i>
+            </a>
+
+            <!-- Profile Dropdown -->
+            <div class="portal-profile-dropdown">
+                <button class="portal-profile-trigger" aria-label="Profile Menu">
+                    <div class="portal-profile-avatar">@applicantInitials</div>
+                    <div class="portal-profile-info">
+                        <span class="portal-profile-name">@(applicantName ?? "Applicant")</span>
+                        <span class="portal-profile-role">Applicant</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down portal-profile-chevron"></i>
+                </button>
+                <div class="portal-profile-menu">
+                    <a href="@Url.Action("Profile", "Admission")" class="portal-profile-menu-item">
+                        <i class="fa-solid fa-user"></i> My Profile
+                    </a>
+                    <a href="@Url.Action("Settings", "Admission")" class="portal-profile-menu-item">
+                        <i class="fa-solid fa-gear"></i> Settings
+                    </a>
+                    <a href="@Url.Action("Help", "Admission")" class="portal-profile-menu-item">
+                        <i class="fa-solid fa-circle-question"></i> Help & Support
+                    </a>
+                    <div class="portal-profile-menu-divider"></div>
+                    <a href="@Url.Action("Logout", "Admission")" class="portal-profile-menu-item danger">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════ MAIN CONTENT ═══════ -->
+    <main class="portal-content" role="main">
+        @RenderBody()
+    </main>
+
+    <!-- ═══════ PORTAL FOOTER ═══════ -->
+    <footer class="portal-footer">
+        <span>&copy; @DateTime.Now.Year @settings.UniversityName — Applicant Portal v1.0</span>
+        <div style="display: flex; gap: 16px;">
+            <a href="@Url.Action("Privacy", "Home")" target="_blank">Privacy Policy</a>
+            <a href="@Url.Action("FAQs", "Home")" target="_blank">Help</a>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/portal.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

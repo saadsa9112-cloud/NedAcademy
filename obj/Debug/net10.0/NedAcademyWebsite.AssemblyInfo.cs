@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NedAcademyWebsite")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+46e918bbf6a713e409b3b959e29b10d1002f6ad2")]
 [assembly: System.Reflection.AssemblyProductAttribute("NedAcademyWebsite")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NedAcademyWebsite")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,0 +1,45 @@
+@using NedAcademyWebsite.Models
+@{
+    Layout = "_ApplicantLayout";
+    ViewData["Title"] = "Notifications";
+
+    var applicant = ViewBag.Applicant as Applicant;
+    var applications = ViewBag.Applications as IEnumerable<AdmissionApplication> ?? new List<AdmissionApplication>();
+}
+
+<div class="container-fluid p-0">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="portal-content-title">System Notifications</h1>
+            <p class="portal-content-subtitle">Real-time alerts, admission status updates, and deadline reminders.</p>
+        </div>
+    </div>
+
+    <div class="portal-card mb-4">
+        <div class="portal-card-header">
+            <div class="portal-card-title"><i class="fa-solid fa-bell me-2"></i> Recent Alerts & System Events</div>
+        </div>
+        <div class="portal-card-body">
+            <div class="d-flex flex-column gap-3">
+                <div class="portal-card p-3" style="border-left:4px solid var(--portal-cyan);">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fw-bold text-white"><i class="fa-solid fa-circle-check text-cyan me-2"></i> Applicant Portal Account Active</span>
+                        <span style="font-size:0.78rem; color:var(--portal-text-muted);">@DateTime.Now.ToString("dd MMM yyyy")</span>
+                    </div>
+                    <p class="mb-0" style="font-size:0.85rem; color:var(--portal-text-secondary);">Your applicant account was created and authenticated successfully. You can now track your application lifecycle.</p>
+                </div>
+
+                @foreach (var app in applications)
+                {
+                    <div class="portal-card p-3" style="border-left:4px solid var(--portal-blue);">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold text-white"><i class="fa-solid fa-file-lines text-blue me-2"></i> Application Status Update (@app.ApplicationNumber)</span>
+                            <span style="font-size:0.78rem; color:var(--portal-text-muted);">@app.CreatedDate.ToString("dd MMM yyyy")</span>
+                        </div>
+                        <p class="mb-0" style="font-size:0.85rem; color:var(--portal-text-secondary);">Application for @(app.DegreeProgram?.Name ?? "Degree Program") is currently in status: <strong>@app.CurrentStatus</strong>.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

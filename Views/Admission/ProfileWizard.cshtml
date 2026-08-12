@@ -1,0 +1,280 @@
+@using NedAcademyWebsite.Models
+@{
+    Layout = "_ApplicantLayout";
+    ViewData["Title"] = "Profile Completion Wizard";
+
+    var applicant = ViewBag.Applicant as Applicant;
+    var profile = applicant?.Profile ?? new ApplicantProfile();
+    var guardian = ViewBag.Guardian as ApplicantGuardianInfo ?? new ApplicantGuardianInfo();
+}
+
+<div class="container-fluid p-0">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="portal-content-title">Complete Your Applicant Profile</h1>
+            <p class="portal-content-subtitle">Please complete all 5 steps to achieve 100% profile verification for admission consideration.</p>
+        </div>
+        <div>
+            <span class="portal-badge portal-badge-active" style="font-size:0.9rem; padding:8px 14px;">
+                <i class="fa-solid fa-chart-pie me-1"></i> Completion: @(profile?.ProfileCompletionPercentage ?? 0)%
+            </span>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="portal-alert portal-alert-success mb-4">
+            <i class="fa-solid fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- 5-Step Wizard Progress Bar -->
+    <div class="portal-card mb-4 p-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 text-center" id="wizardStepper">
+            <div class="wizard-step active" id="stepIndicator-1">
+                <div class="wizard-step-circle">1</div>
+                <div class="wizard-step-label">Personal Info</div>
+            </div>
+            <div class="wizard-step-line"></div>
+            <div class="wizard-step" id="stepIndicator-2">
+                <div class="wizard-step-circle">2</div>
+                <div class="wizard-step-label">Address & City</div>
+            </div>
+            <div class="wizard-step-line"></div>
+            <div class="wizard-step" id="stepIndicator-3">
+                <div class="wizard-step-circle">3</div>
+                <div class="wizard-step-label">Guardian Info</div>
+            </div>
+            <div class="wizard-step-line"></div>
+            <div class="wizard-step" id="stepIndicator-4">
+                <div class="wizard-step-circle">4</div>
+                <div class="wizard-step-label">Emergency Contact</div>
+            </div>
+            <div class="wizard-step-line"></div>
+            <div class="wizard-step" id="stepIndicator-5">
+                <div class="wizard-step-circle">5</div>
+                <div class="wizard-step-label">Photo Upload</div>
+            </div>
+        </div>
+    </div>
+
+    <form asp-controller="Admission" asp-action="SaveProfileWizard" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        <!-- STEP 1: Personal Information -->
+        <div class="portal-card mb-4 wizard-content-pane" id="wizardPane-1">
+            <div class="portal-card-header">
+                <div class="portal-card-title"><i class="fa-solid fa-user me-2"></i> Step 1: Personal Information</div>
+            </div>
+            <div class="portal-card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Full Name <span class="required">*</span></label>
+                        <input type="text" name="FullName" class="portal-form-control" value="@(profile?.FullName ?? applicant?.FullName)" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Father's / Guardian's Name <span class="required">*</span></label>
+                        <input type="text" name="FatherName" class="portal-form-control" value="@(profile?.FatherName ?? guardian?.FatherName)" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="portal-form-label">CNIC / B-Form Number <span class="required">*</span></label>
+                        <input type="text" name="CNIC_Passport" class="portal-form-control" value="@(profile?.CNIC_Passport ?? applicant?.CNIC_Passport)" placeholder="e.g. 42101-1234567-1" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="portal-form-label">Date of Birth <span class="required">*</span></label>
+                        <input type="date" name="DateOfBirth" class="portal-form-control" value="@((profile?.DateOfBirth ?? applicant?.DateOfBirth ?? DateTime.Now).ToString("yyyy-MM-dd"))" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="portal-form-label">Gender <span class="required">*</span></label>
+                        <select name="Gender" class="portal-form-select" required>
+                            <option value="Male" selected="@(profile?.Gender == ApplicantGender.Male)">Male</option>
+                            <option value="Female" selected="@(profile?.Gender == ApplicantGender.Female)">Female</option>
+                            <option value="Other" selected="@(profile?.Gender == ApplicantGender.Other)">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Nationality <span class="required">*</span></label>
+                        <input type="text" name="Nationality" class="portal-form-control" value="@(profile?.Nationality ?? applicant?.Nationality ?? "Pakistani")" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Domicile District <span class="required">*</span></label>
+                        <input type="text" name="Domicile" class="portal-form-control" value="@(profile?.Domicile)" placeholder="e.g. Karachi East" required />
+                    </div>
+                </div>
+            </div>
+            <div class="portal-card-footer justify-content-end">
+                <button type="button" class="portal-btn portal-btn-cyan" onclick="goToWizardStep(2)">Next: Address <i class="fa-solid fa-arrow-right ms-1"></i></button>
+            </div>
+        </div>
+
+        <!-- STEP 2: Address & Residence -->
+        <div class="portal-card mb-4 wizard-content-pane" id="wizardPane-2" style="display:none;">
+            <div class="portal-card-header">
+                <div class="portal-card-title"><i class="fa-solid fa-location-dot me-2"></i> Step 2: Address & Residence Details</div>
+            </div>
+            <div class="portal-card-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="portal-form-label">Permanent Address <span class="required">*</span></label>
+                        <textarea name="PermanentAddress" rows="3" class="portal-form-control" placeholder="House/Flat No, Block, Street, Area" required>@(profile?.PermanentAddress ?? applicant?.Address)</textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="portal-form-label">Postal / Mailing Address <span class="required">*</span></label>
+                        <textarea name="PostalAddress" rows="3" class="portal-form-control" placeholder="Current residential address for official dispatch" required>@(profile?.PostalAddress ?? applicant?.Address)</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">City <span class="required">*</span></label>
+                        <input type="text" name="City" class="portal-form-control" value="@(profile?.City ?? applicant?.City)" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Province / Region <span class="required">*</span></label>
+                        <select name="Province" class="portal-form-select" required>
+                            <option value="Sindh" selected="@(profile?.Province == "Sindh")">Sindh</option>
+                            <option value="Punjab" selected="@(profile?.Province == "Punjab")">Punjab</option>
+                            <option value="Khyber Pakhtunkhwa" selected="@(profile?.Province == "Khyber Pakhtunkhwa")">Khyber Pakhtunkhwa</option>
+                            <option value="Balochistan" selected="@(profile?.Province == "Balochistan")">Balochistan</option>
+                            <option value="Gilgit-Baltistan" selected="@(profile?.Province == "Gilgit-Baltistan")">Gilgit-Baltistan</option>
+                            <option value="Azad Kashmir" selected="@(profile?.Province == "Azad Kashmir")">Azad Kashmir</option>
+                            <option value="Islamabad Capital Territory" selected="@(profile?.Province == "Islamabad Capital Territory")">Islamabad Capital Territory</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="portal-card-footer justify-content-between">
+                <button type="button" class="portal-btn portal-btn-outline" onclick="goToWizardStep(1)"><i class="fa-solid fa-arrow-left me-1"></i> Back</button>
+                <button type="button" class="portal-btn portal-btn-cyan" onclick="goToWizardStep(3)">Next: Guardian Info <i class="fa-solid fa-arrow-right ms-1"></i></button>
+            </div>
+        </div>
+
+        <!-- STEP 3: Guardian Details -->
+        <div class="portal-card mb-4 wizard-content-pane" id="wizardPane-3" style="display:none;">
+            <div class="portal-card-header">
+                <div class="portal-card-title"><i class="fa-solid fa-users me-2"></i> Step 3: Guardian & Financial Details</div>
+            </div>
+            <div class="portal-card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Guardian Full Name <span class="required">*</span></label>
+                        <input type="text" name="GuardianName" class="portal-form-control" value="@(guardian?.GuardianName ?? profile?.GuardianName)" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Relationship with Guardian <span class="required">*</span></label>
+                        <select name="GuardianRelation" class="portal-form-select" required>
+                            <option value="Father" selected="@(guardian?.GuardianRelation == "Father")">Father</option>
+                            <option value="Mother" selected="@(guardian?.GuardianRelation == "Mother")">Mother</option>
+                            <option value="Brother" selected="@(guardian?.GuardianRelation == "Brother")">Brother</option>
+                            <option value="Uncle" selected="@(guardian?.GuardianRelation == "Uncle")">Uncle</option>
+                            <option value="Other" selected="@(guardian?.GuardianRelation == "Other")">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Father / Guardian CNIC <span class="required">*</span></label>
+                        <input type="text" name="GuardianCNIC" class="portal-form-control" value="@(guardian?.GuardianCNIC ?? guardian?.FatherCNIC)" placeholder="e.g. 42101-9876543-1" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Guardian Occupation <span class="required">*</span></label>
+                        <input type="text" name="GuardianOccupation" class="portal-form-control" value="@(guardian?.GuardianOccupation ?? guardian?.FatherOccupation)" placeholder="e.g. Engineer / Government Officer / Businessman" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Guardian Phone Number <span class="required">*</span></label>
+                        <input type="text" name="GuardianPhone" class="portal-form-control" value="@(guardian?.GuardianPhone ?? profile?.GuardianPhone)" placeholder="+92-300-1234567" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Monthly Household Income (PKR) <span class="required">*</span></label>
+                        <input type="number" name="MonthlyIncome" class="portal-form-control" value="@(guardian?.MonthlyIncome ?? 100000)" required />
+                    </div>
+                </div>
+            </div>
+            <div class="portal-card-footer justify-content-between">
+                <button type="button" class="portal-btn portal-btn-outline" onclick="goToWizardStep(2)"><i class="fa-solid fa-arrow-left me-1"></i> Back</button>
+                <button type="button" class="portal-btn portal-btn-cyan" onclick="goToWizardStep(4)">Next: Emergency Contact <i class="fa-solid fa-arrow-right ms-1"></i></button>
+            </div>
+        </div>
+
+        <!-- STEP 4: Emergency Contacts -->
+        <div class="portal-card mb-4 wizard-content-pane" id="wizardPane-4" style="display:none;">
+            <div class="portal-card-header">
+                <div class="portal-card-title"><i class="fa-solid fa-phone-volume me-2"></i> Step 4: Emergency Contact Details</div>
+            </div>
+            <div class="portal-card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Emergency Contact Person Name <span class="required">*</span></label>
+                        <input type="text" name="EmergencyContactName" class="portal-form-control" value="@(profile?.EmergencyContactName)" placeholder="Name of immediate relative" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Emergency Contact Phone Number <span class="required">*</span></label>
+                        <input type="text" name="EmergencyContactPhone" class="portal-form-control" value="@(profile?.EmergencyContactPhone)" placeholder="+92-300-9876543" required />
+                    </div>
+                    <div class="col-12">
+                        <label class="portal-form-label">Emergency Residence Address <span class="required">*</span></label>
+                        <textarea name="EmergencyAddress" rows="2" class="portal-form-control" placeholder="Address to contact in case of emergency" required>@(guardian?.EmergencyAddress ?? profile?.PermanentAddress)</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="portal-card-footer justify-content-between">
+                <button type="button" class="portal-btn portal-btn-outline" onclick="goToWizardStep(3)"><i class="fa-solid fa-arrow-left me-1"></i> Back</button>
+                <button type="button" class="portal-btn portal-btn-cyan" onclick="goToWizardStep(5)">Next: Photo Upload <i class="fa-solid fa-arrow-right ms-1"></i></button>
+            </div>
+        </div>
+
+        <!-- STEP 5: Photograph Upload & Finish -->
+        <div class="portal-card mb-4 wizard-content-pane" id="wizardPane-5" style="display:none;">
+            <div class="portal-card-header">
+                <div class="portal-card-title"><i class="fa-solid fa-camera me-2"></i> Step 5: Profile Photograph & Finalization</div>
+            </div>
+            <div class="portal-card-body">
+                <div class="row align-items-center g-4">
+                    <div class="col-md-4 text-center">
+                        <div class="portal-avatar-lg mx-auto mb-3" style="width:120px; height:120px; font-size:2.5rem; background:linear-gradient(135deg, var(--portal-cyan), var(--portal-blue)); color:#030712; display:flex; align-items:center; justify-content:center; border-radius:50%; font-weight:800;">
+                            @if (!string.IsNullOrEmpty(profile?.ProfilePhotoPath))
+                            {
+                                <img src="@profile.ProfilePhotoPath" alt="Profile" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />
+                            }
+                            else
+                            {
+                                <span>@(applicant?.FullName?[0] ?? 'A')</span>
+                            }
+                        </div>
+                        <span class="portal-badge portal-badge-info">Passport Size Photo</span>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="portal-form-label">Upload Passport Photograph (JPG / PNG, Max 2MB)</label>
+                        <input type="file" name="profilePhoto" class="portal-form-control mb-2" accept=".jpg,.jpeg,.png" />
+                        <div style="font-size:0.8rem; color:var(--portal-text-muted);">
+                            Photo must be clear, white or blue background, taken within the last 6 months.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="portal-card-footer justify-content-between">
+                <button type="button" class="portal-btn portal-btn-outline" onclick="goToWizardStep(4)"><i class="fa-solid fa-arrow-left me-1"></i> Back</button>
+                <button type="submit" class="portal-btn portal-btn-cyan"><i class="fa-solid fa-circle-check me-1"></i> Save Profile & Complete (100%)</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    .wizard-step { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+    .wizard-step-circle { width: 36px; height: 36px; border-radius: 50%; background: var(--portal-surface); border: 2px solid var(--portal-border); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--portal-text-muted); transition: all 0.3s ease; }
+    .wizard-step.active .wizard-step-circle { background: var(--portal-cyan); border-color: var(--portal-cyan); color: #030712; }
+    .wizard-step-label { font-size: 0.78rem; font-weight: 600; color: var(--portal-text-muted); margin-top: 6px; }
+    .wizard-step.active .wizard-step-label { color: var(--portal-cyan); }
+    .wizard-step-line { flex: 1; height: 2px; background: var(--portal-border); margin: 0 10px; align-self: center; }
+</style>
+
+<script>
+    function goToWizardStep(stepNumber) {
+        for (let i = 1; i <= 5; i++) {
+            document.getElementById('wizardPane-' + i).style.display = (i === stepNumber) ? 'block' : 'none';
+            const indicator = document.getElementById('stepIndicator-' + i);
+            if (i <= stepNumber) {
+                indicator.classList.add('active');
+            } else {
+                indicator.classList.remove('active');
+            }
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>

@@ -19,6 +19,7 @@ public class AdminController : Controller
     private readonly IStructureService _structureService;
     private readonly IPageBuilderService _pageBuilderService;
     private readonly ISearchService _searchService;
+    private readonly IAdmissionService _admissionService;
 
     public AdminController(
         ApplicationDbContext context,
@@ -26,7 +27,8 @@ public class AdminController : Controller
         IAuditLogService auditLog,
         IStructureService structureService,
         IPageBuilderService pageBuilderService,
-        ISearchService searchService)
+        ISearchService searchService,
+        IAdmissionService admissionService)
     {
         _context = context;
         _env = env;
@@ -34,6 +36,7 @@ public class AdminController : Controller
         _structureService = structureService;
         _pageBuilderService = pageBuilderService;
         _searchService = searchService;
+        _admissionService = admissionService;
     }
 
     [AllowAnonymous]
@@ -100,6 +103,16 @@ public class AdminController : Controller
         ViewBag.MediaAssetsCount = await _context.MediaAssets.CountAsync(m => !m.IsDeleted);
         ViewBag.RecentLogs = await _auditLog.GetLogsAsync(7);
         ViewBag.RecentUploads = await _context.MediaAssets.Where(m => !m.IsDeleted).OrderByDescending(m => m.UploadDate).Take(4).ToListAsync();
+
+        ViewBag.ApplicationsCount = await _context.AdmissionApplications.CountAsync(a => !a.IsDeleted);
+        ViewBag.PendingApplicationsCount = await _context.AdmissionApplications.CountAsync(a => !a.IsDeleted && (a.CurrentStatus == ApplicationStatus.Submitted || a.CurrentStatus == ApplicationStatus.UnderReview));
+        ViewBag.RecentApplications = await _context.AdmissionApplications
+            .Include(a => a.Applicant)
+            .Include(a => a.DegreeProgram)
+            .Where(a => !a.IsDeleted)
+            .OrderByDescending(a => a.CreatedDate)
+            .Take(5)
+            .ToListAsync();
 
         var recentMessages = await _context.ContactMessages
             .OrderByDescending(m => m.ReceivedDate)
@@ -979,6 +992,269 @@ public class AdminController : Controller
             TempData["Success"] = "File moved to Recycle Bin.";
         }
         return RedirectToAction(nameof(Media));
+    }
+    #endregion
+
+    #region Admission Digital Admission File & Decision Workflow
+    // GET: /Admin/Admissions or /Admin/Applications
+    [HttpGet("Admin/Admissions")]
+    [HttpGet("Admin/Applications")]
+    public async Task<IActionResult> Admissions(string? status, string? search)
+    {
+        var query = _context.AdmissionApplications
+            .Include(a => a.Applicant)
+            .Include(a => a.DegreeProgram)
+            .Where(a => !a.IsDeleted);
+
+        if (!string.IsNullOrEmpty(status) && Enum.TryParse<ApplicationStatus>(status, true, out var parsedStatus))
+        {
+            query = query.Where(a => a.CurrentStatus == parsedStatus);
+        }
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(a => a.ApplicationNumber.Contains(search) || (a.Applicant != null && a.Applicant.FullName.Contains(search)) || (a.Applicant != null && a.Applicant.Email.Contains(search)));
+        }
+
+        var list = await query.OrderByDescending(a => a.CreatedDate).ToListAsync();
+        ViewBag.CurrentStatus = status;
+        ViewBag.Search = search;
+        return View(list);
+    }
+
+    // GET: /Admin/ApplicantDetails/{id}
+    [HttpGet("Admin/ApplicantDetails/{id}")]
+    public async Task<IActionResult> ApplicantDetails(int id, string? tab = "overview")
+    {
+        var app = await _context.AdmissionApplications
+            .Include(a => a.Applicant)
+            .Include(a => a.DegreeProgram)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (app == null) return NotFound();
+
+        var profile = await _admissionService.GetApplicantProfileAsync(app.ApplicantId);
+        var guardian = await _admissionService.GetGuardianInfoAsync(app.ApplicantId);
+        var academics = await _admissionService.GetAcademicRecordsAsync(app.ApplicantId);
+        var documents = await _admissionService.GetDocumentsByApplicationAsync(app.Id);
+        var vouchers = await _admissionService.GetVouchersByApplicantAsync(app.ApplicantId);
+        var timeline = await _admissionService.GetTimelineLogsAsync(app.Id);
+        var enrollment = await _admissionService.GetEnrollmentRecordByApplicantAsync(app.ApplicantId);
+
+        var decisions = await _context.AdmissionDecisions
+            .Where(d => d.AdmissionApplicationId == id)
+            .OrderByDescending(d => d.Timestamp)
+            .ToListAsync();
+
+        var auditLogs = await _context.AdmissionAuditLogs
+            .Where(l => l.EntityId == id.ToString() || l.EntityId == app.ApplicantId.ToString())
+            .OrderByDescending(l => l.Timestamp)
+            .ToListAsync();
+
+        var testSchedule = await _admissionService.GetTestScheduleByApplicationAsync(app.Id);
+        var testResult = await _admissionService.GetTestResultByApplicationAsync(app.Id);
+
+        ViewBag.ApplicantProfile = profile;
+        ViewBag.Guardian = guardian;
+        ViewBag.Academics = academics;
+        ViewBag.Documents = documents;
+        var internalNotes = await _admissionService.GetInternalNotesByApplicationAsync(app.Id);
+
+        ViewBag.FeeVouchers = vouchers;
+        ViewBag.TimelineLogs = timeline;
+        ViewBag.EnrollmentRecord = enrollment;
+        ViewBag.Decisions = decisions;
+        ViewBag.AuditLogs = auditLogs;
+        ViewBag.TestSchedule = testSchedule;
+        ViewBag.TestResult = testResult;
+        ViewBag.InternalNotes = internalNotes;
+        ViewBag.ActiveTab = string.IsNullOrWhiteSpace(tab) ? "overview" : tab.ToLower().Trim();
+
+        return View(app);
+    }
+
+    // POST: /Admin/SaveInternalNote
+    [HttpPost("Admin/SaveInternalNote")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SaveInternalNote(int applicationId, string noteText, string? activeTab = "audit")
+    {
+        string officerId = User.Identity?.Name ?? "AdmissionAdmin";
+        if (!string.IsNullOrWhiteSpace(noteText))
+        {
+            await _admissionService.SaveInternalNoteAsync(applicationId, officerId, noteText.Trim(), null, null);
+            TempData["Success"] = "Internal note saved successfully.";
+        }
+        return RedirectToAction(nameof(ApplicantDetails), new { id = applicationId, tab = activeTab ?? "audit" });
+    }
+
+    // POST: /Admin/AssignOfficer
+    [HttpPost("Admin/AssignOfficer")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AssignOfficer(int applicationId, string officerId, string? activeTab = "overview")
+    {
+        string currentAdmin = User.Identity?.Name ?? "SuperAdmin";
+        if (!string.IsNullOrWhiteSpace(officerId))
+        {
+            await _admissionService.AssignOfficerAsync(applicationId, officerId, currentAdmin);
+            TempData["Success"] = $"Application reassigned to officer '{officerId}'.";
+        }
+        return RedirectToAction(nameof(ApplicantDetails), new { id = applicationId, tab = activeTab ?? "overview" });
+    }
+
+    // POST: /Admin/OverrideScholarship
+    [HttpPost("Admin/OverrideScholarship")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> OverrideScholarship(int applicationId, double overridePercentage, string reason, string? activeTab = "scholarship")
+    {
+        string currentAdmin = User.Identity?.Name ?? "SuperAdmin";
+        if (overridePercentage >= 0 && overridePercentage <= 100)
+        {
+            await _admissionService.OverrideScholarshipAsync(applicationId, overridePercentage, reason ?? "Approved by Management", currentAdmin);
+            TempData["Success"] = $"Scholarship percentage manually updated to {overridePercentage}%.";
+        }
+        return RedirectToAction(nameof(ApplicantDetails), new { id = applicationId, tab = activeTab ?? "scholarship" });
+    }
+
+    // POST: /Admin/ProcessDecision
+    [HttpPost("Admin/ProcessDecision")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ProcessDecision(int applicationId, string decisionType, string comments, string? activeTab = "approval")
+    {
+        string officerId = User.Identity?.Name ?? "AdmissionAdmin";
+        var enrollment = await _admissionService.ProcessAdmissionDecisionAsync(applicationId, decisionType, comments, officerId);
+
+        TempData["Success"] = $"Admission Decision '{decisionType}' processed successfully!";
+        return RedirectToAction(nameof(ApplicantDetails), new { id = applicationId, tab = activeTab ?? "approval" });
+    }
+
+    // POST: /Admin/VerifyDocument
+    [HttpPost("Admin/VerifyDocument")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> VerifyDocument(int documentId, int applicationId, string status, string remarks, string? activeTab = "documents")
+    {
+        string officerId = User.Identity?.Name ?? "AdmissionAdmin";
+        if (Enum.TryParse<DocumentVerificationStatus>(status, true, out var parsedStatus))
+        {
+            await _admissionService.VerifyDocumentAsync(documentId, parsedStatus, remarks, officerId);
+            TempData["Success"] = $"Document verification updated to '{status}'.";
+        }
+        return RedirectToAction(nameof(ApplicantDetails), new { id = applicationId, tab = activeTab ?? "documents" });
+    }
+
+    // POST: /Admin/VerifyFeePayment
+    [HttpPost("Admin/VerifyFeePayment")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> VerifyFeePayment(int voucherId, int applicationId, string? paymentMethod, string? transactionRef, string? activeTab = "fee")
+    {
+        string officerId = User.Identity?.Name ?? "AdmissionAdmin";
+        await _admissionService.VerifyFeePaymentAsync(voucherId, paymentMethod ?? "BankTransfer", transactionRef ?? "TXN-VERIFIED", officerId);
+        TempData["Success"] = "Fee voucher payment approved and verified successfully!";
+        return RedirectToAction(nameof(ApplicantDetails), new { id = applicationId, tab = activeTab ?? "fee" });
+    }
+
+    // POST: /Admin/GenerateFeeVoucher
+    [HttpPost("Admin/GenerateFeeVoucher")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> GenerateFeeVoucher(int applicationId, string voucherType, decimal amount, string? activeTab = "fee")
+    {
+        string officerId = User.Identity?.Name ?? "AdmissionAdmin";
+        await _admissionService.GenerateFeeVoucherAsync(applicationId, voucherType, amount, DateTime.UtcNow.AddDays(14));
+        TempData["Success"] = $"Fee voucher ({voucherType} - PKR {amount:N0}) generated successfully!";
+        return RedirectToAction(nameof(ApplicantDetails), new { id = applicationId, tab = activeTab ?? "fee" });
+    }
+
+    // POST: /Admin/DeleteFeeVoucher
+    [HttpPost("Admin/DeleteFeeVoucher")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteFeeVoucher(int voucherId, int applicationId, string? activeTab = "fee")
+    {
+        string officerId = User.Identity?.Name ?? "AdmissionAdmin";
+        await _admissionService.DeleteFeeVoucherAsync(voucherId, officerId);
+        TempData["Success"] = "Fee voucher deleted and removed successfully!";
+        return RedirectToAction(nameof(ApplicantDetails), new { id = applicationId, tab = activeTab ?? "fee" });
+    }
+
+    // GET: /Admin/Scholarships
+    [HttpGet("Admin/Scholarships")]
+    public async Task<IActionResult> Scholarships()
+    {
+        var rules = await _admissionService.GetAllScholarshipRulesAsync();
+        return View(rules);
+    }
+
+    // POST: /Admin/SaveScholarshipRule
+    [HttpPost("Admin/SaveScholarshipRule")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SaveScholarshipRule(ScholarshipRule rule)
+    {
+        if (ModelState.IsValid)
+        {
+            await _admissionService.SaveScholarshipRuleAsync(rule);
+            TempData["Success"] = $"Scholarship Rule '{rule.ScholarshipName}' saved successfully!";
+        }
+        return RedirectToAction(nameof(Scholarships));
+    }
+
+    // POST: /Admin/DeleteScholarshipRule
+    [HttpPost("Admin/DeleteScholarshipRule")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteScholarshipRule(int id)
+    {
+        await _admissionService.DeleteScholarshipRuleAsync(id);
+        TempData["Success"] = "Scholarship rule removed successfully.";
+        return RedirectToAction(nameof(Scholarships));
+    }
+
+    // GET: /Admin/FeeConfig
+    [HttpGet("Admin/FeeConfig")]
+    public async Task<IActionResult> FeeConfig()
+    {
+        var config = await _admissionService.GetFeeStructureConfigAsync();
+        return View(config);
+    }
+
+    // POST: /Admin/SaveFeeConfig
+    [HttpPost("Admin/SaveFeeConfig")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SaveFeeConfig(FeeStructureConfig config)
+    {
+        string officerId = User.Identity?.Name ?? "Admin";
+        await _admissionService.SaveFeeStructureConfigAsync(config, officerId);
+        TempData["Success"] = "University Fee Structure updated successfully!";
+        return RedirectToAction(nameof(FeeConfig));
+    }
+
+    // POST: /Admin/ScheduleTest
+    [HttpPost("Admin/ScheduleTest")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ScheduleTest(AdmissionTestSchedule schedule, string? activeTab = "schedule")
+    {
+        schedule.ScheduledByUserId = User.Identity?.Name ?? "AdmissionOfficer";
+        await _admissionService.ScheduleAdmissionTestAsync(schedule);
+        TempData["Success"] = "Admission Test scheduled successfully!";
+        return RedirectToAction(nameof(ApplicantDetails), new { id = schedule.AdmissionApplicationId, tab = activeTab ?? "schedule" });
+    }
+
+    // POST: /Admin/RecordTestResult
+    [HttpPost("Admin/RecordTestResult")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RecordTestResult(int applicationId, double obtainedMarks, double totalMarks, string remarks, string? activeTab = "results")
+    {
+        string officerId = User.Identity?.Name ?? "AdmissionOfficer";
+        var result = await _admissionService.RecordTestResultAsync(applicationId, obtainedMarks, totalMarks, remarks, officerId);
+        TempData["Success"] = $"Test Result recorded ({obtainedMarks}/{totalMarks} - {result.CalculatedPercentage}%). Status updated!";
+        return RedirectToAction(nameof(ApplicantDetails), new { id = applicationId, tab = activeTab ?? "results" });
+    }
+
+    // POST: /Admin/ReactivateVoucher
+    [HttpPost("Admin/ReactivateVoucher")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ReactivateVoucher(int oldVoucherId, int applicationId, DateTime newDueDate, string? activeTab = "fee")
+    {
+        string officerId = User.Identity?.Name ?? "AdmissionAdmin";
+        var voucher = await _admissionService.ReactivateVoucherAsync(oldVoucherId, newDueDate, officerId);
+        TempData["Success"] = $"Voucher reactivated with new Voucher #: {voucher.VoucherNumber} (Due: {newDueDate:dd MMM yyyy})!";
+        return RedirectToAction(nameof(ApplicantDetails), new { id = applicationId, tab = activeTab ?? "fee" });
     }
     #endregion
 }

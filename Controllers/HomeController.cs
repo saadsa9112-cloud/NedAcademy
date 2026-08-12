@@ -20,6 +20,7 @@ public class HomeController : Controller
     private readonly IDownloadService _downloadService;
     private readonly IFAQService _faqService;
     private readonly IContactService _contactService;
+    private readonly IAdmissionService _admissionService;
 
     public HomeController(
         ApplicationDbContext context,
@@ -32,7 +33,8 @@ public class HomeController : Controller
         INewsService newsService,
         IDownloadService downloadService,
         IFAQService faqService,
-        IContactService contactService)
+        IContactService contactService,
+        IAdmissionService admissionService)
     {
         _context = context;
         _settingService = settingService;
@@ -45,6 +47,7 @@ public class HomeController : Controller
         _downloadService = downloadService;
         _faqService = faqService;
         _contactService = contactService;
+        _admissionService = admissionService;
     }
 
     public async Task<IActionResult> Index()
@@ -105,9 +108,21 @@ public class HomeController : Controller
         return View(list);
     }
 
-    public IActionResult Admissions()
+    public async Task<IActionResult> Admissions()
     {
-        return View();
+        var settings = await _settingService.GetSettingsAsync();
+        var activeSession = await _admissionService.GetActiveAdmissionSessionAsync();
+        var offeredPrograms = activeSession != null 
+            ? await _admissionService.GetOfferedProgramsAsync(activeSession.Id) 
+            : new List<AdmissionSessionProgram>();
+        var faqs = await _faqService.GetFAQsAsync();
+
+        ViewBag.ActiveSession = activeSession;
+        ViewBag.OfferedPrograms = offeredPrograms;
+        ViewBag.AdmissionFaqs = faqs.Where(f => f.Category == "General" || f.Category == "Academics" || f.Category == "Admissions").ToList();
+        ViewBag.SystemSettings = settings;
+
+        return View(settings);
     }
 
     public IActionResult Scholarships()

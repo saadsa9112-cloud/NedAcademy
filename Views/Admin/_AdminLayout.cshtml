@@ -214,6 +214,17 @@
                     <i class="fa-solid fa-rectangle-list"></i> Dynamic Form Builder
                 </a>
 
+                <div class="nav-section-header">Admission ERP System</div>
+                <a asp-action="Admissions" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Admissions" || ViewContext.RouteData.Values["action"]?.ToString() == "ApplicantDetails" ? "active" : "")">
+                    <i class="fa-solid fa-id-card-clip"></i> Applications Queue
+                </a>
+                <a asp-action="Scholarships" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Scholarships" ? "active" : "")">
+                    <i class="fa-solid fa-award"></i> Scholarships Engine
+                </a>
+                <a asp-action="FeeConfig" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "FeeConfig" ? "active" : "")">
+                    <i class="fa-solid fa-calculator"></i> Fee Structure Config
+                </a>
+
                 <div class="nav-section-header">Content Modules</div>
                 <a asp-action="Programs" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Programs" ? "active" : "")">
                     <i class="fa-solid fa-graduation-cap"></i> Degree Programs

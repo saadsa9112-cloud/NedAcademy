@@ -1,0 +1,141 @@
+@using NedAcademyWebsite.Models
+@{
+    ViewData["Title"] = "Online Admission System Portal - NED Academy";
+    var activeSession = ViewBag.ActiveSession as AdmissionSession;
+    var selectedProgram = ViewBag.SelectedProgram as DegreeProgram;
+    var settings = ViewBag.SystemSettings as SystemSetting;
+    string sessionTitle = activeSession?.Title ?? "Fall 2026 Admissions";
+    string deadlineStr = activeSession != null ? activeSession.ApplicationDeadline.ToString("MMMM dd, yyyy") : "October 15, 2026";
+    string feeStr = activeSession != null ? $"PKR {activeSession.ProcessingFeeAmount:N0}" : "PKR 2,500";
+}
+
+<div class="container py-5" style="margin-top: 40px;">
+    <!-- Breadcrumbs Navigation -->
+    <nav aria-label="breadcrumb" class="mb-4 reveal-up">
+        <ol class="breadcrumb mb-0 px-3 py-2 rounded-3" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border);">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-gradient-cyan text-decoration-none"><i class="fa-solid fa-house me-1"></i> Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Admissions" class="text-gradient-cyan text-decoration-none">Admissions</a></li>
+            <li class="breadcrumb-item active text-light" aria-current="page">Online Application Portal</li>
+        </ol>
+    </nav>
+
+    <!-- Header Welcome Banner -->
+    <div class="glass-card p-5 mb-5 text-center position-relative overflow-hidden reveal-up" style="border-top: 3px solid var(--cyan); background: radial-gradient(circle at 50% 0%, rgba(0, 242, 254, 0.12) 0%, rgba(3, 7, 18, 0.85) 70%);">
+        <div class="max-width-700 mx-auto position-relative" style="z-index: 1;">
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-3" style="background: rgba(0, 242, 254, 0.06); border: 1px solid rgba(0, 242, 254, 0.2);">
+                <span class="d-inline-block rounded-circle bg-success" style="width: 8px; height: 8px; animation: pulse 1.5s infinite;"></span>
+                <span class="text-uppercase font-headings fw-bold text-gradient-cyan" style="font-size: 0.78rem; letter-spacing: 0.1em;">@sessionTitle - Online Portal</span>
+            </div>
+            
+            <h1 class="display-4 text-white mb-3" style="font-weight: 800;">Welcome to Online Admission Portal</h1>
+            <p class="text-muted fs-5 mb-4 pe-lg-3" style="line-height: 1.6;">
+                Begin your admission application, register your applicant profile, upload documents, and track your application status in real time.
+            </p>
+
+            @if (selectedProgram != null)
+            {
+                <!-- Selected Program Pre-selection Highlight Box -->
+                <div class="p-3 rounded-3 mb-4 text-start" style="background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.3);">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <small class="text-uppercase font-headings text-gradient-cyan fw-bold" style="font-size:0.75rem;">Selected Degree Program</small>
+                            <h5 class="text-white m-0 fw-bold"><i class="fa-solid fa-graduation-cap text-gradient-cyan me-2"></i> @selectedProgram.Name</h5>
+                        </div>
+                        <span class="badge bg-primary px-3 py-2 font-headings" style="font-size:0.8rem;">@selectedProgram.Duration Program</span>
+                    </div>
+                </div>
+            }
+
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <a asp-controller="Admission" asp-action="Register" asp-route-program="@selectedProgram?.Slug" class="btn btn-cyber">
+                    <i class="fa-solid fa-user-plus me-1"></i> Create Applicant Account
+                </a>
+                <a asp-controller="Admission" asp-action="Login" asp-route-program="@selectedProgram?.Slug" class="btn btn-cyber-outline">
+                    <i class="fa-solid fa-right-to-bracket me-1"></i> Applicant Login
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3 Action Cards Grid -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-4 col-md-6">
+            <div class="glass-card p-4 h-100 text-start d-flex flex-column justify-content-between reveal-up" style="border-top: 3px solid var(--cyan);">
+                <div>
+                    <div class="rounded-3 p-3 mb-4 d-inline-block bg-primary bg-opacity-10 text-gradient-cyan">
+                        <i class="fa-solid fa-user-plus fa-2x"></i>
+                    </div>
+                    <h4 class="text-white mb-2" style="font-weight: 700;">New Applicants</h4>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem; line-height: 1.6;">
+                        First time applying at NED Academy? Create a secure applicant profile using your CNIC/Passport number and valid email address.
+                    </p>
+                </div>
+                <a asp-controller="Admission" asp-action="Register" asp-route-program="@selectedProgram?.Slug" class="btn btn-cyber w-100 justify-content-center">
+                    Start Application <i class="fa-solid fa-arrow-right-long ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <div class="glass-card p-4 h-100 text-start d-flex flex-column justify-content-between reveal-up" style="border-top: 3px solid var(--royal-blue);">
+                <div>
+                    <div class="rounded-3 p-3 mb-4 d-inline-block bg-primary bg-opacity-10 text-gradient-blue">
+                        <i class="fa-solid fa-right-to-bracket fa-2x"></i>
+                    </div>
+                    <h4 class="text-white mb-2" style="font-weight: 700;">Registered Applicants</h4>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem; line-height: 1.6;">
+                        Already created an account or saved a draft? Log in to complete your application, upload documents, or download your fee voucher.
+                    </p>
+                </div>
+                <a asp-controller="Admission" asp-action="Login" asp-route-program="@selectedProgram?.Slug" class="btn btn-cyber-outline w-100 justify-content-center">
+                    Applicant Login <i class="fa-solid fa-key ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-12">
+            <div class="glass-card p-4 h-100 text-start d-flex flex-column justify-content-between reveal-up" style="border-top: 3px solid #22c55e;">
+                <div>
+                    <div class="rounded-3 p-3 mb-4 d-inline-block bg-success bg-opacity-10 text-success">
+                        <i class="fa-solid fa-file-arrow-down fa-2x"></i>
+                    </div>
+                    <h4 class="text-white mb-2" style="font-weight: 700;">Prospectus & Guides</h4>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem; line-height: 1.6;">
+                        Review complete degree curriculums, eligibility rules, fee structures, and scholarship guidelines in our official prospectus.
+                    </p>
+                </div>
+                <a asp-controller="Home" asp-action="Downloads" class="btn btn-cyber-outline w-100 justify-content-center">
+                    Download Prospectus <i class="fa-solid fa-download ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Requirements & Support Information Section -->
+    <div class="row g-4 text-start">
+        <div class="col-lg-6">
+            <div class="glass-card p-4 h-100 reveal-up">
+                <h5 class="text-white fw-bold mb-3"><i class="fa-solid fa-clipboard-check text-gradient-cyan me-2"></i> Application Checklist</h5>
+                <ul class="list-unstyled d-flex flex-column gap-2 text-muted mb-0" style="font-size: 0.9rem;">
+                    <li><i class="fa-solid fa-check text-gradient-cyan me-2"></i> Scanned copy of CNIC or B-Form</li>
+                    <li><i class="fa-solid fa-check text-gradient-cyan me-2"></i> Secondary School (Matric / O-Level) Marksheet</li>
+                    <li><i class="fa-solid fa-check text-gradient-cyan me-2"></i> Higher Secondary (Intermediate / A-Level) Marksheet</li>
+                    <li><i class="fa-solid fa-check text-gradient-cyan me-2"></i> Recent passport size photograph (white background)</li>
+                    <li><i class="fa-solid fa-check text-gradient-cyan me-2"></i> Valid Email address and mobile phone number</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="glass-card p-4 h-100 reveal-up">
+                <h5 class="text-white fw-bold mb-3"><i class="fa-solid fa-headset text-gradient-blue me-2"></i> Need Assistance?</h5>
+                <p class="text-muted mb-3" style="font-size: 0.9rem;">If you experience technical issues while applying, our admission help desk is available during office hours.</p>
+                <div class="d-flex flex-column gap-2 text-light" style="font-size: 0.9rem;">
+                    <div><i class="fa-solid fa-phone text-gradient-cyan me-2"></i> <strong>Helpline:</strong> @(settings?.ContactPhone ?? "+92-21-99261261")</div>
+                    <div><i class="fa-solid fa-envelope text-gradient-blue me-2"></i> <strong>Email:</strong> admissions@@nedacademy.edu</div>
+                    <div><i class="fa-solid fa-clock text-gradient-cyan me-2"></i> <strong>Hours:</strong> Mon - Fri | 08:30 AM - 04:30 PM</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

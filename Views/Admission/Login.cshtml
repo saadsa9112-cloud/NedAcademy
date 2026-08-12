@@ -1,0 +1,128 @@
+@inject NedAcademyWebsite.Services.ISettingService SettingService
+@{
+    Layout = null;
+    var settings = await SettingService.GetSettingsAsync();
+    string? programSlug = ViewBag.SelectedProgram as string;
+    string? errorMessage = ViewBag.ErrorMessage as string;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In - @settings.UniversityName Applicant Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="~/css/portal.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="portal-auth-page">
+        <!-- Left Panel -->
+        <div class="portal-auth-brand">
+            <div class="portal-auth-brand-logo">
+                <div class="portal-auth-brand-icon">@(settings.UniversityName?.FirstOrDefault() ?? 'N')</div>
+                <div class="portal-auth-brand-title">@settings.UniversityName</div>
+                <div class="portal-auth-brand-subtitle">Applicant Portal</div>
+            </div>
+            
+            <div class="portal-auth-brand-content">
+                <h1 class="portal-auth-brand-heading">Welcome Back to Your<br><span>Admission Portal</span></h1>
+                <p class="portal-auth-brand-desc">Manage your admission applications, track your status, and stay updated with real-time notifications.</p>
+                
+                <ul class="portal-auth-features">
+                    <li class="portal-auth-feature">
+                        <i class="fa-solid fa-chart-line portal-auth-feature-icon"></i> Track Application Status
+                    </li>
+                    <li class="portal-auth-feature">
+                        <i class="fa-solid fa-file-arrow-up portal-auth-feature-icon"></i> Upload Documents Securely
+                    </li>
+                    <li class="portal-auth-feature">
+                        <i class="fa-regular fa-bell portal-auth-feature-icon"></i> Real-time Notifications
+                    </li>
+                    <li class="portal-auth-feature">
+                        <i class="fa-solid fa-laptop-code portal-auth-feature-icon"></i> 24/7 Portal Access
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="portal-auth-badges">
+                <div class="portal-auth-badge"><i class="fa-solid fa-lock"></i> 256-bit SSL</div>
+                <div class="portal-auth-badge"><i class="fa-solid fa-shield-halved"></i> GDPR Compliant</div>
+                <div class="portal-auth-badge"><i class="fa-solid fa-check-double"></i> Secure Portal</div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="portal-auth-form-panel">
+            <a href="@Url.Action("Index", "Home")" class="portal-auth-back">&larr; Back to Website</a>
+            
+            <div class="portal-auth-form-container">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="portal-alert portal-alert-success">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <span>@TempData["SuccessMessage"]</span>
+                    </div>
+                }
+                
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="portal-alert portal-alert-error">
+                        <i class="fa-solid fa-exclamation-circle"></i>
+                        <span>@errorMessage</span>
+                    </div>
+                }
+
+                <div class="portal-auth-form-header">
+                    <h2 class="portal-auth-form-title">Sign In</h2>
+                    <p class="portal-auth-form-subtitle">Enter your credentials to access your portal</p>
+                </div>
+
+                <form method="post" asp-controller="Admission" asp-action="Login" asp-antiforgery="true">
+                    @if (!string.IsNullOrEmpty(programSlug))
+                    {
+                        <input type="hidden" name="program" value="@programSlug" />
+                    }
+
+                    <div class="portal-form-group">
+                        <label class="portal-form-label">Email</label>
+                        <input type="email" name="email" class="portal-form-control" required placeholder="name@example.com" />
+                    </div>
+
+                    <div class="portal-form-group">
+                        <label class="portal-form-label">Password</label>
+                        <input type="password" name="password" class="portal-form-control" required placeholder="Enter your password" />
+                    </div>
+
+                    <div class="portal-auth-actions d-flex justify-content-between align-items-center mb-4">
+                        <div class="portal-form-check">
+                            <input type="checkbox" name="rememberMe" id="rememberMe" value="true" class="form-check-input" />
+                            <label for="rememberMe" class="form-check-label">Remember me</label>
+                        </div>
+                        <a href="@Url.Action("ForgotPassword", "Admission")" class="portal-auth-link">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="portal-btn portal-btn-primary portal-btn-lg" style="width:100%">
+                        Sign In <i class="fa-solid fa-arrow-right ms-2"></i>
+                    </button>
+                </form>
+
+                <div class="portal-auth-divider">
+                    <span>or</span>
+                </div>
+
+                <div class="portal-auth-footer-text text-center">
+                    Don't have an account? 
+                    <a href="@Url.Action("Register", "Admission", new { program = programSlug })" class="portal-auth-link">Register here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/portal.js" asp-append-version="true"></script>
+</body>
+</html>

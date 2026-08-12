@@ -1,0 +1,38 @@
+@model NedAcademyWebsite.Models.ApplicationDocument
+
+<div class="col-md-6 col-lg-4">
+    <div class="portal-card p-3" style="border-left: 4px solid @(Model.VerificationStatus == NedAcademyWebsite.Models.DocumentVerificationStatus.Verified ? "var(--portal-green)" : Model.VerificationStatus == NedAcademyWebsite.Models.DocumentVerificationStatus.Rejected || Model.ReplacementRequested ? "var(--portal-red)" : "var(--portal-gold)"); background: var(--portal-surface);">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="portal-badge @(Model.VerificationStatus == NedAcademyWebsite.Models.DocumentVerificationStatus.Verified ? "portal-badge-active" : Model.VerificationStatus == NedAcademyWebsite.Models.DocumentVerificationStatus.Rejected || Model.ReplacementRequested ? "portal-badge-error" : "portal-badge-info")">
+                <i class="fa-solid @(Model.VerificationStatus == NedAcademyWebsite.Models.DocumentVerificationStatus.Verified ? "fa-circle-check" : Model.VerificationStatus == NedAcademyWebsite.Models.DocumentVerificationStatus.Rejected || Model.ReplacementRequested ? "fa-circle-exclamation" : "fa-clock") me-1"></i>
+                @(Model.ReplacementRequested ? "Replacement Requested" : Model.VerificationStatus.ToString())
+            </span>
+            <span style="font-size:0.75rem; color:var(--portal-text-muted);">@Model.UploadDate.ToString("dd MMM yyyy")</span>
+        </div>
+        
+        <h6 class="m-0 font-headings text-white fw-bold mb-1">@Model.DocumentType.ToString()</h6>
+        <div class="text-truncate text-muted mb-2" style="font-size:0.8rem;" title="@Model.FileName">
+            <i class="fa-solid fa-file me-1"></i> @Model.FileName
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.VerificationRemarks))
+        {
+            <div class="p-2 mb-2 rounded" style="background: rgba(255, 255, 255, 0.05); font-size:0.78rem; color:var(--portal-text-secondary);">
+                <strong>Admin Remarks:</strong> @Model.VerificationRemarks
+            </div>
+        }
+
+        <div class="d-flex align-items-center justify-content-between pt-2 border-top border-white border-opacity-10">
+            <a href="@Model.FilePath" target="_blank" class="portal-btn portal-btn-ghost portal-btn-sm text-cyan">
+                <i class="fa-solid fa-eye me-1"></i> Preview
+            </a>
+            <form asp-controller="Admission" asp-action="DeleteDocument" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this document?');">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="documentId" value="@Model.Id" />
+                <button type="submit" class="portal-btn portal-btn-ghost portal-btn-sm text-danger">
+                    <i class="fa-solid fa-trash me-1"></i> Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

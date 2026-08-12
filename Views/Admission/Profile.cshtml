@@ -1,0 +1,109 @@
+@using NedAcademyWebsite.Models
+@{
+    Layout = "_ApplicantLayout";
+    ViewData["Title"] = "My Profile";
+
+    var applicant = ViewBag.Applicant as Applicant;
+    var profile = ViewBag.ApplicantProfile as ApplicantProfile;
+    var guardian = ViewBag.GuardianInfo as ApplicantGuardianInfo;
+}
+
+<div class="container-fluid p-0">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="portal-content-title">Applicant Profile</h1>
+            <p class="portal-content-subtitle">Manage your personal details, residential address, and guardian information.</p>
+        </div>
+        <div class="portal-badge portal-badge-active px-3 py-2" style="font-size:0.82rem;">
+            <i class="fa-solid fa-user-check me-1"></i> Profile Completion: @(profile?.ProfileCompletionPercentage ?? 100)%
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="portal-alert portal-alert-success mb-4">
+            <i class="fa-solid fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Left Profile Card -->
+        <div class="col-lg-4">
+            <div class="portal-card text-center p-4">
+                <div class="portal-profile-avatar mx-auto mb-3" style="width:80px; height:80px; font-size:2.2rem; border-radius:50%;">
+                    @(applicant?.FullName?.Substring(0, 1) ?? "A")
+                </div>
+                <h5 class="portal-content-title mb-1" style="font-size:1.15rem;">@applicant?.FullName</h5>
+                <p class="portal-content-subtitle mb-3">@applicant?.Email</p>
+
+                <div class="d-flex justify-content-center gap-2 mb-4">
+                    <span class="portal-badge portal-badge-info">@applicant?.AccountStatus</span>
+                    <span class="portal-badge portal-badge-active">Verified Applicant</span>
+                </div>
+
+                <div class="border-top border-white border-opacity-10 pt-3 text-start" style="font-size:0.84rem;">
+                    <div class="d-flex justify-content-between py-1">
+                        <span class="text-muted">Member Since:</span>
+                        <span class="fw-medium">@applicant?.CreatedAt.ToString("dd MMM yyyy")</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-1">
+                        <span class="text-muted">CNIC / Passport:</span>
+                        <span class="fw-medium">@(applicant?.CNIC_Passport ?? "35202-1234567-1")</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-1">
+                        <span class="text-muted">Phone Number:</span>
+                        <span class="fw-medium">@applicant?.PhoneNumber</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Profile Form -->
+        <div class="col-lg-8">
+            <form asp-controller="Admission" asp-action="SaveProfile" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="portal-card mb-4">
+                    <div class="portal-card-header">
+                        <div class="portal-card-title"><i class="fa-solid fa-user me-2"></i> Personal Details</div>
+                    </div>
+                    <div class="portal-card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="portal-form-label">Full Name <span class="required">*</span></label>
+                                <input type="text" name="fullName" class="portal-form-control" value="@applicant?.FullName" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="portal-form-label">Email Address (Primary)</label>
+                                <input type="email" class="portal-form-control" value="@applicant?.Email" readonly style="background:var(--portal-surface-2);" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="portal-form-label">CNIC / Passport Number <span class="required">*</span></label>
+                                <input type="text" name="cnic" class="portal-form-control" value="@(applicant?.CNIC_Passport ?? "35202-1234567-1")" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="portal-form-label">Date of Birth <span class="required">*</span></label>
+                                <input type="date" name="dateOfBirth" class="portal-form-control" value="@(applicant?.DateOfBirth.ToString("yyyy-MM-dd") ?? "2004-05-15")" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="portal-form-label">Nationality <span class="required">*</span></label>
+                                <input type="text" name="nationality" class="portal-form-control" value="@(applicant?.Nationality ?? "Pakistani")" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="portal-form-label">City <span class="required">*</span></label>
+                                <input type="text" name="city" class="portal-form-control" value="@(applicant?.City ?? "Karachi")" required />
+                            </div>
+                            <div class="col-12">
+                                <label class="portal-form-label">Permanent Residential Address <span class="required">*</span></label>
+                                <input type="text" name="address" class="portal-form-control" value="@(applicant?.Address ?? "Main University Road, Gulshan-e-Iqbal, Karachi")" required />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portal-card-footer justify-content-end">
+                        <button type="submit" class="portal-btn portal-btn-cyan"><i class="fa-solid fa-save me-1"></i> Save Profile Changes</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

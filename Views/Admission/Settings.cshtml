@@ -1,0 +1,87 @@
+@using NedAcademyWebsite.Models
+@{
+    Layout = "_ApplicantLayout";
+    ViewData["Title"] = "Account Settings";
+
+    var applicant = ViewBag.Applicant as Applicant;
+}
+
+<div class="container-fluid p-0">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="portal-content-title">Portal Settings & Security</h1>
+            <p class="portal-content-subtitle">Manage your account security, password, and login sessions.</p>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="portal-alert portal-alert-success mb-4">
+            <i class="fa-solid fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="portal-alert portal-alert-error mb-4">
+            <i class="fa-solid fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Change Password -->
+        <div class="col-lg-6">
+            <form asp-controller="Admission" asp-action="ChangePassword" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="portal-card mb-4">
+                    <div class="portal-card-header">
+                        <div class="portal-card-title"><i class="fa-solid fa-lock me-2"></i> Change Password</div>
+                    </div>
+                    <div class="portal-card-body">
+                        <div class="mb-3">
+                            <label class="portal-form-label">Current Password <span class="required">*</span></label>
+                            <input type="password" name="currentPassword" class="portal-form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="portal-form-label">New Password <span class="required">*</span></label>
+                            <input type="password" name="newPassword" class="portal-form-control" oninput="portalPasswordStrength(this)" required />
+                            <div class="portal-password-strength mt-2">
+                                <span class="portal-password-bar"></span>
+                                <span class="portal-password-bar"></span>
+                                <span class="portal-password-bar"></span>
+                                <span class="portal-password-bar"></span>
+                                <span class="portal-password-bar"></span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="portal-form-label">Confirm New Password <span class="required">*</span></label>
+                            <input type="password" name="confirmPassword" class="portal-form-control" required />
+                        </div>
+                    </div>
+                    <div class="portal-card-footer justify-content-end">
+                        <button type="submit" class="portal-btn portal-btn-cyan"><i class="fa-solid fa-key me-1"></i> Update Password</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Security Sessions -->
+        <div class="col-lg-6">
+            <div class="portal-card mb-4">
+                <div class="portal-card-header">
+                    <div class="portal-card-title"><i class="fa-solid fa-shield-halved me-2"></i> Active Security Sessions</div>
+                </div>
+                <div class="portal-card-body">
+                    <div class="portal-card p-3 mb-3 border-cyan">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold text-white"><i class="fa-solid fa-desktop text-cyan me-2"></i> Current Session (Windows Chrome)</span>
+                            <span class="portal-badge portal-badge-active">Active Now</span>
+                        </div>
+                        <div style="font-size:0.8rem; color:var(--portal-text-muted);">IP Address: 127.0.0.1 | Started: @DateTime.Now.ToString("dd MMM yyyy, hh:mm tt")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

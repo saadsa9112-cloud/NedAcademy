@@ -7,6 +7,393 @@ public static class DbSeeder
 {
     public static void Seed(ApplicationDbContext context)
     {
+        // 0. Ensure Phase 3 Tables Exist in SQL Database
+        try
+        {
+            context.Database.ExecuteSqlRaw(@"
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'ApplicantGuardianInfos')
+                BEGIN
+                    CREATE TABLE [ApplicantGuardianInfos] (
+                        [Id] int NOT NULL IDENTITY,
+                        [ApplicantId] int NOT NULL,
+                        [FatherName] nvarchar(120) NOT NULL,
+                        [FatherCNIC] nvarchar(50) NULL,
+                        [FatherOccupation] nvarchar(100) NULL,
+                        [FatherPhone] nvarchar(30) NULL,
+                        [GuardianName] nvarchar(120) NOT NULL,
+                        [GuardianRelation] nvarchar(50) NOT NULL,
+                        [GuardianPhone] nvarchar(30) NOT NULL,
+                        [GuardianCNIC] nvarchar(50) NULL,
+                        [GuardianOccupation] nvarchar(100) NULL,
+                        [MonthlyIncome] decimal(18,2) NOT NULL DEFAULT 0.0,
+                        [EmergencyAddress] nvarchar(250) NULL,
+                        [LastUpdatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        CONSTRAINT [PK_ApplicantGuardianInfos] PRIMARY KEY ([Id]),
+                        CONSTRAINT [FK_ApplicantGuardianInfos_Applicants_ApplicantId] FOREIGN KEY ([ApplicantId]) REFERENCES [Applicants] ([Id]) ON DELETE CASCADE
+                    );
+                    CREATE UNIQUE INDEX [IX_ApplicantGuardianInfos_ApplicantId] ON [ApplicantGuardianInfos] ([ApplicantId]);
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'ApplicantAcademicRecords')
+                BEGIN
+                    CREATE TABLE [ApplicantAcademicRecords] (
+                        [Id] int NOT NULL IDENTITY,
+                        [ApplicantId] int NOT NULL,
+                        [Level] nvarchar(50) NOT NULL,
+                        [DegreeOrCertificateTitle] nvarchar(150) NOT NULL,
+                        [BoardOrUniversity] nvarchar(150) NOT NULL,
+                        [PassingYear] int NOT NULL,
+                        [RollNumber] nvarchar(50) NOT NULL,
+                        [TotalMarks] float NOT NULL,
+                        [ObtainedMarks] float NOT NULL,
+                        [Percentage] float NOT NULL,
+                        [GradeOrGPA] nvarchar(10) NOT NULL,
+                        [MarksheetPath] nvarchar(250) NULL,
+                        [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        CONSTRAINT [PK_ApplicantAcademicRecords] PRIMARY KEY ([Id]),
+                        CONSTRAINT [FK_ApplicantAcademicRecords_Applicants_ApplicantId] FOREIGN KEY ([ApplicantId]) REFERENCES [Applicants] ([Id]) ON DELETE CASCADE
+                    );
+                    CREATE INDEX [IX_ApplicantAcademicRecords_ApplicantId] ON [ApplicantAcademicRecords] ([ApplicantId]);
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'ApplicantMessages')
+                BEGIN
+                    CREATE TABLE [ApplicantMessages] (
+                        [Id] int NOT NULL IDENTITY,
+                        [ApplicantId] int NOT NULL,
+                        [SenderType] nvarchar(50) NOT NULL,
+                        [SenderName] nvarchar(100) NULL,
+                        [Subject] nvarchar(200) NOT NULL,
+                        [MessageBody] nvarchar(max) NOT NULL,
+                        [AttachmentPath] nvarchar(250) NULL,
+                        [IsRead] bit NOT NULL DEFAULT 0,
+                        [SentAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        CONSTRAINT [PK_ApplicantMessages] PRIMARY KEY ([Id]),
+                        CONSTRAINT [FK_ApplicantMessages_Applicants_ApplicantId] FOREIGN KEY ([ApplicantId]) REFERENCES [Applicants] ([Id]) ON DELETE CASCADE
+                    );
+                    CREATE INDEX [IX_ApplicantMessages_ApplicantId] ON [ApplicantMessages] ([ApplicantId]);
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'SupportTickets')
+                BEGIN
+                    CREATE TABLE [SupportTickets] (
+                        [Id] int NOT NULL IDENTITY,
+                        [TicketNumber] nvarchar(50) NOT NULL,
+                        [ApplicantId] int NOT NULL,
+                        [Subject] nvarchar(200) NOT NULL,
+                        [Category] nvarchar(50) NOT NULL,
+                        [Priority] nvarchar(30) NOT NULL,
+                        [Description] nvarchar(max) NOT NULL,
+                        [Status] nvarchar(30) NOT NULL,
+                        [ResolutionNotes] nvarchar(max) NULL,
+                        [AssignedOfficerId] nvarchar(max) NULL,
+                        [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        [ResolvedAt] datetime2 NULL,
+                        CONSTRAINT [PK_SupportTickets] PRIMARY KEY ([Id]),
+                        CONSTRAINT [FK_SupportTickets_Applicants_ApplicantId] FOREIGN KEY ([ApplicantId]) REFERENCES [Applicants] ([Id]) ON DELETE CASCADE
+                    );
+                    CREATE INDEX [IX_SupportTickets_ApplicantId] ON [SupportTickets] ([ApplicantId]);
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'EnrollmentRecords')
+                BEGIN
+                    CREATE TABLE [EnrollmentRecords] (
+                        [Id] int NOT NULL IDENTITY,
+                        [ApplicantId] int NOT NULL,
+                        [AdmissionApplicationId] int NOT NULL,
+                        [GeneratedStudentId] nvarchar(50) NOT NULL,
+                        [GeneratedRollNumber] nvarchar(50) NOT NULL,
+                        [DegreeProgramId] int NOT NULL,
+                        [DepartmentId] int NOT NULL,
+                        [Batch] nvarchar(30) NOT NULL DEFAULT 'Batch 2026',
+                        [Semester] nvarchar(30) NOT NULL DEFAULT '1st Semester',
+                        [EnrollmentStatus] nvarchar(30) NOT NULL DEFAULT 'Active',
+                        [ActivationDate] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        [FutureUmsSyncStatus] nvarchar(30) NOT NULL DEFAULT 'PendingSync',
+                        [SyncMetadataJson] nvarchar(max) NULL,
+                        CONSTRAINT [PK_EnrollmentRecords] PRIMARY KEY ([Id]),
+                        CONSTRAINT [FK_EnrollmentRecords_Applicants_ApplicantId] FOREIGN KEY ([ApplicantId]) REFERENCES [Applicants] ([Id]) ON DELETE CASCADE
+                    );
+                    CREATE UNIQUE INDEX [IX_EnrollmentRecords_ApplicantId] ON [EnrollmentRecords] ([ApplicantId]);
+                    CREATE INDEX [IX_EnrollmentRecords_AdmissionApplicationId] ON [EnrollmentRecords] ([AdmissionApplicationId]);
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'AdmissionDecisions')
+                BEGIN
+                    CREATE TABLE [AdmissionDecisions] (
+                        [Id] int NOT NULL IDENTITY,
+                        [AdmissionApplicationId] int NOT NULL,
+                        [DecisionType] nvarchar(50) NOT NULL,
+                        [Comments] nvarchar(500) NULL,
+                        [OfficerId] nvarchar(100) NOT NULL,
+                        [Timestamp] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        CONSTRAINT [PK_AdmissionDecisions] PRIMARY KEY ([Id]),
+                        CONSTRAINT [FK_AdmissionDecisions_AdmissionApplications_AdmissionApplicationId] FOREIGN KEY ([AdmissionApplicationId]) REFERENCES [AdmissionApplications] ([Id]) ON DELETE CASCADE
+                    );
+                    CREATE INDEX [IX_AdmissionDecisions_AdmissionApplicationId] ON [AdmissionDecisions] ([AdmissionApplicationId]);
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'ApplicationTimelineLogs')
+                BEGIN
+                    CREATE TABLE [ApplicationTimelineLogs] (
+                        [Id] int NOT NULL IDENTITY,
+                        [AdmissionApplicationId] int NOT NULL,
+                        [StageName] nvarchar(100) NOT NULL,
+                        [Description] nvarchar(200) NOT NULL,
+                        [PerformedBy] nvarchar(100) NOT NULL DEFAULT 'System',
+                        [Timestamp] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        CONSTRAINT [PK_ApplicationTimelineLogs] PRIMARY KEY ([Id]),
+                        CONSTRAINT [FK_ApplicationTimelineLogs_AdmissionApplications_AdmissionApplicationId] FOREIGN KEY ([AdmissionApplicationId]) REFERENCES [AdmissionApplications] ([Id]) ON DELETE CASCADE
+                    );
+                    CREATE INDEX [IX_ApplicationTimelineLogs_AdmissionApplicationId] ON [ApplicationTimelineLogs] ([AdmissionApplicationId]);
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'ApplicantNotifications')
+                BEGIN
+                    CREATE TABLE [ApplicantNotifications] (
+                        [Id] int NOT NULL IDENTITY,
+                        [ApplicantId] int NOT NULL,
+                        [Title] nvarchar(150) NOT NULL,
+                        [Message] nvarchar(max) NOT NULL,
+                        [NotificationType] nvarchar(50) NOT NULL DEFAULT 'Info',
+                        [IsRead] bit NOT NULL DEFAULT 0,
+                        [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        CONSTRAINT [PK_ApplicantNotifications] PRIMARY KEY ([Id]),
+                        CONSTRAINT [FK_ApplicantNotifications_Applicants_ApplicantId] FOREIGN KEY ([ApplicantId]) REFERENCES [Applicants] ([Id]) ON DELETE CASCADE
+                    );
+                    CREATE INDEX [IX_ApplicantNotifications_ApplicantId] ON [ApplicantNotifications] ([ApplicantId]);
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('ApplicantProfiles') AND name = 'FullName')
+                    ALTER TABLE [ApplicantProfiles] ADD [FullName] nvarchar(120) NULL;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('ApplicantProfiles') AND name = 'FatherName')
+                    ALTER TABLE [ApplicantProfiles] ADD [FatherName] nvarchar(120) NULL;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('ApplicantProfiles') AND name = 'CNIC_Passport')
+                    ALTER TABLE [ApplicantProfiles] ADD [CNIC_Passport] nvarchar(50) NULL;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('ApplicantProfiles') AND name = 'Domicile')
+                    ALTER TABLE [ApplicantProfiles] ADD [Domicile] nvarchar(80) NULL;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('ApplicantProfiles') AND name = 'PermanentAddress')
+                    ALTER TABLE [ApplicantProfiles] ADD [PermanentAddress] nvarchar(250) NULL;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('ApplicantProfiles') AND name = 'PostalAddress')
+                    ALTER TABLE [ApplicantProfiles] ADD [PostalAddress] nvarchar(250) NULL;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('ApplicantProfiles') AND name = 'GuardianName')
+                    ALTER TABLE [ApplicantProfiles] ADD [GuardianName] nvarchar(120) NULL;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('ApplicantProfiles') AND name = 'GuardianPhone')
+                    ALTER TABLE [ApplicantProfiles] ADD [GuardianPhone] nvarchar(30) NULL;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('ApplicantProfiles') AND name = 'EmergencyContactName')
+                    ALTER TABLE [ApplicantProfiles] ADD [EmergencyContactName] nvarchar(120) NULL;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('ApplicantProfiles') AND name = 'EmergencyContactPhone')
+                    ALTER TABLE [ApplicantProfiles] ADD [EmergencyContactPhone] nvarchar(30) NULL;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('ApplicationDocuments') AND name = 'ReplacementRequested')
+                    ALTER TABLE [ApplicationDocuments] ADD [ReplacementRequested] bit NOT NULL DEFAULT 0;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('ApplicationDocuments') AND name = 'RejectionReason')
+                    ALTER TABLE [ApplicationDocuments] ADD [RejectionReason] nvarchar(500) NULL;
+
+                -- Missing FeeVouchers Columns
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'AdmissionFee')
+                    ALTER TABLE [FeeVouchers] ADD [AdmissionFee] decimal(18,2) NOT NULL DEFAULT 15000;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'RegistrationFee')
+                    ALTER TABLE [FeeVouchers] ADD [RegistrationFee] decimal(18,2) NOT NULL DEFAULT 5000;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'SecurityDeposit')
+                    ALTER TABLE [FeeVouchers] ADD [SecurityDeposit] decimal(18,2) NOT NULL DEFAULT 5000;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'LibraryFee')
+                    ALTER TABLE [FeeVouchers] ADD [LibraryFee] decimal(18,2) NOT NULL DEFAULT 2500;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'LabFee')
+                    ALTER TABLE [FeeVouchers] ADD [LabFee] decimal(18,2) NOT NULL DEFAULT 2500;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'StudentActivityFee')
+                    ALTER TABLE [FeeVouchers] ADD [StudentActivityFee] decimal(18,2) NOT NULL DEFAULT 1000;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'SemesterFee')
+                    ALTER TABLE [FeeVouchers] ADD [SemesterFee] decimal(18,2) NOT NULL DEFAULT 125000;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'SubTotalAmount')
+                    ALTER TABLE [FeeVouchers] ADD [SubTotalAmount] decimal(18,2) NOT NULL DEFAULT 155000;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'ScholarshipPercentageApplied')
+                    ALTER TABLE [FeeVouchers] ADD [ScholarshipPercentageApplied] float NOT NULL DEFAULT 0;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'ScholarshipDiscountAmount')
+                    ALTER TABLE [FeeVouchers] ADD [ScholarshipDiscountAmount] decimal(18,2) NOT NULL DEFAULT 0;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'ManualDiscountAmount')
+                    ALTER TABLE [FeeVouchers] ADD [ManualDiscountAmount] decimal(18,2) NOT NULL DEFAULT 0;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'FineAmount')
+                    ALTER TABLE [FeeVouchers] ADD [FineAmount] decimal(18,2) NOT NULL DEFAULT 0;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'NetPayableAmount')
+                    ALTER TABLE [FeeVouchers] ADD [NetPayableAmount] decimal(18,2) NOT NULL DEFAULT 155000;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'ExpiryDate')
+                    ALTER TABLE [FeeVouchers] ADD [ExpiryDate] datetime2 NOT NULL DEFAULT GETUTCDATE();
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'VoucherStatus')
+                    ALTER TABLE [FeeVouchers] ADD [VoucherStatus] int NOT NULL DEFAULT 1;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('FeeVouchers') AND name = 'PreviousVoucherId')
+                    ALTER TABLE [FeeVouchers] ADD [PreviousVoucherId] int NULL;
+
+                -- Missing AdmissionAuditLogs Columns
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('AdmissionAuditLogs') AND name = 'OldValue')
+                    ALTER TABLE [AdmissionAuditLogs] ADD [OldValue] nvarchar(max) NULL;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('AdmissionAuditLogs') AND name = 'NewValue')
+                    ALTER TABLE [AdmissionAuditLogs] ADD [NewValue] nvarchar(max) NULL;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('AdmissionAuditLogs') AND name = 'UserAgent')
+                    ALTER TABLE [AdmissionAuditLogs] ADD [UserAgent] nvarchar(250) NULL;
+
+                -- New ERP Tables
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'DocumentVersionHistories')
+                BEGIN
+                    CREATE TABLE [DocumentVersionHistories] (
+                        [Id] int NOT NULL IDENTITY,
+                        [ApplicationDocumentId] int NOT NULL,
+                        [VersionNumber] int NOT NULL DEFAULT 1,
+                        [FileName] nvarchar(250) NOT NULL,
+                        [FilePath] nvarchar(500) NOT NULL,
+                        [RejectionReason] nvarchar(500) NULL,
+                        [UploadedBy] nvarchar(100) NOT NULL DEFAULT 'Applicant',
+                        [UploadedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        CONSTRAINT [PK_DocumentVersionHistories] PRIMARY KEY ([Id])
+                    );
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'AdmissionTestSchedules')
+                BEGIN
+                    CREATE TABLE [AdmissionTestSchedules] (
+                        [Id] int NOT NULL IDENTITY,
+                        [AdmissionApplicationId] int NOT NULL,
+                        [ApplicantId] int NOT NULL,
+                        [TestDate] datetime2 NOT NULL,
+                        [TestTime] nvarchar(20) NOT NULL DEFAULT '09:00 AM',
+                        [DurationHours] int NOT NULL DEFAULT 2,
+                        [CampusName] nvarchar(150) NOT NULL DEFAULT 'NED Main Campus',
+                        [BuildingName] nvarchar(150) NOT NULL DEFAULT 'Department of Computer Science',
+                        [RoomNumber] nvarchar(50) NOT NULL DEFAULT 'Lab 101',
+                        [ReportingTime] nvarchar(20) NOT NULL DEFAULT '08:30 AM',
+                        [Instructions] nvarchar(500) NULL,
+                        [RequiredItems] nvarchar(250) NULL,
+                        [DressCode] nvarchar(150) NULL,
+                        [QrCodeData] nvarchar(250) NULL,
+                        [GoogleMapsUrl] nvarchar(500) NULL,
+                        [ScheduledByUserId] nvarchar(100) NOT NULL DEFAULT 'AdmissionOfficer',
+                        [ScheduledAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        CONSTRAINT [PK_AdmissionTestSchedules] PRIMARY KEY ([Id])
+                    );
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'AdmissionTestResults')
+                BEGIN
+                    CREATE TABLE [AdmissionTestResults] (
+                        [Id] int NOT NULL IDENTITY,
+                        [AdmissionApplicationId] int NOT NULL,
+                        [TotalMarks] float NOT NULL DEFAULT 100,
+                        [ObtainedMarks] float NOT NULL DEFAULT 0,
+                        [PassingPercentage] float NOT NULL DEFAULT 50,
+                        [CalculatedPercentage] float NOT NULL DEFAULT 0,
+                        [IsQualified] bit NOT NULL DEFAULT 0,
+                        [Remarks] nvarchar(500) NULL,
+                        [EvaluatedByUserId] nvarchar(100) NOT NULL DEFAULT 'AdmissionOfficer',
+                        [EvaluatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        CONSTRAINT [PK_AdmissionTestResults] PRIMARY KEY ([Id])
+                    );
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'ScholarshipRules')
+                BEGIN
+                    CREATE TABLE [ScholarshipRules] (
+                        [Id] int NOT NULL IDENTITY,
+                        [ScholarshipName] nvarchar(120) NOT NULL,
+                        [Description] nvarchar(250) NULL,
+                        [MinimumPercentage] float NOT NULL DEFAULT 0,
+                        [ScholarshipPercentage] float NOT NULL DEFAULT 0,
+                        [EffectiveStartDate] datetime2 NULL,
+                        [EffectiveEndDate] datetime2 NULL,
+                        [IsEnabled] bit NOT NULL DEFAULT 1,
+                        [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        CONSTRAINT [PK_ScholarshipRules] PRIMARY KEY ([Id])
+                    );
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'FeeStructureConfigs')
+                BEGIN
+                    CREATE TABLE [FeeStructureConfigs] (
+                        [Id] int NOT NULL IDENTITY,
+                        [AdmissionFee] decimal(18,2) NOT NULL DEFAULT 15000,
+                        [RegistrationFee] decimal(18,2) NOT NULL DEFAULT 5000,
+                        [SecurityDeposit] decimal(18,2) NOT NULL DEFAULT 5000,
+                        [LibraryFee] decimal(18,2) NOT NULL DEFAULT 2500,
+                        [LabFee] decimal(18,2) NOT NULL DEFAULT 2500,
+                        [StudentActivityFee] decimal(18,2) NOT NULL DEFAULT 1000,
+                        [SemesterFee] decimal(18,2) NOT NULL DEFAULT 125000,
+                        [LastUpdatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        [UpdatedByUserId] nvarchar(100) NOT NULL DEFAULT 'SystemAdmin',
+                        CONSTRAINT [PK_FeeStructureConfigs] PRIMARY KEY ([Id])
+                    );
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'ApplicationInternalNotes')
+                BEGIN
+                    CREATE TABLE [ApplicationInternalNotes] (
+                        [Id] int NOT NULL IDENTITY,
+                        [AdmissionApplicationId] int NOT NULL,
+                        [AuthorUserId] nvarchar(100) NOT NULL,
+                        [NoteText] nvarchar(max) NOT NULL,
+                        [AttachmentPath] nvarchar(250) NULL,
+                        [MentionedAdminUser] nvarchar(100) NULL,
+                        [Timestamp] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        CONSTRAINT [PK_ApplicationInternalNotes] PRIMARY KEY ([Id])
+                    );
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'CommunicationTemplates')
+                BEGIN
+                    CREATE TABLE [CommunicationTemplates] (
+                        [Id] int NOT NULL IDENTITY,
+                        [TemplateKey] nvarchar(100) NOT NULL,
+                        [Subject] nvarchar(200) NOT NULL,
+                        [BodyHtml] nvarchar(max) NOT NULL,
+                        [Channel] nvarchar(50) NOT NULL DEFAULT 'Email',
+                        [PlaceholderGuide] nvarchar(500) NULL,
+                        [LastUpdated] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+                        CONSTRAINT [PK_CommunicationTemplates] PRIMARY KEY ([Id])
+                    );
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('AdmissionApplications') AND name = 'AssignedDate')
+                BEGIN
+                    ALTER TABLE [AdmissionApplications] ADD [AssignedDate] datetime2 NULL;
+                    ALTER TABLE [AdmissionApplications] ADD [AssignedByUserId] nvarchar(100) NULL;
+                END;
+
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('AdmissionTestResults') AND name = 'CalculatedScholarshipPercentage')
+                BEGIN
+                    ALTER TABLE [AdmissionTestResults] ADD [CalculatedScholarshipPercentage] float NOT NULL DEFAULT 0;
+                    ALTER TABLE [AdmissionTestResults] ADD [ApprovedScholarshipPercentage] float NOT NULL DEFAULT 0;
+                    ALTER TABLE [AdmissionTestResults] ADD [OverrideReason] nvarchar(500) NULL;
+                    ALTER TABLE [AdmissionTestResults] ADD [OverrideApprovedByUserId] nvarchar(100) NULL;
+                END;
+            ");
+        }
+        catch { }
+
         // 1. Seed System Settings
         if (!context.SystemSettings.Any())
         {
@@ -350,6 +737,110 @@ public static class DbSeeder
                 new EventItem { Title = "Fall Semester Orientation 2026", Date = DateTime.Today.AddDays(42), TimeString = "09:30 AM - 12:30 PM", Venue = "Main Campus Plaza", BannerImagePath = "" },
                 new EventItem { Title = "Annual Tech & Research Expo", Date = DateTime.Today.AddDays(64), TimeString = "09:00 AM - 05:00 PM", Venue = "CS Innovation Wing", BannerImagePath = "" }
             );
+            context.SaveChanges();
+        }
+
+        // 12. Seed Enterprise Admission Sessions & Offered Programs
+        if (!context.AdmissionSessions.Any())
+        {
+            var session = new AdmissionSession
+            {
+                Title = "Fall 2026 Admissions",
+                AcademicYear = "2026-2027",
+                Term = "Fall",
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddMonths(4),
+                ApplicationDeadline = DateTime.UtcNow.AddMonths(2),
+                Status = AdmissionSessionStatus.OpenForApplications,
+                MaxCapacity = 1500,
+                ProcessingFeeAmount = 2500.00m,
+                CreatedAt = DateTime.UtcNow
+            };
+            context.AdmissionSessions.Add(session);
+            context.SaveChanges();
+
+            var programs = context.DegreePrograms.ToList();
+            foreach (var prog in programs)
+            {
+                context.AdmissionSessionPrograms.Add(new AdmissionSessionProgram
+                {
+                    AdmissionSessionId = session.Id,
+                    DegreeProgramId = prog.Id,
+                    CapacitySeats = 60,
+                    AvailableSeats = 60,
+                    MinimumEligibilityMarksPercentage = 50.0,
+                    IsActive = true
+                });
+            }
+            context.SaveChanges();
+        }
+
+        // 13. Seed Demo Applicant Account
+        if (!context.Applicants.Any(a => a.Email == "applicant@ned.edu.pk"))
+        {
+            string salt = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(16));
+            byte[] bytes = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes("Applicant123!" + salt));
+            string pwdHash = Convert.ToHexString(bytes);
+
+            var demoApplicant = new Applicant
+            {
+                FullName = "Demo Applicant",
+                Email = "applicant@ned.edu.pk",
+                PasswordSalt = salt,
+                PasswordHash = pwdHash,
+                PhoneNumber = "+92 3001234567",
+                CNIC_Passport = "42101-1234567-1",
+                City = "Karachi",
+                Address = "NED University Campus, Karachi",
+                AccountStatus = ApplicantAccountStatus.Active,
+                IsEmailVerified = true,
+                IsActive = true,
+                IsDeleted = false,
+                CreatedAt = DateTime.UtcNow
+            };
+            context.Applicants.Add(demoApplicant);
+            context.SaveChanges();
+
+            context.ApplicantProfiles.Add(new ApplicantProfile
+            {
+                ApplicantId = demoApplicant.Id,
+                Nationality = "Pakistani",
+                Gender = ApplicantGender.Male,
+                City = "Karachi",
+                Address = "NED University Campus, Karachi",
+                Country = "Pakistan",
+                ProfileCompletionPercentage = 30,
+                LastUpdatedAt = DateTime.UtcNow
+            });
+            context.SaveChanges();
+        }
+
+        // 14. Seed Default Scholarship Rules (CMS Manageable Defaults)
+        if (!context.ScholarshipRules.Any())
+        {
+            context.ScholarshipRules.AddRange(
+                new ScholarshipRule { ScholarshipName = "Merit Scholarship", Description = "Awarded to top test scorers with 90%+ calculated score", MinimumPercentage = 90.0, ScholarshipPercentage = 100.0, IsEnabled = true },
+                new ScholarshipRule { ScholarshipName = "Academic Excellence Scholarship", Description = "Awarded to high achievers with 80%+ score", MinimumPercentage = 80.0, ScholarshipPercentage = 60.0, IsEnabled = true },
+                new ScholarshipRule { ScholarshipName = "University Scholarship", Description = "Default university scholarship for 75%+ score", MinimumPercentage = 75.0, ScholarshipPercentage = 40.0, IsEnabled = true }
+            );
+            context.SaveChanges();
+        }
+
+        // 15. Seed Fee Structure Configuration (CMS Manageable Defaults)
+        if (!context.FeeStructureConfigs.Any())
+        {
+            context.FeeStructureConfigs.Add(new FeeStructureConfig
+            {
+                AdmissionFee = 15000,
+                RegistrationFee = 5000,
+                SecurityDeposit = 5000,
+                LibraryFee = 2500,
+                LabFee = 2500,
+                StudentActivityFee = 1000,
+                SemesterFee = 125000,
+                LastUpdatedAt = DateTime.UtcNow,
+                UpdatedByUserId = "SystemAdmin"
+            });
             context.SaveChanges();
         }
     }

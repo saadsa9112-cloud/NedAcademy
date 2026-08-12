@@ -1,0 +1,211 @@
+@using NedAcademyWebsite.Models
+@{
+    Layout = "_ApplicantLayout";
+    ViewData["Title"] = "Document Repository";
+
+    var applicant = ViewBag.Applicant as Applicant;
+    var documents = ViewBag.Documents as IEnumerable<ApplicationDocument> ?? new List<ApplicationDocument>();
+
+    var personalDocs = documents.Where(d => d.DocumentType == DocumentType.CNIC_BForm || d.DocumentType == DocumentType.PassportPhoto || d.DocumentType == DocumentType.Passport || d.DocumentType == DocumentType.Domicile);
+    var guardianDocs = documents.Where(d => d.DocumentType == DocumentType.FatherCNIC || d.DocumentType == DocumentType.MotherCNIC || d.DocumentType == DocumentType.GuardianCNIC);
+    var academicDocs = documents.Where(d => d.DocumentType == DocumentType.MatricMarkSheet || d.DocumentType == DocumentType.IntermediateMarkSheet || d.DocumentType == DocumentType.BachelorsDegree || d.DocumentType == DocumentType.MastersDegree || d.DocumentType == DocumentType.Transcript);
+    var certificateDocs = documents.Where(d => d.DocumentType == DocumentType.CharacterCertificate || d.DocumentType == DocumentType.MigrationCertificate || d.DocumentType == DocumentType.EquivalenceCertificate || d.DocumentType == DocumentType.NOC || d.DocumentType == DocumentType.ExperienceCertificate);
+    var otherDocs = documents.Where(d => d.DocumentType == DocumentType.Other || (!personalDocs.Contains(d) && !guardianDocs.Contains(d) && !academicDocs.Contains(d) && !certificateDocs.Contains(d)));
+}
+
+<div class="container-fluid p-0">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="portal-content-title">Sectional Document Repository</h1>
+            <p class="portal-content-subtitle">Upload and track verification status for all mandatory admission documents.</p>
+        </div>
+        <button class="portal-btn portal-btn-cyan" data-bs-toggle="modal" data-bs-target="#uploadDocModal">
+            <i class="fa-solid fa-cloud-arrow-up me-1"></i> Upload Document
+        </button>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="portal-alert portal-alert-success mb-4">
+            <i class="fa-solid fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- 1. PERSONAL DOCUMENTS SECTION -->
+    <div class="portal-card mb-4">
+        <div class="portal-card-header">
+            <div class="portal-card-title"><i class="fa-solid fa-id-card me-2"></i> 1. Personal Identification Documents</div>
+        </div>
+        <div class="portal-card-body">
+            @if (personalDocs.Any())
+            {
+                <div class="row g-3">
+                    @foreach (var doc in personalDocs)
+                    {
+                        <partial name="_DocumentCardPartial" model="doc" />
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="portal-empty-state py-3">
+                    <div class="portal-empty-desc">No personal identification documents uploaded yet (CNIC/B-Form, Passport Photo, Domicile).</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- 2. GUARDIAN DOCUMENTS SECTION -->
+    <div class="portal-card mb-4">
+        <div class="portal-card-header">
+            <div class="portal-card-title"><i class="fa-solid fa-users me-2"></i> 2. Guardian Identification Documents</div>
+        </div>
+        <div class="portal-card-body">
+            @if (guardianDocs.Any())
+            {
+                <div class="row g-3">
+                    @foreach (var doc in guardianDocs)
+                    {
+                        <partial name="_DocumentCardPartial" model="doc" />
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="portal-empty-state py-3">
+                    <div class="portal-empty-desc">No guardian identification documents uploaded yet (Father CNIC / Guardian CNIC).</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- 3. ACADEMIC DOCUMENTS SECTION -->
+    <div class="portal-card mb-4">
+        <div class="portal-card-header">
+            <div class="portal-card-title"><i class="fa-solid fa-graduation-cap me-2"></i> 3. Academic Marksheets & Certificates</div>
+        </div>
+        <div class="portal-card-body">
+            @if (academicDocs.Any())
+            {
+                <div class="row g-3">
+                    @foreach (var doc in academicDocs)
+                    {
+                        <partial name="_DocumentCardPartial" model="doc" />
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="portal-empty-state py-3">
+                    <div class="portal-empty-desc">No academic certificates or marksheets uploaded yet (Matric/Intermediate/Diploma).</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- 4. CERTIFICATES SECTION -->
+    <div class="portal-card mb-4">
+        <div class="portal-card-header">
+            <div class="portal-card-title"><i class="fa-solid fa-award me-2"></i> 4. Character, Migration & Equivalence Certificates</div>
+        </div>
+        <div class="portal-card-body">
+            @if (certificateDocs.Any())
+            {
+                <div class="row g-3">
+                    @foreach (var doc in certificateDocs)
+                    {
+                        <partial name="_DocumentCardPartial" model="doc" />
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="portal-empty-state py-3">
+                    <div class="portal-empty-desc">No certificates uploaded yet (Character, Migration, Domicile, NOC, Equivalence).</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- 5. OTHER DOCUMENTS SECTION -->
+    <div class="portal-card mb-4">
+        <div class="portal-card-header">
+            <div class="portal-card-title"><i class="fa-solid fa-folder-plus me-2"></i> 5. Other Documents & Attachments</div>
+        </div>
+        <div class="portal-card-body">
+            @if (otherDocs.Any())
+            {
+                <div class="row g-3">
+                    @foreach (var doc in otherDocs)
+                    {
+                        <partial name="_DocumentCardPartial" model="doc" />
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="portal-empty-state py-3">
+                    <div class="portal-empty-desc">No other documents uploaded.</div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadDocModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:var(--portal-surface); border:1px solid var(--portal-border); color:var(--portal-text);">
+            <div class="modal-header" style="border-bottom:1px solid var(--portal-border);">
+                <h5 class="modal-title font-headings" style="font-size:1.1rem; font-weight:700;"><i class="fa-solid fa-cloud-arrow-up me-2 text-cyan"></i> Upload Document</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Admission" asp-action="UploadDocument" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="portal-form-label">Document Category & Type <span class="required">*</span></label>
+                        <select name="documentType" class="portal-form-select" required>
+                            <optgroup label="Personal Documents">
+                                <option value="CNIC_BForm">CNIC / B-Form</option>
+                                <option value="PassportPhoto">Passport Size Photograph</option>
+                                <option value="Passport">Passport</option>
+                                <option value="Domicile">Domicile Certificate</option>
+                            </optgroup>
+                            <optgroup label="Guardian Documents">
+                                <option value="FatherCNIC">Father CNIC</option>
+                                <option value="MotherCNIC">Mother CNIC</option>
+                                <option value="GuardianCNIC">Guardian CNIC</option>
+                            </optgroup>
+                            <optgroup label="Academic Documents">
+                                <option value="MatricMarkSheet">Matric (SSC) Marksheet</option>
+                                <option value="IntermediateMarkSheet">Intermediate (HSSC) Marksheet</option>
+                                <option value="BachelorsDegree">Bachelors Degree Certificate</option>
+                                <option value="MastersDegree">Masters Degree Certificate</option>
+                                <option value="Transcript">Academic Transcript</option>
+                            </optgroup>
+                            <optgroup label="Certificates">
+                                <option value="CharacterCertificate">Character Certificate</option>
+                                <option value="MigrationCertificate">Migration Certificate</option>
+                                <option value="EquivalenceCertificate">Equivalence Certificate</option>
+                                <option value="NOC">No Objection Certificate (NOC)</option>
+                                <option value="ExperienceCertificate">Experience Certificate</option>
+                            </optgroup>
+                            <optgroup label="Other Documents">
+                                <option value="Other">Other Certificate / Document</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="portal-form-label">Select File (PDF, JPG, PNG - Max 5MB) <span class="required">*</span></label>
+                        <input type="file" name="file" class="portal-form-control" accept=".pdf,.jpg,.jpeg,.png" required />
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top:1px solid var(--portal-border);">
+                    <button type="button" class="portal-btn portal-btn-outline" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="portal-btn portal-btn-cyan"><i class="fa-solid fa-cloud-arrow-up me-1"></i> Upload File</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

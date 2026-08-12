@@ -1,0 +1,707 @@
+@model NedAcademyWebsite.Models.AdmissionApplication
+@using NedAcademyWebsite.Models
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = $"Digital Admission File: {Model.ApplicationNumber}";
+
+    var profile = ViewBag.ApplicantProfile as ApplicantProfile;
+    var guardian = ViewBag.Guardian as ApplicantGuardianInfo;
+    var academics = ViewBag.Academics as IEnumerable<ApplicantAcademicRecord> ?? new List<ApplicantAcademicRecord>();
+    var documents = ViewBag.Documents as IEnumerable<ApplicationDocument> ?? new List<ApplicationDocument>();
+    var vouchers = ViewBag.FeeVouchers as IEnumerable<FeeVoucher> ?? new List<FeeVoucher>();
+    var timeline = ViewBag.TimelineLogs as IEnumerable<ApplicationTimelineLog> ?? new List<ApplicationTimelineLog>();
+    var enrollment = ViewBag.EnrollmentRecord as EnrollmentRecord;
+    var decisions = ViewBag.Decisions as IEnumerable<AdmissionDecision> ?? new List<AdmissionDecision>();
+    var auditLogs = ViewBag.AuditLogs as IEnumerable<AdmissionAuditLog> ?? new List<AdmissionAuditLog>();
+    var testSchedule = ViewBag.TestSchedule as AdmissionTestSchedule;
+    var testResult = ViewBag.TestResult as AdmissionTestResult;
+
+    var activeTab = (ViewBag.ActiveTab as string ?? "overview").ToLower().Trim();
+}
+
+<div class="container-fluid py-3">
+    <!-- Top Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 font-headings fw-bold mb-1 text-white"><i class="fa-solid fa-folder-open text-cyan me-2"></i> Digital Admission File: @Model.ApplicationNumber</h1>
+            <p class="text-muted mb-0">Applicant: <strong class="text-white">@(Model.Applicant?.FullName ?? "Applicant")</strong> | CNIC: <strong class="text-white">@(profile?.CNIC_Passport ?? Model.Applicant?.CNIC_Passport)</strong></p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary fs-6 py-2 px-3">Status: @Model.CurrentStatus</span>
+            @if (enrollment != null && enrollment.EnrollmentStatus == "Active")
+            {
+                <span class="badge bg-success fs-6 py-2 px-3"><i class="fa-solid fa-graduation-cap me-1"></i> Student ID: @enrollment.GeneratedStudentId</span>
+            }
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4 text-white fw-bold shadow-sm" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(5, 150, 105, 0.95)); border: 1px solid #10b981; border-radius: 10px;" role="alert">
+            <i class="fa-solid fa-circle-check me-2 fa-lg"></i> @TempData["Success"]
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- 11-TAB NAVIGATION BAR -->
+    <ul class="nav nav-tabs mb-4 font-headings border-secondary" id="admissionFileTabs" role="tablist">
+        <li class="nav-item"><button class="nav-link @(activeTab == "overview" ? "active" : "")" id="tab-overview" data-bs-toggle="tab" data-bs-target="#pane-overview" type="button"><i class="fa-solid fa-gauge me-1"></i> Overview</button></li>
+        <li class="nav-item"><button class="nav-link @(activeTab == "personal" ? "active" : "")" id="tab-personal" data-bs-toggle="tab" data-bs-target="#pane-personal" type="button"><i class="fa-solid fa-user me-1"></i> Personal</button></li>
+        <li class="nav-item"><button class="nav-link @(activeTab == "guardian" ? "active" : "")" id="tab-guardian" data-bs-toggle="tab" data-bs-target="#pane-guardian" type="button"><i class="fa-solid fa-users me-1"></i> Guardian</button></li>
+        <li class="nav-item"><button class="nav-link @(activeTab == "academics" ? "active" : "")" id="tab-academics" data-bs-toggle="tab" data-bs-target="#pane-academics" type="button"><i class="fa-solid fa-graduation-cap me-1"></i> Academics</button></li>
+        <li class="nav-item"><button class="nav-link @(activeTab == "program" ? "active" : "")" id="tab-program" data-bs-toggle="tab" data-bs-target="#pane-program" type="button"><i class="fa-solid fa-book me-1"></i> Program</button></li>
+        <li class="nav-item"><button class="nav-link @(activeTab == "documents" ? "active" : "")" id="tab-documents" data-bs-toggle="tab" data-bs-target="#pane-documents" type="button"><i class="fa-solid fa-folder me-1"></i> Documents (@documents.Count())</button></li>
+        <li class="nav-item"><button class="nav-link @(activeTab == "test" || activeTab == "schedule" || activeTab == "results" ? "active" : "")" id="tab-test" data-bs-toggle="tab" data-bs-target="#pane-test" type="button"><i class="fa-solid fa-pen-ruler me-1"></i> Test & Results</button></li>
+        <li class="nav-item"><button class="nav-link @(activeTab == "fee" ? "active" : "")" id="tab-fee" data-bs-toggle="tab" data-bs-target="#pane-fee" type="button"><i class="fa-solid fa-receipt me-1"></i> Fee</button></li>
+        <li class="nav-item"><button class="nav-link @(activeTab == "timeline" ? "active" : "")" id="tab-timeline" data-bs-toggle="tab" data-bs-target="#pane-timeline" type="button"><i class="fa-solid fa-timeline me-1"></i> Timeline</button></li>
+        <li class="nav-item"><button class="nav-link @(activeTab == "remarks" ? "active" : "")" id="tab-remarks" data-bs-toggle="tab" data-bs-target="#pane-remarks" type="button"><i class="fa-solid fa-comments me-1"></i> Remarks</button></li>
+        <li class="nav-item"><button class="nav-link @(activeTab == "audit" ? "active" : "")" id="tab-audit" data-bs-toggle="tab" data-bs-target="#pane-audit" type="button"><i class="fa-solid fa-shield-halved me-1"></i> Audit Logs</button></li>
+        <li class="nav-item"><button class="nav-link text-cyan fw-bold @(activeTab == "approval" || activeTab == "decision" ? "active" : "")" id="tab-approval" data-bs-toggle="tab" data-bs-target="#pane-approval" type="button"><i class="fa-solid fa-gavel me-1"></i> Decision Center</button></li>
+    </ul>
+
+    <!-- TAB CONTENTS -->
+    <div class="tab-content" id="admissionFileContent">
+        <!-- 1. OVERVIEW -->
+        <div class="tab-pane fade @(activeTab == "overview" ? "show active" : "")" id="pane-overview" role="tabpanel">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="glass-card p-4" style="border-left: 4px solid var(--cyan);">
+                        <h6 class="text-muted text-uppercase mb-3 font-headings">Student Portal Activation</h6>
+                        @if (enrollment != null && enrollment.EnrollmentStatus == "Active")
+                        {
+                            <div class="p-3 rounded bg-success bg-opacity-10 border border-success text-success">
+                                <strong><i class="fa-solid fa-circle-check me-1"></i> Active & Provisioned</strong><br />
+                                Student ID: <code class="text-white">@enrollment.GeneratedStudentId</code><br />
+                                Roll No: <code class="text-white">@enrollment.GeneratedRollNumber</code>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="p-3 rounded bg-warning bg-opacity-10 border border-warning text-warning">
+                                <i class="fa-solid fa-lock me-1"></i> Portal Locked — Waiting for Admission Approval
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="glass-card p-4" style="border-left: 4px solid var(--royal-blue);">
+                        <h6 class="text-muted text-uppercase mb-2 font-headings">Applied Program Coordinates</h6>
+                        <h4 class="text-white font-headings fw-bold">@(Model.DegreeProgram?.Name ?? "Degree Program")</h4>
+                        <p class="mb-0 text-muted">Applied Date: @Model.CreatedDate.ToString("dd MMM yyyy, hh:mm tt") | Shift: Morning | Campus: Main Campus</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. PERSONAL INFORMATION -->
+        <div class="tab-pane fade @(activeTab == "personal" ? "show active" : "")" id="pane-personal" role="tabpanel">
+            <div class="glass-card p-4">
+                <h5 class="mb-4 text-white font-headings fw-bold"><i class="fa-solid fa-user text-cyan me-2"></i>Personal Coordinates</h5>
+                <div class="row g-3" style="font-size:0.92rem;">
+                    <div class="col-md-4"><span class="text-muted">Full Name:</span> <strong class="text-white">@(profile?.FullName ?? Model.Applicant?.FullName)</strong></div>
+                    <div class="col-md-4"><span class="text-muted">Father Name:</span> <strong class="text-white">@(profile?.FatherName ?? guardian?.FatherName)</strong></div>
+                    <div class="col-md-4"><span class="text-muted">CNIC:</span> <strong class="text-white">@(profile?.CNIC_Passport ?? Model.Applicant?.CNIC_Passport)</strong></div>
+                    <div class="col-md-4"><span class="text-muted">Date of Birth:</span> <strong class="text-white">@((profile?.DateOfBirth ?? Model.Applicant?.DateOfBirth ?? DateTime.Now).ToString("dd MMM yyyy"))</strong></div>
+                    <div class="col-md-4"><span class="text-muted">Gender:</span> <strong class="text-white">@(profile?.Gender.ToString() ?? Model.Applicant?.Gender.ToString())</strong></div>
+                    <div class="col-md-4"><span class="text-muted">Nationality:</span> <strong class="text-white">@(profile?.Nationality ?? Model.Applicant?.Nationality)</strong></div>
+                    <div class="col-md-4"><span class="text-muted">City:</span> <strong class="text-white">@(profile?.City ?? Model.Applicant?.City)</strong></div>
+                    <div class="col-md-8"><span class="text-muted">Address:</span> <strong class="text-white">@(profile?.PermanentAddress ?? Model.Applicant?.Address)</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. GUARDIAN INFORMATION -->
+        <div class="tab-pane fade @(activeTab == "guardian" ? "show active" : "")" id="pane-guardian" role="tabpanel">
+            <div class="glass-card p-4">
+                <h5 class="mb-4 text-white font-headings fw-bold"><i class="fa-solid fa-users text-cyan me-2"></i>Guardian Information</h5>
+                <div class="row g-3" style="font-size:0.92rem;">
+                    <div class="col-md-4"><span class="text-muted">Father Name:</span> <strong class="text-white">@(guardian?.FatherName ?? "N/A")</strong></div>
+                    <div class="col-md-4"><span class="text-muted">Father CNIC:</span> <strong class="text-white">@(guardian?.FatherCNIC ?? "N/A")</strong></div>
+                    <div class="col-md-4"><span class="text-muted">Father Occupation:</span> <strong class="text-white">@(guardian?.FatherOccupation ?? "N/A")</strong></div>
+                    <div class="col-md-4"><span class="text-muted">Guardian Name:</span> <strong class="text-white">@(guardian?.GuardianName ?? "N/A")</strong></div>
+                    <div class="col-md-4"><span class="text-muted">Guardian Relation:</span> <strong class="text-white">@(guardian?.GuardianRelation ?? "N/A")</strong></div>
+                    <div class="col-md-4"><span class="text-muted">Guardian Phone:</span> <strong class="text-white">@(guardian?.GuardianPhone ?? "N/A")</strong></div>
+                    <div class="col-md-4"><span class="text-muted">Monthly Income:</span> <strong class="text-white">PKR @(guardian?.MonthlyIncome.ToString("N0") ?? "0")</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. ACADEMICS -->
+        <div class="tab-pane fade @(activeTab == "academics" ? "show active" : "")" id="pane-academics" role="tabpanel">
+            <div class="glass-card p-4">
+                <h5 class="mb-4 text-white font-headings fw-bold"><i class="fa-solid fa-graduation-cap text-cyan me-2"></i>Academic History</h5>
+                @if (academics.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle m-0">
+                            <thead>
+                                <tr class="text-uppercase small text-muted border-secondary">
+                                    <th>Level</th>
+                                    <th>Degree / Certificate</th>
+                                    <th>Board / University</th>
+                                    <th>Year</th>
+                                    <th>Roll #</th>
+                                    <th>Marks</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var a in academics)
+                                {
+                                    <tr>
+                                        <td><span class="badge bg-secondary">@a.Level</span></td>
+                                        <td class="fw-bold text-white">@a.DegreeOrCertificateTitle</td>
+                                        <td>@a.BoardOrUniversity</td>
+                                        <td>@a.PassingYear</td>
+                                        <td>@a.RollNumber</td>
+                                        <td>@a.ObtainedMarks / @a.TotalMarks</td>
+                                        <td><strong class="text-cyan">@a.Percentage.ToString("F1")%</strong></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted m-0">No academic records submitted.</p>
+                }
+            </div>
+        </div>
+
+        <!-- 5. PROGRAM SELECTION -->
+        <div class="tab-pane fade @(activeTab == "program" ? "show active" : "")" id="pane-program" role="tabpanel">
+            <div class="glass-card p-4">
+                <h5 class="mb-3 text-white font-headings fw-bold"><i class="fa-solid fa-book text-cyan me-2"></i>Program Offered</h5>
+                <p><span class="text-muted">Program Name:</span> <strong class="text-white">@(Model.DegreeProgram?.Name ?? "Program")</strong></p>
+                <p class="mb-0"><span class="text-muted">Degree Level:</span> <strong class="text-white">@(Model.DegreeProgram?.DegreeLevel.ToString() ?? "Undergraduate")</strong></p>
+            </div>
+        </div>
+
+        <!-- 6. DOCUMENTS -->
+        <div class="tab-pane fade @(activeTab == "documents" ? "show active" : "")" id="pane-documents" role="tabpanel">
+            <div class="glass-card p-4">
+                <h5 class="mb-4 text-white font-headings fw-bold"><i class="fa-solid fa-folder text-cyan me-2"></i>Uploaded Documents Verification</h5>
+                @if (documents.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle m-0 border-secondary">
+                            <thead>
+                                <tr class="text-uppercase small text-muted border-secondary">
+                                    <th>Type</th>
+                                    <th>File Name</th>
+                                    <th>Upload Date</th>
+                                    <th>Status</th>
+                                    <th>Remarks</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var doc in documents)
+                                {
+                                    <tr>
+                                        <td><strong class="text-cyan">@doc.DocumentType</strong></td>
+                                        <td><a href="@doc.FilePath" target="_blank" class="text-info text-decoration-underline"><i class="fa-solid fa-file-arrow-down me-1"></i>@doc.FileName</a></td>
+                                        <td class="small text-muted">@doc.UploadDate.ToString("dd MMM yyyy")</td>
+                                        <td>
+                                            <span class="badge @(doc.VerificationStatus == DocumentVerificationStatus.Verified ? "bg-success" : doc.VerificationStatus == DocumentVerificationStatus.Rejected ? "bg-danger" : "bg-warning text-dark")">
+                                                @doc.VerificationStatus
+                                            </span>
+                                        </td>
+                                        <td class="small text-muted">@(doc.VerificationRemarks ?? "-")</td>
+                                        <td class="text-end">
+                                            <form asp-controller="Admin" asp-action="VerifyDocument" method="post" class="d-inline-flex gap-2">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="documentId" value="@doc.Id" />
+                                                <input type="hidden" name="applicationId" value="@Model.Id" />
+                                                <input type="hidden" name="activeTab" value="documents" />
+                                                <input type="text" name="remarks" class="form-control form-control-sm bg-dark text-white border-secondary" style="width:160px;" placeholder="Remarks..." />
+                                                <button type="submit" name="status" value="Verified" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-check me-1"></i> Approve</button>
+                                                <button type="submit" name="status" value="Rejected" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-xmark me-1"></i> Reject</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted m-0">No documents uploaded.</p>
+                }
+            </div>
+        </div>
+
+        <!-- 7. TEST SCHEDULER & MARKS ENTRY -->
+        <div class="tab-pane fade @(activeTab == "test" || activeTab == "schedule" || activeTab == "results" ? "show active" : "")" id="pane-test" role="tabpanel">
+            <div class="row g-4">
+                <!-- Schedule Form / Card -->
+                <div class="col-md-6">
+                    <div class="glass-card p-4 h-100">
+                        <h5 class="mb-3 text-white font-headings fw-bold"><i class="fa-solid fa-calendar-check text-cyan me-2"></i>Schedule Admission Test</h5>
+                        <form asp-controller="Admin" asp-action="ScheduleTest" method="post" class="d-flex flex-column gap-3">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="AdmissionApplicationId" value="@Model.Id" />
+                            <input type="hidden" name="ApplicantId" value="@Model.ApplicantId" />
+                            <input type="hidden" name="activeTab" value="test" />
+
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label text-cyan small fw-bold">Test Date</label>
+                                    <input type="date" name="TestDate" class="form-control bg-dark text-white border-secondary" value="@(testSchedule?.TestDate.ToString("yyyy-MM-dd") ?? DateTime.Today.AddDays(7).ToString("yyyy-MM-dd"))" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-cyan small fw-bold">Test Time (08:00 AM - 04:00 PM)</label>
+                                    <input type="text" name="TestTime" class="form-control bg-dark text-white border-secondary" placeholder="e.g. 09:30 AM" value="@(testSchedule?.TestTime ?? "09:30 AM")" required />
+                                </div>
+                            </div>
+
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label text-cyan small fw-bold">Duration</label>
+                                    <select name="DurationHours" class="form-select bg-dark text-white border-secondary">
+                                        <option value="1" selected="@(testSchedule?.DurationHours == 1)">1 Hour</option>
+                                        <option value="2" selected="@(testSchedule?.DurationHours == 2 || testSchedule == null)">2 Hours</option>
+                                        <option value="3" selected="@(testSchedule?.DurationHours == 3)">3 Hours (Max)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-cyan small fw-bold">Reporting Time</label>
+                                    <input type="text" name="ReportingTime" class="form-control bg-dark text-white border-secondary" placeholder="e.g. 09:00 AM" value="@(testSchedule?.ReportingTime ?? "09:00 AM")" required />
+                                </div>
+                            </div>
+
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label text-cyan small fw-bold">Building Name</label>
+                                    <input type="text" name="BuildingName" class="form-control bg-dark text-white border-secondary" value="@(testSchedule?.BuildingName ?? "Department of Computer Science")" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-cyan small fw-bold">Room / Lab Number</label>
+                                    <input type="text" name="RoomNumber" class="form-control bg-dark text-white border-secondary" value="@(testSchedule?.RoomNumber ?? "Lab 101")" required />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="form-label text-cyan small fw-bold">Instructions for Candidate</label>
+                                <textarea name="Instructions" class="form-control bg-dark text-white border-secondary" rows="2">@(testSchedule?.Instructions ?? "Bring original CNIC, printed admit card slip, and clipboard. Mobile phones strictly prohibited.")</textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-cyber btn-sm mt-2"><i class="fa-solid fa-paper-plane me-1"></i> Save & Broadcast Test Admit Card</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Marks Entry & Result Card -->
+                <div class="col-md-6">
+                    <div class="glass-card p-4 h-100">
+                        <h5 class="mb-3 text-white font-headings fw-bold"><i class="fa-solid fa-square-poll-vertical text-cyan me-2"></i>Record Test Marks & Auto Scholarship</h5>
+                        
+                        @if (testResult != null)
+                        {
+                            <div class="p-3 rounded mb-3 border border-secondary" style="background: rgba(255,255,255,0.02);">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-white fw-bold">Recorded Test Score:</span>
+                                    <span class="badge fs-6 @(testResult.IsQualified ? "bg-success" : "bg-danger")">
+                                        @(testResult.IsQualified ? "QUALIFIED" : "NOT QUALIFIED")
+                                    </span>
+                                </div>
+                                <div class="h4 text-cyan fw-bold mb-1">@testResult.ObtainedMarks / @testResult.TotalMarks (@testResult.CalculatedPercentage%)</div>
+                                <div class="small text-muted">Evaluated by @testResult.EvaluatedByUserId on @testResult.EvaluatedAt.ToString("dd MMM yyyy HH:mm")</div>
+                            </div>
+                        }
+
+                        <form asp-controller="Admin" asp-action="RecordTestResult" method="post" class="d-flex flex-column gap-3">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="applicationId" value="@Model.Id" />
+                            <input type="hidden" name="activeTab" value="test" />
+
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label text-cyan small fw-bold">Obtained Marks</label>
+                                    <input type="number" step="0.5" name="obtainedMarks" class="form-control bg-dark text-white border-secondary" value="@(testResult?.ObtainedMarks ?? 0)" required placeholder="e.g. 82" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-cyan small fw-bold">Total Marks</label>
+                                    <input type="number" step="1" name="totalMarks" class="form-control bg-dark text-white border-secondary" value="@(testResult?.TotalMarks ?? 100)" required />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="form-label text-cyan small fw-bold">Evaluation Remarks</label>
+                                <textarea name="remarks" class="form-control bg-dark text-white border-secondary" rows="3" placeholder="Enter evaluation comments or merit notes...">@(testResult?.Remarks)</textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-success btn-sm mt-2"><i class="fa-solid fa-square-check me-1"></i> Submit Marks & Trigger Auto Scholarship</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. FEE -->
+        <div class="tab-pane fade @(activeTab == "fee" ? "show active" : "")" id="pane-fee" role="tabpanel">
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <h5 class="m-0 text-white font-headings fw-bold"><i class="fa-solid fa-receipt text-cyan me-2"></i>Fee Vouchers & Payment Approval Workspace</h5>
+                    <button type="button" class="btn btn-sm btn-cyber" data-bs-toggle="collapse" data-bs-target="#generateVoucherForm">
+                        <i class="fa-solid fa-plus-circle me-1"></i> Generate Custom / Installment Fee Voucher
+                    </button>
+                </div>
+
+                <!-- ═══════ CUSTOM & INSTALLMENT VOUCHER GENERATOR FORM ═══════ -->
+                <div class="collapse mb-4" id="generateVoucherForm">
+                    <div class="p-4 rounded border border-cyan" style="background: rgba(0, 242, 254, 0.03);">
+                        <h6 class="text-cyan font-headings fw-bold mb-3"><i class="fa-solid fa-sliders me-2"></i>Admin Fee Voucher Decision Controls</h6>
+                        <form asp-controller="Admin" asp-action="GenerateFeeVoucher" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="applicationId" value="@Model.Id" />
+                            <input type="hidden" name="activeTab" value="fee" />
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label text-white small fw-bold">Voucher Category / Installment <span class="text-danger">*</span></label>
+                                    <select name="voucherType" class="form-select bg-dark text-white border-secondary form-select-sm" required>
+                                        <option value="ProcessingFee">Processing Fee (Rs. 2,500)</option>
+                                        <option value="AdmissionFee">Admission Fee Only (Rs. 25,000)</option>
+                                        <option value="FirstSemesterFee" selected>First Semester Fee (Full Tuition)</option>
+                                        <option value="Installment_1_of_2">Installment 1 of 2 (50% Payment Plan)</option>
+                                        <option value="Installment_2_of_2">Installment 2 of 2 (50% Remaining)</option>
+                                        <option value="Installment_1_of_3">Installment 1 of 3 (33% Plan)</option>
+                                        <option value="Installment_2_of_3">Installment 2 of 3 (33% Plan)</option>
+                                        <option value="Installment_3_of_3">Installment 3 of 3 (Final Plan)</option>
+                                        <option value="CustomFee">Custom Admin Fee Voucher</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label text-white small fw-bold">Admin Payable Fee Amount (PKR) <span class="text-danger">*</span></label>
+                                    <input type="number" name="amount" class="form-control bg-dark text-white border-secondary form-control-sm" value="50000" min="500" max="500000" step="500" required />
+                                    <span class="small text-muted d-block mt-1">Admin decides exact installment amount to pay.</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label text-white small fw-bold">Payment Due Date <span class="text-danger">*</span></label>
+                                    <input type="date" name="dueDate" class="form-control bg-dark text-white border-secondary form-control-sm" value="@DateTime.Today.AddDays(14).ToString("yyyy-MM-dd")" required />
+                                </div>
+                                <div class="col-12 text-end">
+                                    <button type="submit" class="btn btn-sm btn-success px-4 font-headings">
+                                        <i class="fa-solid fa-file-circle-plus me-1"></i> Generate & Issue Voucher to Student
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                @if (vouchers.Any())
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var v in vouchers)
+                        {
+                            bool hasReceipt = !string.IsNullOrEmpty(v.PaymentProofPath);
+                            <div class="p-3 rounded border border-secondary" style="background: rgba(255,255,255,0.02);">
+                                <div class="row align-items-center g-3">
+                                    <div class="col-md-4">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="fa-solid fa-file-invoice-dollar text-cyan fa-xl"></i>
+                                            <div>
+                                                <h6 class="text-white fw-bold m-0">Voucher #: @v.VoucherNumber</h6>
+                                                <div class="small text-muted">Type: <strong>@v.VoucherType</strong> | Due: @v.DueDate.ToString("dd MMM yyyy")</div>
+                                                <div class="mt-1">
+                                                    <span class="badge bg-info text-dark">Amount: PKR @v.Amount.ToString("N0")</span>
+                                                    <span class="badge @(v.PaymentStatus == PaymentStatus.Paid ? "bg-success" : "bg-warning text-dark")">@v.PaymentStatus</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        @if (hasReceipt)
+                                        {
+                                            <div class="p-2 rounded border border-success bg-dark bg-opacity-50">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <span class="badge bg-success"><i class="fa-solid fa-check-circle me-1"></i> Student Submitted Proof</span>
+                                                    <a href="@v.PaymentProofPath" target="_blank" class="btn btn-xs btn-outline-info">
+                                                        <i class="fa-solid fa-file-image me-1"></i> View Receipt
+                                                    </a>
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(v.TransactionReference))
+                                                {
+                                                    <div class="small text-light mt-1">Txn Ref: <strong>@v.TransactionReference</strong></div>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="p-2 rounded border border-warning bg-dark bg-opacity-50 text-center">
+                                                <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> Awaiting Student Payment Proof</span>
+                                                <div class="small text-muted mt-1">Student has not submitted receipt slip yet.</div>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <div class="col-md-4 text-end">
+                                        <div class="d-flex justify-content-end align-items-center gap-2">
+                                            @if (v.PaymentStatus == PaymentStatus.Paid)
+                                            {
+                                                <div class="text-success small fw-bold text-end">
+                                                    <i class="fa-solid fa-circle-check me-1"></i> Approved & Verified
+                                                    <div class="text-muted fw-normal" style="font-size:0.75rem;">Verified by @(v.VerifiedByUserId ?? "Admin") on @(v.VerifiedDate?.ToString("dd MMM yyyy") ?? "-")</div>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <form asp-controller="Admin" asp-action="VerifyFeePayment" method="post" class="d-flex flex-column gap-2 flex-grow-1" onsubmit="return @(hasReceipt ? "true" : "confirm('WARNING: The student has NOT uploaded a payment proof receipt yet! Are you sure you want to forcibly approve this unpaid voucher?')")">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="voucherId" value="@v.Id" />
+                                                    <input type="hidden" name="applicationId" value="@Model.Id" />
+                                                    <input type="hidden" name="activeTab" value="fee" />
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text" name="transactionRef" class="form-control bg-dark text-white border-secondary" placeholder="Txn Ref #" value="@(v.TransactionReference ?? "TXN-MANUAL")" required />
+                                                        <button type="submit" class="btn btn-sm @(hasReceipt ? "btn-success" : "btn-outline-warning") px-2" title="@(hasReceipt ? "Approve Verified Student Payment" : "Accidental Click Protection: Student has not uploaded proof yet")">
+                                                            <i class="fa-solid fa-check-double me-1"></i> @(hasReceipt ? "Approve" : "Force Approve")
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            }
+
+                                            <!-- Delete / Cancel Voucher Form -->
+                                            <form asp-controller="Admin" asp-action="DeleteFeeVoucher" method="post" onsubmit="return confirm('Are you sure you want to DELETE/CANCEL Fee Voucher #@v.VoucherNumber? This action cannot be undone.');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="voucherId" value="@v.Id" />
+                                                <input type="hidden" name="applicationId" value="@Model.Id" />
+                                                <input type="hidden" name="activeTab" value="fee" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger px-2" title="Delete / Remove Voucher">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4 text-muted">
+                        <i class="fa-solid fa-receipt fa-2x mb-2 d-block opacity-50"></i>
+                        No fee vouchers generated yet for this applicant. Click the button above to generate a voucher.
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- 8. TIMELINE -->
+        <div class="tab-pane fade @(activeTab == "timeline" ? "show active" : "")" id="pane-timeline" role="tabpanel">
+            <div class="glass-card p-4">
+                <h5 class="mb-4 text-white font-headings fw-bold"><i class="fa-solid fa-timeline text-cyan me-2"></i>Lifecycle Milestone Log</h5>
+                <ul class="list-group list-group-flush bg-transparent">
+                    @foreach (var t in timeline)
+                    {
+                        <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="text-cyan">@t.StageName</strong>: @t.Description
+                            </div>
+                            <span class="text-muted small">@t.Timestamp.ToString("dd MMM yyyy, hh:mm tt")</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <!-- 9. REMARKS -->
+        <div class="tab-pane fade @(activeTab == "remarks" ? "show active" : "")" id="pane-remarks" role="tabpanel">
+            <div class="glass-card p-4">
+                <h5 class="mb-3 text-white font-headings fw-bold"><i class="fa-solid fa-comments text-cyan me-2"></i>Officer Remarks & Notes</h5>
+                <p class="text-white m-0">@(Model.Remarks ?? "No remarks recorded.")</p>
+            </div>
+        </div>
+
+        <!-- 10. AUDIT LOGS -->
+        <div class="tab-pane fade @(activeTab == "audit" ? "show active" : "")" id="pane-audit" role="tabpanel">
+            <div class="glass-card p-4">
+                <h5 class="mb-4 text-white font-headings fw-bold"><i class="fa-solid fa-shield-halved text-cyan me-2"></i>Immutable Audit Trail</h5>
+                <ul class="list-group list-group-flush bg-transparent">
+                    @foreach (var log in auditLogs)
+                    {
+                        <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="text-cyan">@log.Action</strong> (@log.EntityName): @log.Details
+                            </div>
+                            <span class="text-muted small">@log.Timestamp.ToString("dd MMM yyyy, hh:mm tt")</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <!-- 11. APPROVAL CENTER -->
+        <div class="tab-pane fade @(activeTab == "approval" || activeTab == "decision" ? "show active" : "")" id="pane-approval" role="tabpanel">
+            @{
+                var latestDecision = decisions.OrderByDescending(d => d.Timestamp).FirstOrDefault();
+                bool isAlreadyDecided = Model.CurrentStatus == ApplicationStatus.Approved || 
+                                         Model.CurrentStatus == ApplicationStatus.Rejected || 
+                                         Model.CurrentStatus == ApplicationStatus.Withdrawn || 
+                                         Model.CurrentStatus == ApplicationStatus.Cancelled || 
+                                         latestDecision != null;
+            }
+
+            @if (isAlreadyDecided)
+            {
+                <!-- ═══════ RECORDED DECISION SUMMARY (NON-REPEATABLE POPUP/FORM) ═══════ -->
+                <div class="glass-card p-4 mb-4" style="border-left: 4px solid @(Model.CurrentStatus == ApplicationStatus.Approved ? "var(--portal-green)" : Model.CurrentStatus == ApplicationStatus.Rejected ? "#ef4444" : "#f59e0b");">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h5 class="m-0 text-white font-headings fw-bold">
+                            <i class="fa-solid fa-stamp text-cyan me-2"></i> Executed Admission Decision Record
+                        </h5>
+                        <span class="badge @(Model.CurrentStatus == ApplicationStatus.Approved ? "bg-success" : Model.CurrentStatus == ApplicationStatus.Rejected ? "bg-danger" : "bg-warning text-dark") fs-6 px-3 py-2">
+                            Status: @Model.CurrentStatus
+                        </span>
+                    </div>
+
+                    <div class="p-3 rounded mb-4" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <div class="text-muted small">Latest Decision Action</div>
+                                <div class="text-white fw-bold">@(latestDecision?.DecisionType ?? Model.CurrentStatus.ToString())</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-muted small">Decided By Officer</div>
+                                <div class="text-cyan fw-bold"><i class="fa-solid fa-user-check me-1"></i> @(latestDecision?.OfficerId ?? "Admission Committee")</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-muted small">Decision Date & Time</div>
+                                <div class="text-white">@(latestDecision?.Timestamp.ToString("dd MMM yyyy, hh:mm tt") ?? Model.LastStatusUpdateDate.ToString("dd MMM yyyy"))</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-muted small">Student Portal Record</div>
+                                <div class="text-success fw-bold">@(enrollment?.EnrollmentStatus ?? (Model.CurrentStatus == ApplicationStatus.Approved ? "Active" : "Locked"))</div>
+                            </div>
+                            <div class="col-12 border-top border-secondary pt-3 mt-2">
+                                <div class="text-muted small mb-1">Committee Official Remarks / Justification</div>
+                                <div class="p-3 rounded bg-dark text-light font-monospace small" style="border: 1px solid rgba(255,255,255,0.1);">
+                                    @(latestDecision?.Comments ?? Model.Remarks ?? "No remarks entered.")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.CurrentStatus == ApplicationStatus.Approved && enrollment != null)
+                    {
+                        <!-- PROVISIONED CREDENTIALS DISPLAY -->
+                        <div class="p-3 rounded border border-success bg-success bg-opacity-10 mb-4">
+                            <h6 class="text-success font-headings fw-bold mb-2"><i class="fa-solid fa-id-card me-2"></i> Official Student Issued Credentials</h6>
+                            <div class="row g-2 text-white small">
+                                <div class="col-md-4">Student ID: <strong class="text-cyan">@enrollment.GeneratedStudentId</strong></div>
+                                <div class="col-md-4">Class Roll Number: <strong class="text-cyan">@enrollment.GeneratedRollNumber</strong></div>
+                                <div class="col-md-4">Batch & Semester: <strong>@enrollment.Batch (@enrollment.Semester)</strong></div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- ═══════ COLLATERAL ACTIONS: WITHDRAW / CANCEL ADMISSION / RE-OPEN ═══════ -->
+                    <div class="border-top border-secondary pt-3">
+                        <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="collapse" data-bs-target="#overrideDecisionCollapse">
+                            <i class="fa-solid fa-right-left me-1"></i> Update Decision / Withdraw Admission / Re-Open Panel
+                        </button>
+
+                        <div class="collapse mt-3" id="overrideDecisionCollapse">
+                            <div class="p-3 rounded border border-warning" style="background: rgba(245, 158, 11, 0.05);">
+                                <h6 class="text-warning font-headings fw-bold mb-3"><i class="fa-solid fa-triangle-exclamation me-2"></i> Admission Lifecycle Override Controls</h6>
+                                <form asp-controller="Admin" asp-action="ProcessDecision" method="post" onsubmit="return confirm('Attention: Updating an executed decision will modify student portal access and official logs. Proceed?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="applicationId" value="@Model.Id" />
+                                    <input type="hidden" name="activeTab" value="approval" />
+                                    
+                                    <div class="row g-3">
+                                        <div class="col-md-5">
+                                            <label class="form-label text-white small fw-bold">Select Override Action <span class="text-danger">*</span></label>
+                                            <select name="decisionType" class="form-select bg-dark text-white border-secondary form-select-sm" required>
+                                                <option value="Withdraw">Withdraw Application / Cancel Admission (Student Left / Refund)</option>
+                                                <option value="CancelAdmission">Cancel Enrolment & Lock Student Credentials</option>
+                                                <option value="Hold">Place Admission On Hold</option>
+                                                <option value="Reopen">Re-Open Decision Panel for Re-Evaluation</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-7">
+                                            <label class="form-label text-white small fw-bold">Mandatory Override / Withdrawal Reason <span class="text-danger">*</span></label>
+                                            <input type="text" name="comments" class="form-control bg-dark text-white border-secondary form-control-sm" placeholder="Enter reason for withdrawal or status update..." required />
+                                        </div>
+                                        <div class="col-12 text-end">
+                                            <button type="submit" class="btn btn-sm btn-warning text-dark font-headings fw-bold">
+                                                <i class="fa-solid fa-gavel me-1"></i> Execute Status Override & Revoke Access
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- ═══════ FIRST-TIME ADMISSION DECISION FORM ═══════ -->
+                <div class="glass-card p-4" style="border-left: 4px solid var(--cyan);">
+                    <h5 class="mb-4 text-white font-headings fw-bold"><i class="fa-solid fa-gavel text-cyan me-2"></i> Admission Decision Panel</h5>
+                    <form asp-controller="Admin" asp-action="ProcessDecision" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="applicationId" value="@Model.Id" />
+                        <input type="hidden" name="activeTab" value="approval" />
+                        <div class="mb-4">
+                            <label class="form-label text-white fw-bold">Select Decision Action <span class="text-danger">*</span></label>
+                            <select name="decisionType" class="form-select bg-dark text-white border-secondary" required>
+                                <option value="Approve" selected>Approve Admission & Activate Student Record</option>
+                                <option value="Reject">Reject Application</option>
+                                <option value="Hold">Place On Hold</option>
+                                <option value="RequestAdditionalDocuments">Request Additional Documents</option>
+                                <option value="WaitList">Place On Wait List</option>
+                                <option value="InterviewRequired">Schedule Interview Required</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-white fw-bold">Committee Remarks / Justification <span class="text-danger">*</span></label>
+                            <textarea name="comments" rows="4" class="form-control bg-dark text-white border-secondary" placeholder="Enter detailed decision comments..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-cyber btn-lg px-4"><i class="fa-solid fa-circle-check me-2"></i> Submit Decision Action</button>
+                    </form>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check hash or URL query param for active tab persistence
+            const urlParams = new URLSearchParams(window.location.search);
+            let activeTab = urlParams.get('tab') || '@activeTab';
+            
+            if (window.location.hash) {
+                activeTab = window.location.hash.replace('#', '');
+            } else {
+                const savedTab = sessionStorage.getItem('activeAdmissionTab_@Model.Id');
+                if (savedTab && !urlParams.get('tab')) activeTab = savedTab;
+            }
+
+            const tabBtn = document.querySelector(`[data-bs-target="#pane-${activeTab}"]`);
+            if (tabBtn) {
+                const bsTab = new bootstrap.Tab(tabBtn);
+                bsTab.show();
+            }
+
+            document.querySelectorAll('#admissionFileTabs button[data-bs-toggle="tab"]').forEach(btn => {
+                btn.addEventListener('shown.bs.tab', function (e) {
+                    const paneId = e.target.getAttribute('data-bs-target').replace('#pane-', '');
+                    sessionStorage.setItem('activeAdmissionTab_@Model.Id', paneId);
+                    
+                    // Update URL without reloading page
+                    const url = new URL(window.location);
+                    url.searchParams.set('tab', paneId);
+                    window.history.replaceState(null, '', url);
+                });
+            });
+        });
+    </script>
+}

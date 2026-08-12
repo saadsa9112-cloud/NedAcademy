@@ -1,0 +1,139 @@
+@using NedAcademyWebsite.Models
+@{
+    Layout = "_ApplicantLayout";
+    ViewData["Title"] = "Fee & Payments";
+
+    var applicant = ViewBag.Applicant as Applicant;
+    var vouchers = ViewBag.Vouchers as IEnumerable<FeeVoucher> ?? new List<FeeVoucher>();
+}
+
+<div class="container-fluid p-0">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="portal-content-title">Fee Vouchers & Payment Center</h1>
+            <p class="portal-content-subtitle">View processing fee vouchers, print bank challan slips, and submit deposit receipts.</p>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="portal-alert portal-alert-success mb-4">
+            <i class="fa-solid fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="portal-alert portal-alert-error mb-4">
+            <i class="fa-solid fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- Voucher Cards List -->
+    <div class="portal-card mb-4">
+        <div class="portal-card-header">
+            <div class="portal-card-title"><i class="fa-solid fa-receipt me-2"></i> Issued Admission Fee Vouchers</div>
+        </div>
+        <div class="portal-card-body">
+            @if (vouchers.Any())
+            {
+                <div class="table-responsive">
+                    <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+                        <thead>
+                            <tr style="border-bottom:1px solid var(--portal-border);">
+                                <th style="padding:10px 12px; color:var(--portal-text-muted);">Voucher #</th>
+                                <th style="padding:10px 12px; color:var(--portal-text-muted);">Voucher Type</th>
+                                <th style="padding:10px 12px; color:var(--portal-text-muted);">Amount (PKR)</th>
+                                <th style="padding:10px 12px; color:var(--portal-text-muted);">Issue Date</th>
+                                <th style="padding:10px 12px; color:var(--portal-text-muted);">Due Date</th>
+                                <th style="padding:10px 12px; color:var(--portal-text-muted);">Payment Status</th>
+                                <th style="padding:10px 12px; color:var(--portal-text-muted); text-align:right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var v in vouchers)
+                            {
+                                <tr style="border-bottom:1px solid var(--portal-border-light);">
+                                    <td style="padding:12px; color:var(--portal-text); font-weight:700;">@v.VoucherNumber</td>
+                                    <td style="padding:12px; color:var(--portal-text-secondary);">@v.VoucherType</td>
+                                    <td style="padding:12px; color:var(--portal-cyan); font-weight:700;">PKR @v.Amount.ToString("N2")</td>
+                                    <td style="padding:12px; color:var(--portal-text-muted);">@v.IssueDate.ToString("dd MMM yyyy")</td>
+                                    <td style="padding:12px; color:var(--portal-text-muted);">@v.DueDate.ToString("dd MMM yyyy")</td>
+                                    <td style="padding:12px;">
+                                        @{
+                                            string badgeClass = v.PaymentStatus switch
+                                            {
+                                                PaymentStatus.Paid => "portal-badge-active",
+                                                PaymentStatus.PendingVerification => "portal-badge-info",
+                                                PaymentStatus.Failed => "portal-badge-danger",
+                                                _ => "portal-badge-pending"
+                                            };
+                                        }
+                                        <span class="portal-badge @badgeClass">@v.PaymentStatus</span>
+                                    </td>
+                                    <td style="padding:12px; text-align:right;">
+                                        <a href="@Url.Action("PrintVoucher", "Admission", new { id = v.Id })" target="_blank" class="portal-btn portal-btn-outline portal-btn-sm me-1" title="Print Bank Challan">
+                                            <i class="fa-solid fa-print me-1"></i> Print Challan
+                                        </a>
+                                        @if (v.PaymentStatus == PaymentStatus.Unpaid)
+                                        {
+                                            <button type="button" class="portal-btn portal-btn-cyan portal-btn-sm" data-bs-toggle="modal" data-bs-target="#uploadProofModal-@v.Id">
+                                                <i class="fa-solid fa-upload me-1"></i> Submit Deposit Proof
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+
+                                <!-- Upload Proof Modal -->
+                                <div class="modal fade" id="uploadProofModal-@v.Id" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content" style="background:var(--portal-surface); border:1px solid var(--portal-border); color:var(--portal-text);">
+                                            <div class="modal-header" style="border-bottom:1px solid var(--portal-border);">
+                                                <h5 class="modal-title font-headings" style="font-size:1.1rem; font-weight:700;"><i class="fa-solid fa-upload me-2 text-cyan"></i> Submit Payment Receipt</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form asp-controller="Admission" asp-action="UploadPaymentProof" method="post" enctype="multipart/form-data">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="voucherId" value="@v.Id" />
+                                                <div class="modal-body p-4 text-start">
+                                                    <div class="mb-3">
+                                                        <label class="portal-form-label">Payment Method <span class="required">*</span></label>
+                                                        <select name="paymentMethod" class="portal-form-select" required>
+                                                            <option value="Bank Deposit Slip">Bank Deposit Slip (NBP / HBL / MCB)</option>
+                                                            <option value="Online Bank Transfer">Online 1Link / IBFT Bank Transfer</option>
+                                                            <option value="JazzCash / EasyPaisa">JazzCash / EasyPaisa Mobile Wallet</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="portal-form-label">Bank Transaction Reference / Deposit Slip # <span class="required">*</span></label>
+                                                        <input type="text" name="transactionRef" class="portal-form-control" placeholder="e.g. TXN-982147102" required />
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="portal-form-label">Upload Receipt Image / PDF (Max 5MB) <span class="required">*</span></label>
+                                                        <input type="file" name="proofFile" class="portal-form-control" accept=".pdf,.jpg,.jpeg,.png" required />
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer" style="border-top:1px solid var(--portal-border);">
+                                                    <button type="button" class="portal-btn portal-btn-outline" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="portal-btn portal-btn-cyan"><i class="fa-solid fa-check me-1"></i> Submit Payment Proof</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="portal-empty-state">
+                    <div class="portal-empty-icon"><i class="fa-solid fa-receipt"></i></div>
+                    <div class="portal-empty-title">No Vouchers Generated Yet</div>
+                    <div class="portal-empty-desc">Your processing fee voucher will be generated automatically when you complete and submit your admission application.</div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

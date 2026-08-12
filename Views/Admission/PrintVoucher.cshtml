@@ -1,0 +1,135 @@
+@using NedAcademyWebsite.Models
+@{
+    Layout = null;
+    var voucher = ViewBag.Voucher as FeeVoucher;
+    var settings = ViewBag.SystemSettings as SystemSetting;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fee Voucher @voucher?.VoucherNumber - @settings?.UniversityName</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            padding: 20px;
+            font-size: 12px;
+        }
+        .challan-copy {
+            background: #fff;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+        .challan-header {
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+        .copy-tag {
+            background: #0f172a;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .table-challan td, .table-challan th {
+            padding: 6px 8px;
+            font-size: 11px;
+        }
+        @@media print {
+            body { background: #fff; padding: 0; }
+            .no-print { display: none !important; }
+            .challan-copy { page-break-inside: avoid; border-style: solid; border-color: #000; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Print Action Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print" style="max-width: 900px; margin: 0 auto;">
+        <div>
+            <h5 class="m-0 fw-bold">Official Bank Deposit Voucher</h5>
+            <span class="text-muted">Voucher Number: @voucher?.VoucherNumber</span>
+        </div>
+        <div>
+            <button onclick="window.print()" class="btn btn-primary btn-sm px-4"><i class="fa-solid fa-print me-1"></i> Print / Save PDF</button>
+            <button onclick="window.close()" class="btn btn-outline-secondary btn-sm ms-2">Close</button>
+        </div>
+    </div>
+
+    <div style="max-width: 900px; margin: 0 auto;">
+        @foreach (var copyName in new[] { "BANK COPY", "UNIVERSITY COPY", "STUDENT COPY" })
+        {
+            <div class="challan-copy">
+                <div class="challan-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="m-0 fw-bold" style="font-family:'Space Grotesk', sans-serif;">@settings?.UniversityName</h6>
+                        <span class="text-muted" style="font-size:10px;">@settings?.Slogan</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="copy-tag">@copyName</span>
+                        <div class="fw-bold mt-1" style="font-size:11px;">NATIONAL BANK OF PAKISTAN (NBP)</div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold" style="font-size:13px; color:#0f172a;">@voucher?.VoucherNumber</div>
+                        <span class="text-muted" style="font-size:10px;">A/C: 0148920194812</span>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <strong>Applicant Name:</strong> @voucher?.Applicant?.FullName<br />
+                        <strong>Email Address:</strong> @voucher?.Applicant?.Email<br />
+                        <strong>Phone Number:</strong> @voucher?.Applicant?.PhoneNumber
+                    </div>
+                    <div class="col-6 text-end">
+                        <strong>Issue Date:</strong> @voucher?.IssueDate.ToString("dd-MMM-yyyy")<br />
+                        <strong>Due Date:</strong> <span class="text-danger fw-bold">@voucher?.DueDate.ToString("dd-MMM-yyyy")</span><br />
+                        <strong>Voucher Type:</strong> @voucher?.VoucherType
+                    </div>
+                </div>
+
+                <table class="table table-bordered table-challan mb-3">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Particulars / Description</th>
+                            <th class="text-end">Amount (PKR)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Admission Processing Fee (@voucher?.VoucherType)</td>
+                            <td class="text-end fw-bold">@voucher?.Amount.ToString("N2")</td>
+                        </tr>
+                        <tr class="table-light">
+                            <td class="fw-bold">TOTAL AMOUNT PAYABLE:</td>
+                            <td class="text-end fw-bold text-success" style="font-size:13px;">PKR @voucher?.Amount.ToString("N2")</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-between align-items-end pt-2" style="font-size:10px; color:#64748b;">
+                    <div>
+                        <span>Bank Officer Stamp & Signature: _______________________</span>
+                    </div>
+                    <div>
+                        <span>Depositor Signature: _______________________</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</body>
+</html>

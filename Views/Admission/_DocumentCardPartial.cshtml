@@ -1,0 +1,68 @@
+@model NedAcademyWebsite.Models.ApplicationDocument
+@using NedAcademyWebsite.Models
+
+<div class="col-md-6 col-lg-4">
+    <div class="portal-card p-3 h-100 d-flex flex-column justify-content-between border @(Model.VerificationStatus == DocumentVerificationStatus.Verified ? "border-success" : Model.VerificationStatus == DocumentVerificationStatus.Rejected || Model.VerificationStatus == DocumentVerificationStatus.NeedReupload ? "border-danger" : "border-secondary")">
+        <div>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="badge bg-dark text-cyan border border-secondary font-headings">@Model.DocumentType</span>
+                <span class="badge @(Model.VerificationStatus == DocumentVerificationStatus.Verified ? "bg-success" : Model.VerificationStatus == DocumentVerificationStatus.Rejected || Model.VerificationStatus == DocumentVerificationStatus.NeedReupload ? "bg-danger" : "bg-warning text-dark")">
+                    @Model.VerificationStatus
+                </span>
+            </div>
+
+            <h6 class="text-white font-headings fw-bold text-truncate mb-1" title="@Model.FileName">
+                <i class="fa-solid fa-file-pdf text-danger me-1"></i> @Model.FileName
+            </h6>
+            <div class="small text-muted mb-2">
+                Uploaded: @Model.UploadDate.ToString("dd MMM yyyy") | Size: @((Model.FileSizeBytes / 1024.0 / 1024.0).ToString("F2")) MB
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.VerificationRemarks) || !string.IsNullOrEmpty(Model.RejectionReason))
+            {
+                <div class="p-2 rounded mb-2 small @(Model.VerificationStatus == DocumentVerificationStatus.Rejected || Model.VerificationStatus == DocumentVerificationStatus.NeedReupload ? "bg-danger bg-opacity-10 border border-danger text-light" : "bg-dark border border-secondary text-muted")">
+                    <strong><i class="fa-solid fa-comment-dots me-1"></i> Admin Remarks:</strong> @(Model.VerificationRemarks ?? Model.RejectionReason)
+                </div>
+            }
+        </div>
+
+        <div class="d-flex gap-2 mt-3 pt-2 border-top border-secondary">
+            <a href="@Model.FilePath" target="_blank" class="btn btn-sm btn-outline-info flex-fill font-headings">
+                <i class="fa-solid fa-eye me-1"></i> View / Zoom
+            </a>
+            @if (Model.VerificationStatus == DocumentVerificationStatus.Rejected || Model.VerificationStatus == DocumentVerificationStatus.NeedReupload || Model.VerificationStatus == DocumentVerificationStatus.Pending)
+            {
+                <button type="button" class="btn btn-sm btn-outline-warning flex-fill font-headings" data-bs-toggle="modal" data-bs-target="#replaceModal-@Model.Id">
+                    <i class="fa-solid fa-rotate me-1"></i> Re-upload
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Re-upload Document -->
+<div class="modal fade" id="replaceModal-@Model.Id" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:var(--portal-surface); border:1px solid var(--portal-border); color:var(--portal-text);">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title font-headings text-white"><i class="fa-solid fa-cloud-arrow-up text-warning me-2"></i> Re-upload @Model.DocumentType</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Admission" asp-action="ReuploadDocument" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="documentId" value="@Model.Id" />
+                <div class="modal-body p-4">
+                    <p class="small text-muted mb-3">Re-uploading will store your old file in version history for officer comparison.</p>
+                    <div class="mb-3">
+                        <label class="portal-form-label">Select Replacement File (PDF, JPG, PNG - Max 5MB) <span class="required">*</span></label>
+                        <input type="file" name="file" class="portal-form-control bg-dark text-white border-secondary" accept=".pdf,.jpg,.jpeg,.png" required />
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-warning font-headings"><i class="fa-solid fa-cloud-arrow-up me-1"></i> Upload Replacement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

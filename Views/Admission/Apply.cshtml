@@ -1,0 +1,753 @@
+@using NedAcademyWebsite.Models
+@{
+    Layout = "_ApplicantLayout";
+    ViewData["Title"] = "Admission Application Wizard";
+
+    var applicant = ViewBag.Applicant as Applicant;
+    var profile = ViewBag.ApplicantProfile as ApplicantProfile;
+    var guardian = ViewBag.GuardianInfo as ApplicantGuardianInfo;
+    var academicRecords = ViewBag.AcademicRecords as IEnumerable<ApplicantAcademicRecord> ?? new List<ApplicantAcademicRecord>();
+    var documents = ViewBag.UploadedDocuments as IEnumerable<ApplicationDocument> ?? new List<ApplicationDocument>();
+    var activeSession = ViewBag.ActiveSession as AdmissionSession;
+    var selectedProgram = ViewBag.SelectedProgram as DegreeProgram;
+    var allPrograms = ViewBag.AllPrograms as IEnumerable<DegreeProgram> ?? new List<DegreeProgram>();
+    var existingApps = ViewBag.ExistingApplications as IEnumerable<AdmissionApplication> ?? new List<AdmissionApplication>();
+
+    var sscRecord = academicRecords.FirstOrDefault(r => r.Level == "Matriculation");
+    var hsscRecord = academicRecords.FirstOrDefault(r => r.Level == "Intermediate");
+
+    var cnicDoc = documents.FirstOrDefault(d => d.DocumentType == DocumentType.CNIC_BForm);
+    var sscDoc = documents.FirstOrDefault(d => d.DocumentType == DocumentType.MatricMarkSheet);
+    var hsscDoc = documents.FirstOrDefault(d => d.DocumentType == DocumentType.IntermediateMarkSheet);
+    var photoDoc = documents.FirstOrDefault(d => d.DocumentType == DocumentType.PassportPhoto);
+    var fatherCnicDoc = documents.FirstOrDefault(d => d.DocumentType == DocumentType.FatherCNIC);
+}
+
+<div class="container-fluid p-0">
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="portal-content-title"><i class="fa-solid fa-file-pen text-cyan me-2"></i>Online Admission Application</h1>
+            <p class="portal-content-subtitle">Complete the 8-step wizard to submit your formal application for academic admission.</p>
+        </div>
+        @if (activeSession != null)
+        {
+            <div class="portal-badge portal-badge-active px-3 py-2" style="font-size:0.82rem;">
+                <i class="fa-solid fa-graduation-cap me-1"></i> @activeSession.Title (Deadline: @activeSession.ApplicationDeadline.ToString("dd MMM yyyy"))
+            </div>
+        }
+    </div>
+
+    <!-- Onboarding 8-Step Tracker -->
+    <div class="portal-card mb-4">
+        <div class="portal-card-body p-3">
+            <div class="portal-progress-tracker" id="wizardProgressTracker">
+                <div class="portal-progress-step active" id="step-nav-1">
+                    <div class="portal-progress-dot">1</div>
+                    <div class="portal-progress-label">Personal</div>
+                </div>
+                <div class="portal-progress-step pending" id="step-nav-2">
+                    <div class="portal-progress-dot">2</div>
+                    <div class="portal-progress-label">Academics</div>
+                </div>
+                <div class="portal-progress-step pending" id="step-nav-3">
+                    <div class="portal-progress-dot">3</div>
+                    <div class="portal-progress-label">Program</div>
+                </div>
+                <div class="portal-progress-step pending" id="step-nav-4">
+                    <div class="portal-progress-dot">4</div>
+                    <div class="portal-progress-label">Guardian</div>
+                </div>
+                <div class="portal-progress-step pending" id="step-nav-5">
+                    <div class="portal-progress-dot">5</div>
+                    <div class="portal-progress-label">Documents</div>
+                </div>
+                <div class="portal-progress-step pending" id="step-nav-6">
+                    <div class="portal-progress-dot">6</div>
+                    <div class="portal-progress-label">Review</div>
+                </div>
+                <div class="portal-progress-step pending" id="step-nav-7">
+                    <div class="portal-progress-dot">7</div>
+                    <div class="portal-progress-label">Declaration</div>
+                </div>
+                <div class="portal-progress-step pending" id="step-nav-8">
+                    <div class="portal-progress-dot">8</div>
+                    <div class="portal-progress-label">Submit</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Form Container -->
+    <form asp-controller="Admission" asp-action="SubmitApplication" method="post" id="admissionWizardForm">
+        @Html.AntiForgeryToken()
+
+        <!-- ═══════ STEP 1: PERSONAL INFORMATION ═══════ -->
+        <div class="portal-card wizard-step-panel" id="wizard-step-1">
+            <div class="portal-card-header">
+                <div class="portal-card-title"><i class="fa-solid fa-user me-2"></i> Step 1: Personal Information</div>
+            </div>
+            <div class="portal-card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Full Name <span class="required">*</span></label>
+                        <input type="text" id="inputFullName" class="portal-form-control" value="@(applicant?.FullName ?? profile?.FullName)" readonly style="background:var(--portal-surface-2);" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Email Address <span class="required">*</span></label>
+                        <input type="email" id="inputEmail" class="portal-form-control" value="@(applicant?.Email)" readonly style="background:var(--portal-surface-2);" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Phone Number <span class="required">*</span></label>
+                        <input type="text" id="inputPhone" class="portal-form-control" value="@(applicant?.PhoneNumber)" readonly style="background:var(--portal-surface-2);" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">CNIC / B-Form / Passport <span class="required">*</span></label>
+                        <input type="text" id="inputCnic" class="portal-form-control" value="@(applicant?.CNIC_Passport ?? profile?.CNIC_Passport ?? "35202-1234567-1")" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="portal-form-label">Date of Birth <span class="required">*</span></label>
+                        <input type="date" id="inputDob" class="portal-form-control" value="@((applicant?.DateOfBirth ?? profile?.DateOfBirth ?? DateTime.Now).ToString("yyyy-MM-dd"))" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="portal-form-label">Gender <span class="required">*</span></label>
+                        <select id="inputGender" class="portal-form-select" required>
+                            <option value="Male" selected="@(applicant?.Gender == ApplicantGender.Male || profile?.Gender == ApplicantGender.Male)">Male</option>
+                            <option value="Female" selected="@(applicant?.Gender == ApplicantGender.Female || profile?.Gender == ApplicantGender.Female)">Female</option>
+                            <option value="Other" selected="@(applicant?.Gender == ApplicantGender.Other || profile?.Gender == ApplicantGender.Other)">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="portal-form-label">Nationality <span class="required">*</span></label>
+                        <input type="text" id="inputNationality" class="portal-form-control" value="@(applicant?.Nationality ?? profile?.Nationality ?? "Pakistani")" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">City <span class="required">*</span></label>
+                        <input type="text" id="inputCity" class="portal-form-control" value="@(applicant?.City ?? profile?.City ?? "Karachi")" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Residential Address <span class="required">*</span></label>
+                        <input type="text" id="inputAddress" class="portal-form-control" value="@(applicant?.Address ?? profile?.PermanentAddress ?? "Main University Road, Gulshan-e-Iqbal")" required />
+                    </div>
+                </div>
+            </div>
+            <div class="portal-card-footer justify-content-end">
+                <button type="button" class="portal-btn portal-btn-cyan" onclick="goToStep(2)">Next: Academic History <i class="fa-solid fa-arrow-right ms-1"></i></button>
+            </div>
+        </div>
+
+        <!-- ═══════ STEP 2: ACADEMIC HISTORY ═══════ -->
+        <div class="portal-card wizard-step-panel d-none" id="wizard-step-2">
+            <div class="portal-card-header d-flex justify-content-between align-items-center">
+                <div class="portal-card-title"><i class="fa-solid fa-graduation-cap me-2"></i> Step 2: Academic History & Educational Documents</div>
+                <a asp-action="Documents" target="_blank" class="portal-btn portal-btn-sm portal-btn-outline"><i class="fa-solid fa-upload me-1"></i> Manage Document Repository</a>
+            </div>
+            <div class="portal-card-body">
+                <!-- Matric / SSC Section -->
+                <div class="portal-form-section">
+                    <div class="portal-form-section-title"><i class="fa-solid fa-certificate"></i> Secondary School Certificate (Matric / O-Level / SSC)</div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="portal-form-label">Degree / Certificate <span class="required">*</span></label>
+                            <input type="text" id="inputSscTitle" name="sscTitle" class="portal-form-control" value="@(sscRecord?.DegreeOrCertificateTitle ?? "SSC Science Group")" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="portal-form-label">Board / Institution <span class="required">*</span></label>
+                            <input type="text" id="inputSscBoard" name="sscBoard" class="portal-form-control" value="@(sscRecord?.BoardOrUniversity ?? "BISE Karachi")" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="portal-form-label">Passing Year <span class="required">*</span></label>
+                            <input type="number" id="inputSscYear" name="sscYear" class="portal-form-control" value="@(sscRecord?.PassingYear > 1900 ? sscRecord.PassingYear : 2022)" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="portal-form-label">Roll Number <span class="required">*</span></label>
+                            <input type="text" id="inputSscRoll" name="sscRoll" class="portal-form-control" value="@(sscRecord?.RollNumber ?? "489123")" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="portal-form-label">Total Marks <span class="required">*</span></label>
+                            <input type="number" step="0.1" id="inputSscTotal" name="sscTotal" class="portal-form-control" value="@(sscRecord?.TotalMarks > 0 ? sscRecord.TotalMarks : 1100)" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="portal-form-label">Obtained Marks <span class="required">*</span></label>
+                            <input type="number" step="0.1" id="inputSscObtained" name="sscObtained" class="portal-form-control" value="@(sscRecord?.ObtainedMarks > 0 ? sscRecord.ObtainedMarks : 945)" required />
+                        </div>
+                    </div>
+                    <!-- SSC Document Status Badge -->
+                    <div class="p-3 rounded border border-secondary" style="background:var(--portal-surface-2);">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-file-pdf text-danger fa-lg"></i>
+                                <div>
+                                    <div class="fw-bold" style="font-size:0.88rem;">Matriculation Marksheet / Certificate</div>
+                                    <div class="small text-muted">@(sscDoc?.FileName ?? "Document attached in Document Repository")</div>
+                                </div>
+                            </div>
+                            <div>
+                                @if (sscDoc != null)
+                                {
+                                    <span class="portal-badge portal-badge-active"><i class="fa-solid fa-check me-1"></i> Attached (@sscDoc.VerificationStatus)</span>
+                                    <a href="@sscDoc.FilePath" target="_blank" class="btn btn-sm btn-outline-info ms-2"><i class="fa-solid fa-eye me-1"></i> Preview</a>
+                                }
+                                else
+                                {
+                                    <span class="portal-badge portal-badge-warning"><i class="fa-solid fa-clock me-1"></i> Upload Pending</span>
+                                    <a asp-action="Documents" target="_blank" class="btn btn-sm btn-cyber ms-2"><i class="fa-solid fa-upload me-1"></i> Upload Now</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Intermediate / HSSC Section -->
+                <div class="portal-form-section">
+                    <div class="portal-form-section-title"><i class="fa-solid fa-award"></i> Higher Secondary Certificate (Intermediate / A-Level / HSSC / DAE)</div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="portal-form-label">Degree / Certificate <span class="required">*</span></label>
+                            <input type="text" id="inputHsscTitle" name="hsscTitle" class="portal-form-control" value="@(hsscRecord?.DegreeOrCertificateTitle ?? "HSSC Pre-Engineering")" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="portal-form-label">Board / Institution <span class="required">*</span></label>
+                            <input type="text" id="inputHsscBoard" name="hsscBoard" class="portal-form-control" value="@(hsscRecord?.BoardOrUniversity ?? "BISE Karachi")" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="portal-form-label">Passing Year <span class="required">*</span></label>
+                            <input type="number" id="inputHsscYear" name="hsscYear" class="portal-form-control" value="@(hsscRecord?.PassingYear > 1900 ? hsscRecord.PassingYear : 2024)" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="portal-form-label">Roll Number <span class="required">*</span></label>
+                            <input type="text" id="inputHsscRoll" name="hsscRoll" class="portal-form-control" value="@(hsscRecord?.RollNumber ?? "781294")" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="portal-form-label">Total Marks <span class="required">*</span></label>
+                            <input type="number" step="0.1" id="inputHsscTotal" name="hsscTotal" class="portal-form-control" value="@(hsscRecord?.TotalMarks > 0 ? hsscRecord.TotalMarks : 1100)" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="portal-form-label">Obtained Marks <span class="required">*</span></label>
+                            <input type="number" step="0.1" id="inputHsscObtained" name="hsscObtained" class="portal-form-control" value="@(hsscRecord?.ObtainedMarks > 0 ? hsscRecord.ObtainedMarks : 960)" required />
+                        </div>
+                    </div>
+                    <!-- HSSC Document Status Badge -->
+                    <div class="p-3 rounded border border-secondary" style="background:var(--portal-surface-2);">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-file-pdf text-danger fa-lg"></i>
+                                <div>
+                                    <div class="fw-bold" style="font-size:0.88rem;">Intermediate Marksheet / Certificate</div>
+                                    <div class="small text-muted">@(hsscDoc?.FileName ?? "Document attached in Document Repository")</div>
+                                </div>
+                            </div>
+                            <div>
+                                @if (hsscDoc != null)
+                                {
+                                    <span class="portal-badge portal-badge-active"><i class="fa-solid fa-check me-1"></i> Attached (@hsscDoc.VerificationStatus)</span>
+                                    <a href="@hsscDoc.FilePath" target="_blank" class="btn btn-sm btn-outline-info ms-2"><i class="fa-solid fa-eye me-1"></i> Preview</a>
+                                }
+                                else
+                                {
+                                    <span class="portal-badge portal-badge-warning"><i class="fa-solid fa-clock me-1"></i> Upload Pending</span>
+                                    <a asp-action="Documents" target="_blank" class="btn btn-sm btn-cyber ms-2"><i class="fa-solid fa-upload me-1"></i> Upload Now</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="portal-card-footer justify-content-between">
+                <button type="button" class="portal-btn portal-btn-outline" onclick="goToStep(1)"><i class="fa-solid fa-arrow-left me-1"></i> Back</button>
+                <button type="button" class="portal-btn portal-btn-cyan" onclick="goToStep(3)">Next: Program Selection <i class="fa-solid fa-arrow-right ms-1"></i></button>
+            </div>
+        </div>
+
+        <!-- ═══════ STEP 3: PROGRAM SELECTION ═══════ -->
+        <div class="portal-card wizard-step-panel d-none" id="wizard-step-3">
+            <div class="portal-card-header">
+                <div class="portal-card-title"><i class="fa-solid fa-laptop-code me-2"></i> Step 3: Program Selection</div>
+            </div>
+            <div class="portal-card-body">
+                <p class="text-muted mb-4" style="font-size:0.88rem;">Select your desired degree program for admission in the <strong>@(activeSession?.Title ?? "Active Intake")</strong>.</p>
+
+                <div class="row g-3">
+                    @foreach (var prog in allPrograms)
+                    {
+                        bool isSelected = selectedProgram != null ? selectedProgram.Id == prog.Id : prog == allPrograms.FirstOrDefault();
+                        <div class="col-md-6">
+                            <label class="portal-card p-3 d-flex align-items-start gap-3 cursor-pointer h-100" style="border: 2px solid @(isSelected ? "var(--portal-cyan)" : "var(--portal-border)"); background: @(isSelected ? "var(--portal-active)" : "var(--portal-surface)");">
+                                <input type="radio" name="degreeProgramId" value="@prog.Id" data-title="@prog.Name" checked="@isSelected" style="margin-top:4px;" onchange="highlightProgramCard(this)" />
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span style="font-weight:700; color:var(--portal-text); font-size:0.95rem;">@prog.Name</span>
+                                        <span class="portal-badge portal-badge-info">@prog.Code</span>
+                                    </div>
+                                    <div style="font-size:0.8rem; color:var(--portal-text-secondary);" class="mt-1">
+                                        <i class="fa-solid fa-clock me-1"></i> @prog.Duration | Eligibility: @prog.Eligibility
+                                    </div>
+                                    <div style="font-size:0.78rem; color:var(--portal-text-muted);" class="mt-2 line-clamp-2">
+                                        @prog.Overview
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="portal-card-footer justify-content-between">
+                <button type="button" class="portal-btn portal-btn-outline" onclick="goToStep(2)"><i class="fa-solid fa-arrow-left me-1"></i> Back</button>
+                <button type="button" class="portal-btn portal-btn-cyan" onclick="goToStep(4)">Next: Guardian Details <i class="fa-solid fa-arrow-right ms-1"></i></button>
+            </div>
+        </div>
+
+        <!-- ═══════ STEP 4: GUARDIAN DETAILS ═══════ -->
+        <div class="portal-card wizard-step-panel d-none" id="wizard-step-4">
+            <div class="portal-card-header">
+                <div class="portal-card-title"><i class="fa-solid fa-users me-2"></i> Step 4: Guardian & Financial Information</div>
+            </div>
+            <div class="portal-card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Father's Full Name <span class="required">*</span></label>
+                        <input type="text" id="inputFatherName" name="fatherName" class="portal-form-control" value="@(guardian?.FatherName ?? profile?.FatherName ?? "Muhammad Tariq")" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Father's CNIC <span class="required">*</span></label>
+                        <input type="text" id="inputFatherCnic" name="fatherCnic" class="portal-form-control" value="@(guardian?.FatherCNIC ?? "42101-9876543-1")" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Father's Occupation <span class="required">*</span></label>
+                        <input type="text" id="inputFatherOccupation" name="fatherOccupation" class="portal-form-control" value="@(guardian?.FatherOccupation ?? "Senior Executive Engineer")" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Guardian Name <span class="required">*</span></label>
+                        <input type="text" id="inputGuardianName" name="guardianName" class="portal-form-control" value="@(guardian?.GuardianName ?? profile?.GuardianName ?? "Muhammad Tariq")" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="portal-form-label">Relation with Guardian <span class="required">*</span></label>
+                        <select id="inputGuardianRelation" name="guardianRelation" class="portal-form-select" required>
+                            <option value="Father" selected>Father</option>
+                            <option value="Mother">Mother</option>
+                            <option value="Brother">Brother</option>
+                            <option value="Uncle">Uncle</option>
+                            <option value="Legal Guardian">Legal Guardian</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="portal-form-label">Guardian Contact Number <span class="required">*</span></label>
+                        <input type="text" id="inputGuardianPhone" name="guardianPhone" class="portal-form-control" value="@(guardian?.GuardianPhone ?? profile?.GuardianPhone ?? "+92 300 9876543")" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="portal-form-label">Monthly Household Income (PKR) <span class="required">*</span></label>
+                        <input type="number" id="inputMonthlyIncome" name="monthlyIncome" class="portal-form-control" value="@(guardian?.MonthlyIncome > 0 ? guardian.MonthlyIncome : 150000)" required />
+                    </div>
+                </div>
+            </div>
+            <div class="portal-card-footer justify-content-between">
+                <button type="button" class="portal-btn portal-btn-outline" onclick="goToStep(3)"><i class="fa-solid fa-arrow-left me-1"></i> Back</button>
+                <button type="button" class="portal-btn portal-btn-cyan" onclick="goToStep(5)">Next: Upload Documents <i class="fa-solid fa-arrow-right ms-1"></i></button>
+            </div>
+        </div>
+
+        <!-- ═══════ STEP 5: DOCUMENT UPLOADS ═══════ -->
+        <div class="portal-card wizard-step-panel d-none" id="wizard-step-5">
+            <div class="portal-card-header d-flex justify-content-between align-items-center">
+                <div class="portal-card-title"><i class="fa-solid fa-folder-open me-2"></i> Step 5: Required Document Uploads</div>
+                <a asp-action="Documents" target="_blank" class="portal-btn portal-btn-sm portal-btn-cyan"><i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Open Full Document Repository</a>
+            </div>
+            <div class="portal-card-body">
+                <p class="text-muted mb-4" style="font-size:0.88rem;">Ensure all documents are uploaded in the Document Repository. Documents are automatically linked to your admission file.</p>
+
+                <div class="row g-4">
+                    <!-- 1. CNIC -->
+                    <div class="col-md-6">
+                        <div class="portal-card p-3 h-100">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span style="font-weight:600; font-size:0.88rem; color:var(--portal-text);">1. CNIC / B-Form Copy</span>
+                                @if (cnicDoc != null)
+                                {
+                                    <span class="portal-badge portal-badge-active"><i class="fa-solid fa-check me-1"></i> Attached</span>
+                                }
+                                else
+                                {
+                                    <span class="portal-badge portal-badge-warning"><i class="fa-solid fa-clock me-1"></i> Pending</span>
+                                }
+                            </div>
+                            <div style="font-size:0.78rem; color:var(--portal-text-muted);">Filename: @(cnicDoc?.FileName ?? "CNIC_BForm.pdf")</div>
+                            <div class="mt-3">
+                                @if (cnicDoc != null)
+                                {
+                                    <a href="@cnicDoc.FilePath" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-eye me-1"></i> Preview Document</a>
+                                }
+                                else
+                                {
+                                    <a asp-action="Documents" target="_blank" class="btn btn-sm btn-cyber"><i class="fa-solid fa-upload me-1"></i> Upload CNIC Document</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Matric Marksheet -->
+                    <div class="col-md-6">
+                        <div class="portal-card p-3 h-100">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span style="font-weight:600; font-size:0.88rem; color:var(--portal-text);">2. Matric Marksheet (SSC)</span>
+                                @if (sscDoc != null)
+                                {
+                                    <span class="portal-badge portal-badge-active"><i class="fa-solid fa-check me-1"></i> Attached</span>
+                                }
+                                else
+                                {
+                                    <span class="portal-badge portal-badge-warning"><i class="fa-solid fa-clock me-1"></i> Pending</span>
+                                }
+                            </div>
+                            <div style="font-size:0.78rem; color:var(--portal-text-muted);">Filename: @(sscDoc?.FileName ?? "Matric_Marksheet.pdf")</div>
+                            <div class="mt-3">
+                                @if (sscDoc != null)
+                                {
+                                    <a href="@sscDoc.FilePath" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-eye me-1"></i> Preview Document</a>
+                                }
+                                else
+                                {
+                                    <a asp-action="Documents" target="_blank" class="btn btn-sm btn-cyber"><i class="fa-solid fa-upload me-1"></i> Upload SSC Marksheet</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Inter Marksheet -->
+                    <div class="col-md-6">
+                        <div class="portal-card p-3 h-100">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span style="font-weight:600; font-size:0.88rem; color:var(--portal-text);">3. Intermediate Marksheet (HSSC)</span>
+                                @if (hsscDoc != null)
+                                {
+                                    <span class="portal-badge portal-badge-active"><i class="fa-solid fa-check me-1"></i> Attached</span>
+                                }
+                                else
+                                {
+                                    <span class="portal-badge portal-badge-warning"><i class="fa-solid fa-clock me-1"></i> Pending</span>
+                                }
+                            </div>
+                            <div style="font-size:0.78rem; color:var(--portal-text-muted);">Filename: @(hsscDoc?.FileName ?? "Intermediate_Marksheet.pdf")</div>
+                            <div class="mt-3">
+                                @if (hsscDoc != null)
+                                {
+                                    <a href="@hsscDoc.FilePath" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-eye me-1"></i> Preview Document</a>
+                                }
+                                else
+                                {
+                                    <a asp-action="Documents" target="_blank" class="btn btn-sm btn-cyber"><i class="fa-solid fa-upload me-1"></i> Upload HSSC Marksheet</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Photo -->
+                    <div class="col-md-6">
+                        <div class="portal-card p-3 h-100">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span style="font-weight:600; font-size:0.88rem; color:var(--portal-text);">4. Passport Size Photograph</span>
+                                @if (photoDoc != null)
+                                {
+                                    <span class="portal-badge portal-badge-active"><i class="fa-solid fa-check me-1"></i> Attached</span>
+                                }
+                                else
+                                {
+                                    <span class="portal-badge portal-badge-warning"><i class="fa-solid fa-clock me-1"></i> Pending</span>
+                                }
+                            </div>
+                            <div style="font-size:0.78rem; color:var(--portal-text-muted);">Filename: @(photoDoc?.FileName ?? "Passport_Photo.jpg")</div>
+                            <div class="mt-3">
+                                @if (photoDoc != null)
+                                {
+                                    <a href="@photoDoc.FilePath" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-eye me-1"></i> Preview Photo</a>
+                                }
+                                else
+                                {
+                                    <a asp-action="Documents" target="_blank" class="btn btn-sm btn-cyber"><i class="fa-solid fa-upload me-1"></i> Upload Photograph</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="portal-card-footer justify-content-between">
+                <button type="button" class="portal-btn portal-btn-outline" onclick="goToStep(4)"><i class="fa-solid fa-arrow-left me-1"></i> Back</button>
+                <button type="button" class="portal-btn portal-btn-cyan" onclick="goToStep(6)">Next: Application Review <i class="fa-solid fa-arrow-right ms-1"></i></button>
+            </div>
+        </div>
+
+        <!-- ═══════ STEP 6: APPLICATION REVIEW & VERIFICATION ═══════ -->
+        <div class="portal-card wizard-step-panel d-none" id="wizard-step-6">
+            <div class="portal-card-header">
+                <div class="portal-card-title"><i class="fa-solid fa-eye me-2"></i> Step 6: Application Summary Review & Edit</div>
+            </div>
+            <div class="portal-card-body">
+                <div class="portal-alert portal-alert-info mb-4">
+                    <i class="fa-solid fa-circle-info me-2"></i> 
+                    Please review all candidate details, academics, program choice, and uploaded documents below. Click <strong>[Edit Section]</strong> next to any block to modify information before proceeding.
+                </div>
+
+                <div class="row g-4">
+                    <!-- Personal Info Review -->
+                    <div class="col-md-6">
+                        <div class="portal-card p-3 h-100 border border-secondary" style="background:var(--portal-surface-2);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span style="font-weight:700; color:var(--portal-cyan); font-size:0.9rem; text-transform:uppercase;"><i class="fa-solid fa-user me-2"></i> Personal Coordinates</span>
+                                <button type="button" class="btn btn-sm btn-outline-cyan" onclick="goToStep(1)"><i class="fa-solid fa-pen-to-square me-1"></i> Edit Personal</button>
+                            </div>
+                            <ul class="list-unstyled mb-0" style="font-size:0.85rem; color:var(--portal-text-secondary); line-height:1.9;">
+                                <li><strong>Full Name:</strong> <span id="revFullName">@(applicant?.FullName ?? profile?.FullName)</span></li>
+                                <li><strong>Email Address:</strong> <span id="revEmail">@applicant?.Email</span></li>
+                                <li><strong>Phone Number:</strong> <span id="revPhone">@applicant?.PhoneNumber</span></li>
+                                <li><strong>CNIC / Passport:</strong> <span id="revCnic">@(applicant?.CNIC_Passport ?? profile?.CNIC_Passport ?? "35202-1234567-1")</span></li>
+                                <li><strong>Date of Birth:</strong> <span id="revDob">@((applicant?.DateOfBirth ?? DateTime.Now).ToString("dd MMM yyyy"))</span></li>
+                                <li><strong>City & Address:</strong> <span id="revAddress">@(applicant?.Address ?? "Karachi")</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Program Choice Review -->
+                    <div class="col-md-6">
+                        <div class="portal-card p-3 h-100 border border-secondary" style="background:var(--portal-surface-2);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span style="font-weight:700; color:var(--portal-cyan); font-size:0.9rem; text-transform:uppercase;"><i class="fa-solid fa-laptop-code me-2"></i> Offered Degree Choice</span>
+                                <button type="button" class="btn btn-sm btn-outline-cyan" onclick="goToStep(3)"><i class="fa-solid fa-pen-to-square me-1"></i> Edit Program</button>
+                            </div>
+                            <div class="p-3 rounded mb-2" style="background:var(--portal-surface);">
+                                <h6 class="fw-bold text-white mb-1" id="revProgramTitle">@(selectedProgram?.Name ?? "BS Software Engineering")</h6>
+                                <span class="badge bg-primary me-2">Offered Intake: @(activeSession?.Title ?? "2026")</span>
+                                <span class="badge bg-info text-dark">Degree Code: @(selectedProgram?.Code ?? "BS-SE")</span>
+                            </div>
+                            <p class="small text-muted m-0">Eligibility: @(selectedProgram?.Eligibility ?? "HSSC Pre-Engineering or equivalent with 50% marks")</p>
+                        </div>
+                    </div>
+
+                    <!-- Academic History Review -->
+                    <div class="col-md-6">
+                        <div class="portal-card p-3 h-100 border border-secondary" style="background:var(--portal-surface-2);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span style="font-weight:700; color:var(--portal-cyan); font-size:0.9rem; text-transform:uppercase;"><i class="fa-solid fa-graduation-cap me-2"></i> Academic Qualifications</span>
+                                <button type="button" class="btn btn-sm btn-outline-cyan" onclick="goToStep(2)"><i class="fa-solid fa-pen-to-square me-1"></i> Edit Academics</button>
+                            </div>
+                            <div class="mb-3 p-2 rounded" style="background:var(--portal-surface);">
+                                <div class="fw-bold text-white small">SSC / Matriculation</div>
+                                <div class="small text-muted" id="revSscDetails">@(sscRecord?.DegreeOrCertificateTitle ?? "SSC Science") | @(sscRecord?.BoardOrUniversity ?? "BISE Karachi") (@(sscRecord?.PassingYear > 1900 ? sscRecord.PassingYear : 2022))</div>
+                                <div class="small text-cyan fw-bold" id="revSscMarks">Marks: @(sscRecord?.ObtainedMarks ?? 945) / @(sscRecord?.TotalMarks ?? 1100) (@(sscRecord?.Percentage ?? 85.91)%)</div>
+                            </div>
+                            <div class="p-2 rounded" style="background:var(--portal-surface);">
+                                <div class="fw-bold text-white small">HSSC / Intermediate</div>
+                                <div class="small text-muted" id="revHsscDetails">@(hsscRecord?.DegreeOrCertificateTitle ?? "HSSC Pre-Engineering") | @(hsscRecord?.BoardOrUniversity ?? "BISE Karachi") (@(hsscRecord?.PassingYear > 1900 ? hsscRecord.PassingYear : 2024))</div>
+                                <div class="small text-cyan fw-bold" id="revHsscMarks">Marks: @(hsscRecord?.ObtainedMarks ?? 960) / @(hsscRecord?.TotalMarks ?? 1100) (@(hsscRecord?.Percentage ?? 87.27)%)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Guardian Details Review -->
+                    <div class="col-md-6">
+                        <div class="portal-card p-3 h-100 border border-secondary" style="background:var(--portal-surface-2);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span style="font-weight:700; color:var(--portal-cyan); font-size:0.9rem; text-transform:uppercase;"><i class="fa-solid fa-users me-2"></i> Guardian & Financial</span>
+                                <button type="button" class="btn btn-sm btn-outline-cyan" onclick="goToStep(4)"><i class="fa-solid fa-pen-to-square me-1"></i> Edit Guardian</button>
+                            </div>
+                            <ul class="list-unstyled mb-0" style="font-size:0.85rem; color:var(--portal-text-secondary); line-height:1.9;">
+                                <li><strong>Father Name:</strong> <span id="revFatherName">@(guardian?.FatherName ?? "Muhammad Tariq")</span></li>
+                                <li><strong>Father CNIC:</strong> <span id="revFatherCnic">@(guardian?.FatherCNIC ?? "42101-9876543-1")</span></li>
+                                <li><strong>Guardian Name:</strong> <span id="revGuardianName">@(guardian?.GuardianName ?? "Muhammad Tariq")</span></li>
+                                <li><strong>Guardian Relation:</strong> <span id="revGuardianRelation">@(guardian?.GuardianRelation ?? "Father")</span></li>
+                                <li><strong>Guardian Phone:</strong> <span id="revGuardianPhone">@(guardian?.GuardianPhone ?? "+92 300 9876543")</span></li>
+                                <li><strong>Monthly Household Income:</strong> <span id="revMonthlyIncome">PKR @((guardian?.MonthlyIncome ?? 150000).ToString("N0"))</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Uploaded Documents Summary Review -->
+                    <div class="col-12">
+                        <div class="portal-card p-3 border border-secondary" style="background:var(--portal-surface-2);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span style="font-weight:700; color:var(--portal-cyan); font-size:0.9rem; text-transform:uppercase;"><i class="fa-solid fa-folder-open me-2"></i> Uploaded Document Attachments (@documents.Count())</span>
+                                <button type="button" class="btn btn-sm btn-outline-cyan" onclick="goToStep(5)"><i class="fa-solid fa-pen-to-square me-1"></i> Manage Documents</button>
+                            </div>
+                            <div class="row g-3">
+                                @if (documents.Any())
+                                {
+                                    foreach (var doc in documents)
+                                    {
+                                        <div class="col-md-3">
+                                            <div class="p-2 rounded border border-secondary" style="background:var(--portal-surface);">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="fa-solid fa-file-pdf text-danger"></i>
+                                                    <div class="text-truncate small text-white fw-bold">@doc.DocumentType</div>
+                                                </div>
+                                                <div class="small text-muted text-truncate mt-1">@doc.FileName</div>
+                                                <a href="@doc.FilePath" target="_blank" class="btn btn-xs btn-link text-cyan p-0 mt-1">Preview Attachment</a>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="col-12 text-muted small">No document attachments uploaded in repository yet.</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="portal-card-footer justify-content-between">
+                <button type="button" class="portal-btn portal-btn-outline" onclick="goToStep(5)"><i class="fa-solid fa-arrow-left me-1"></i> Back</button>
+                <button type="button" class="portal-btn portal-btn-cyan" onclick="goToStep(7)">Next: Declaration <i class="fa-solid fa-arrow-right ms-1"></i></button>
+            </div>
+        </div>
+
+        <!-- ═══════ STEP 7: DECLARATION ═══════ -->
+        <div class="portal-card wizard-step-panel d-none" id="wizard-step-7">
+            <div class="portal-card-header">
+                <div class="portal-card-title"><i class="fa-solid fa-signature me-2"></i> Step 7: Legal Declaration & E-Signature</div>
+            </div>
+            <div class="portal-card-body">
+                <div class="portal-card p-4 mb-4" style="background:var(--portal-surface-2); font-size:0.85rem; line-height:1.7; color:var(--portal-text-secondary);">
+                    <p class="fw-bold text-white mb-2">UNIVERSITY ADMISSION DECLARATION</p>
+                    <p>I hereby declare that all information provided in this admission application is true, complete, and accurate to the best of my knowledge. I understand that any false statement or misrepresentation will result in immediate disqualification or cancellation of admission at NED Academy.</p>
+                    <p class="mb-0">I agree to abide by all university rules, regulations, code of conduct, and fee payment schedules.</p>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="portal-form-label">Applicant E-Signature (Type Full Name) <span class="required">*</span></label>
+                        <input type="text" name="declarationSigned" class="portal-form-control" placeholder="Type your full legal name as digital signature" value="@(applicant?.FullName ?? profile?.FullName)" required />
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div class="portal-form-check">
+                            <input type="checkbox" id="acceptTermsCheck" required checked />
+                            <label for="acceptTermsCheck">I accept the University Admission Terms & Declaration</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="portal-card-footer justify-content-between">
+                <button type="button" class="portal-btn portal-btn-outline" onclick="goToStep(6)"><i class="fa-solid fa-arrow-left me-1"></i> Back</button>
+                <button type="button" class="portal-btn portal-btn-cyan" onclick="goToStep(8)">Next: Final Confirmation <i class="fa-solid fa-arrow-right ms-1"></i></button>
+            </div>
+        </div>
+
+        <!-- ═══════ STEP 8: FINAL SUBMISSION ═══════ -->
+        <div class="portal-card wizard-step-panel d-none" id="wizard-step-8">
+            <div class="portal-card-header">
+                <div class="portal-card-title"><i class="fa-solid fa-paper-plane me-2"></i> Step 8: Final Submission</div>
+            </div>
+            <div class="portal-card-body text-center py-5">
+                <div class="portal-stat-icon cyan mx-auto mb-3" style="width:64px; height:64px; font-size:1.8rem;">
+                    <i class="fa-solid fa-shield-check"></i>
+                </div>
+                <h3 class="portal-content-title mb-2">Ready to Submit Application</h3>
+                <p class="portal-content-subtitle max-w-lg mx-auto mb-4" style="max-width:500px;">
+                    Once submitted, your application will be assigned an official Application Number and queued for document verification by the Admission Committee.
+                </p>
+
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="button" class="portal-btn portal-btn-outline" onclick="goToStep(6)"><i class="fa-solid fa-pen-to-square me-1"></i> Review & Edit Application</button>
+                    <button type="submit" class="portal-btn portal-btn-cyan portal-btn-lg"><i class="fa-solid fa-check-circle me-1"></i> Submit Official Application Now</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function goToStep(stepNum) {
+            // Hide all step panels
+            document.querySelectorAll('.wizard-step-panel').forEach(el => el.classList.add('d-none'));
+
+            // Sync values to Review section when entering Step 6
+            if (stepNum === 6) {
+                syncReviewData();
+            }
+
+            // Show selected step panel
+            const activePanel = document.getElementById('wizard-step-' + stepNum);
+            if (activePanel) activePanel.classList.remove('d-none');
+
+            // Update step tracker
+            for (let i = 1; i <= 8; i++) {
+                const navItem = document.getElementById('step-nav-' + i);
+                if (navItem) {
+                    if (i < stepNum) {
+                        navItem.className = 'portal-progress-step completed';
+                        navItem.querySelector('.portal-progress-dot').innerHTML = '<i class="fa-solid fa-check" style="font-size:0.7rem;"></i>';
+                    } else if (i === stepNum) {
+                        navItem.className = 'portal-progress-step active';
+                        navItem.querySelector('.portal-progress-dot').innerText = i;
+                    } else {
+                        navItem.className = 'portal-progress-step pending';
+                        navItem.querySelector('.portal-progress-dot').innerText = i;
+                    }
+                }
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function syncReviewData() {
+            // Personal
+            setElText('revCnic', document.getElementById('inputCnic')?.value);
+            setElText('revAddress', document.getElementById('inputAddress')?.value);
+
+            // Program
+            const selectedRadio = document.querySelector('input[name="degreeProgramId"]:checked');
+            if (selectedRadio) {
+                const title = selectedRadio.getAttribute('data-title') || 'Selected Program';
+                setElText('revProgramTitle', title);
+            }
+
+            // Academics
+            const sscT = document.getElementById('inputSscTitle')?.value || 'SSC';
+            const sscB = document.getElementById('inputSscBoard')?.value || 'BISE';
+            const sscY = document.getElementById('inputSscYear')?.value || '';
+            const sscTot = parseFloat(document.getElementById('inputSscTotal')?.value || 1100);
+            const sscObt = parseFloat(document.getElementById('inputSscObtained')?.value || 0);
+            const sscPct = sscTot > 0 ? ((sscObt / sscTot) * 100).toFixed(2) : '0';
+
+            setElText('revSscDetails', `${sscT} | ${sscB} (${sscY})`);
+            setElText('revSscMarks', `Marks: ${sscObt} / ${sscTot} (${sscPct}%)`);
+
+            const hsscT = document.getElementById('inputHsscTitle')?.value || 'HSSC';
+            const hsscB = document.getElementById('inputHsscBoard')?.value || 'BISE';
+            const hsscY = document.getElementById('inputHsscYear')?.value || '';
+            const hsscTot = parseFloat(document.getElementById('inputHsscTotal')?.value || 1100);
+            const hsscObt = parseFloat(document.getElementById('inputHsscObtained')?.value || 0);
+            const hsscPct = hsscTot > 0 ? ((hsscObt / hsscTot) * 100).toFixed(2) : '0';
+
+            setElText('revHsscDetails', `${hsscT} | ${hsscB} (${hsscY})`);
+            setElText('revHsscMarks', `Marks: ${hsscObt} / ${hsscTot} (${hsscPct}%)`);
+
+            // Guardian
+            setElText('revFatherName', document.getElementById('inputFatherName')?.value);
+            setElText('revFatherCnic', document.getElementById('inputFatherCnic')?.value);
+            setElText('revGuardianName', document.getElementById('inputGuardianName')?.value);
+            setElText('revGuardianRelation', document.getElementById('inputGuardianRelation')?.value);
+            setElText('revGuardianPhone', document.getElementById('inputGuardianPhone')?.value);
+            setElText('revMonthlyIncome', 'PKR ' + (document.getElementById('inputMonthlyIncome')?.value || '0'));
+        }
+
+        function setElText(id, val) {
+            const el = document.getElementById(id);
+            if (el && val) el.innerText = val;
+        }
+
+        function highlightProgramCard(radio) {
+            document.querySelectorAll('input[name="degreeProgramId"]').forEach(r => {
+                const card = r.closest('.portal-card');
+                if (card) {
+                    card.style.borderColor = 'var(--portal-border)';
+                    card.style.background = 'var(--portal-surface)';
+                }
+            });
+
+            const selectedCard = radio.closest('.portal-card');
+            if (selectedCard) {
+                selectedCard.style.borderColor = 'var(--portal-cyan)';
+                selectedCard.style.background = 'var(--portal-active)';
+            }
+        }
+    </script>
+}

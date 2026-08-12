@@ -1,12 +1,85 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\saads\\Desktop\\NedAcademyWebsite\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{EF493693-5A79-D0FB-C8CA-275646E46860}|NedAcademyWebsite.csproj|c:\\users\\saads\\desktop\\nedacademywebsite\\views\\home\\academics.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EF493693-5A79-D0FB-C8CA-275646E46860}|NedAcademyWebsite.csproj|solutionrelative:views\\home\\academics.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EF493693-5A79-D0FB-C8CA-275646E46860}|NedAcademyWebsite.csproj|c:\\users\\saads\\desktop\\nedacademywebsite\\views\\home\\about.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EF493693-5A79-D0FB-C8CA-275646E46860}|NedAcademyWebsite.csproj|solutionrelative:views\\home\\about.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EF493693-5A79-D0FB-C8CA-275646E46860}|NedAcademyWebsite.csproj|c:\\users\\saads\\desktop\\nedacademywebsite\\views\\shared\\_validationscriptspartial.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EF493693-5A79-D0FB-C8CA-275646E46860}|NedAcademyWebsite.csproj|solutionrelative:views\\shared\\_validationscriptspartial.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EF493693-5A79-D0FB-C8CA-275646E46860}|NedAcademyWebsite.csproj|c:\\users\\saads\\desktop\\nedacademywebsite\\views\\_viewimports.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EF493693-5A79-D0FB-C8CA-275646E46860}|NedAcademyWebsite.csproj|solutionrelative:views\\_viewimports.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Academics.cshtml",
+              "DocumentMoniker": "C:\\Users\\saads\\Desktop\\NedAcademyWebsite\\Views\\Home\\Academics.cshtml",
+              "RelativeDocumentMoniker": "Views\\Home\\Academics.cshtml",
+              "ToolTip": "C:\\Users\\saads\\Desktop\\NedAcademyWebsite\\Views\\Home\\Academics.cshtml",
+              "RelativeToolTip": "Views\\Home\\Academics.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-21T14:29:08.789Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "About.cshtml",
+              "DocumentMoniker": "C:\\Users\\saads\\Desktop\\NedAcademyWebsite\\Views\\Home\\About.cshtml",
+              "RelativeDocumentMoniker": "Views\\Home\\About.cshtml",
+              "ToolTip": "C:\\Users\\saads\\Desktop\\NedAcademyWebsite\\Views\\Home\\About.cshtml",
+              "RelativeToolTip": "Views\\Home\\About.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-21T14:29:07.352Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "_ValidationScriptsPartial.cshtml",
+              "DocumentMoniker": "C:\\Users\\saads\\Desktop\\NedAcademyWebsite\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "RelativeDocumentMoniker": "Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "ToolTip": "C:\\Users\\saads\\Desktop\\NedAcademyWebsite\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "RelativeToolTip": "Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-21T14:29:02.978Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "_ViewImports.cshtml",
+              "DocumentMoniker": "C:\\Users\\saads\\Desktop\\NedAcademyWebsite\\Views\\_ViewImports.cshtml",
+              "RelativeDocumentMoniker": "Views\\_ViewImports.cshtml",
+              "ToolTip": "C:\\Users\\saads\\Desktop\\NedAcademyWebsite\\Views\\_ViewImports.cshtml",
+              "RelativeToolTip": "Views\\_ViewImports.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-21T14:28:07.471Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

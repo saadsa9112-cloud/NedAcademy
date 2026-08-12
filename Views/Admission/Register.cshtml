@@ -1,0 +1,222 @@
+@model NedAcademyWebsite.Models.Applicant
+@using NedAcademyWebsite.Models
+@inject NedAcademyWebsite.Services.ISettingService SettingService
+@{
+    Layout = null;
+    var settings = await SettingService.GetSettingsAsync();
+    var activeSession = ViewBag.ActiveSession as AdmissionSession;
+    var selectedProgram = ViewBag.SelectedProgram as DegreeProgram;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - @settings.UniversityName Applicant Portal</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Portal CSS -->
+    <link rel="stylesheet" href="~/css/portal.css" asp-append-version="true" />
+</head>
+<body class="portal-auth-page">
+    <div class="portal-auth-brand">
+        <div class="portal-auth-brand-logo">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <h2>@settings.UniversityName</h2>
+            <p>Applicant Portal</p>
+        </div>
+        <div class="portal-auth-brand-content">
+            <h1>Begin Your<br><span>Academic Journey</span></h1>
+            <p class="portal-auth-brand-desc">Join our community of scholars and innovators.</p>
+            <ul class="portal-auth-features">
+                <li><i class="fa-solid fa-check-circle"></i> Secure Account Creation</li>
+                <li><i class="fa-solid fa-check-circle"></i> Track Application Progress</li>
+                <li><i class="fa-solid fa-check-circle"></i> Upload Documents Digitally</li>
+                <li><i class="fa-solid fa-check-circle"></i> Real-time Status Updates</li>
+            </ul>
+            
+            @if (activeSession != null)
+            {
+                <div class="portal-auth-info-box mt-4">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>Admission Session: @activeSession.Title</span>
+                </div>
+            }
+            @if (selectedProgram != null)
+            {
+                <div class="portal-auth-info-box mt-3">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>Selected Program: @selectedProgram.Name</span>
+                </div>
+            }
+            
+            <div class="portal-auth-badges mt-5">
+                <span class="badge bg-dark"><i class="fa-solid fa-shield-halved"></i> Secure Portal</span>
+                <span class="badge bg-dark"><i class="fa-solid fa-server"></i> Fast Application</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="portal-register-form-panel">
+        <div class="portal-auth-back">
+            <a href="~/Home/Index"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+        </div>
+        
+        <div class="portal-register-form-container">
+            <div class="portal-onboarding-steps mb-4">
+                <div class="portal-onboarding-step active">
+                    <div class="step-num">1</div>
+                    <div class="step-label">Create Account</div>
+                </div>
+                <div class="portal-onboarding-step pending">
+                    <div class="step-num">2</div>
+                    <div class="step-label">Complete Profile</div>
+                </div>
+                <div class="portal-onboarding-step pending">
+                    <div class="step-num">3</div>
+                    <div class="step-label">Submit Application</div>
+                </div>
+            </div>
+            
+            <div class="portal-auth-form-header">
+                <h2>Create Your Account</h2>
+                <p>Provide your details to begin the application process.</p>
+            </div>
+            
+            <div asp-validation-summary="ModelOnly" class="portal-alert portal-alert-error"></div>
+            
+            <form asp-controller="Admission" asp-action="Register" method="post">
+                <input type="hidden" name="programSlug" value="@selectedProgram?.Slug" />
+                
+                <div class="portal-form-section">
+                    <h3 class="portal-form-section-title"><i class="fa-solid fa-user"></i> Personal Information</h3>
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label">Full Name</label>
+                        <input asp-for="FullName" class="portal-form-control" required placeholder="Enter your full name as per documents" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Email" class="form-label">Email Address</label>
+                            <input asp-for="Email" class="portal-form-control" required type="email" placeholder="name@example.com" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                            <div class="portal-input-group d-flex">
+                                <select name="countryCode" class="portal-form-select" style="width: auto; border-right: 0; border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                                    <option value="+92">+92 Pakistan</option>
+                                    <option value="+1">+1 USA</option>
+                                    <option value="+44">+44 UK</option>
+                                    <option value="+971">+971 UAE</option>
+                                    <option value="+966">+966 Saudi Arabia</option>
+                                    <option value="+91">+91 India</option>
+                                </select>
+                                <input asp-for="PhoneNumber" class="portal-form-control flex-grow-1" required placeholder="300 1234567" style="border-top-left-radius: 0; border-bottom-left-radius: 0;" />
+                            </div>
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DateOfBirth" class="form-label">Date of Birth</label>
+                            <input asp-for="DateOfBirth" class="portal-form-control" required type="date" />
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Gender" class="form-label">Gender</label>
+                            <select asp-for="Gender" class="portal-form-select" required>
+                                <option value="">Select Gender...</option>
+                                <option value="1">Male</option>
+                                <option value="2">Female</option>
+                                <option value="3">Other</option>
+                            </select>
+                            <span asp-validation-for="Gender" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="portal-form-section">
+                    <h3 class="portal-form-section-title"><i class="fa-solid fa-location-dot"></i> Location Details</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="City" class="form-label">City</label>
+                            <input asp-for="City" class="portal-form-control" required placeholder="E.g., Karachi" />
+                            <span asp-validation-for="City" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Nationality" class="form-label">Nationality</label>
+                            <input asp-for="Nationality" class="portal-form-control" required value="Pakistani" />
+                            <span asp-validation-for="Nationality" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Address" class="form-label">Current Address</label>
+                        <input asp-for="Address" class="portal-form-control" required placeholder="House/Flat No, Street, Area" />
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="CNIC_Passport" class="form-label">CNIC / Passport Number</label>
+                        <input asp-for="CNIC_Passport" class="portal-form-control" placeholder="Optional — CNIC or Passport Number" />
+                        <span asp-validation-for="CNIC_Passport" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="portal-form-section">
+                    <h3 class="portal-form-section-title"><i class="fa-solid fa-shield-halved"></i> Account Security</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" name="password" required class="portal-form-control" oninput="portalPasswordStrength(this)" placeholder="Enter a secure password" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Confirm Password</label>
+                            <input type="password" name="confirmPassword" required class="portal-form-control" placeholder="Re-enter password" />
+                        </div>
+                    </div>
+                    <div class="portal-password-strength mb-2 d-flex gap-1">
+                        <span class="portal-password-bar flex-grow-1 bg-light rounded" style="height: 4px;"></span>
+                        <span class="portal-password-bar flex-grow-1 bg-light rounded" style="height: 4px;"></span>
+                        <span class="portal-password-bar flex-grow-1 bg-light rounded" style="height: 4px;"></span>
+                        <span class="portal-password-bar flex-grow-1 bg-light rounded" style="height: 4px;"></span>
+                        <span class="portal-password-bar flex-grow-1 bg-light rounded" style="height: 4px;"></span>
+                    </div>
+                    <p class="portal-form-hint text-muted small mb-4">Password must be at least 6 characters</p>
+                </div>
+                
+                <button type="submit" class="portal-btn portal-btn-cyan portal-btn-lg w-100 mb-3">
+                    Create Account <i class="fa-solid fa-arrow-right ms-2"></i>
+                </button>
+                
+                <div class="portal-security-notice text-center mb-4">
+                    <i class="fa-solid fa-lock text-success"></i>
+                    <span class="small text-muted ms-1">Your data is encrypted and stored securely</span>
+                </div>
+                
+                <div class="portal-auth-footer-text text-center">
+                    <p>Already have an account? <a href="~/Admission/Login" class="text-primary fw-medium text-decoration-none">Sign In</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- jQuery -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Validation Scripts -->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <!-- Portal JS -->
+    <script src="~/js/portal.js" asp-append-version="true"></script>
+    <!-- portalPasswordStrength is provided by portal.js -->
+</body>
+</html>
