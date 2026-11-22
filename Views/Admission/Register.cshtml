@@ -89,7 +89,16 @@
                 <p>Provide your details to begin the application process.</p>
             </div>
             
-            <div asp-validation-summary="ModelOnly" class="portal-alert portal-alert-error"></div>
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="portal-alert portal-alert-error mb-4" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #dc2626; padding: 12px 16px; border-radius: 8px;">
+                    <div class="d-flex align-items-center mb-1">
+                        <i class="fa-solid fa-circle-exclamation me-2 text-danger"></i>
+                        <strong style="color: #b91c1c;">Please correct the following errors:</strong>
+                    </div>
+                    <div asp-validation-summary="All" class="small mb-0 ps-3" style="color: #dc2626;"></div>
+                </div>
+            }
             
             <form asp-controller="Admission" asp-action="Register" method="post">
                 <input type="hidden" name="programSlug" value="@selectedProgram?.Slug" />

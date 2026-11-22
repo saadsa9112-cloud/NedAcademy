@@ -83,55 +83,61 @@
                                         }
                                     </td>
                                 </tr>
-
-                                <!-- Upload Proof Modal -->
-                                <div class="modal fade" id="uploadProofModal-@v.Id" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content" style="background:var(--portal-surface); border:1px solid var(--portal-border); color:var(--portal-text);">
-                                            <div class="modal-header" style="border-bottom:1px solid var(--portal-border);">
-                                                <h5 class="modal-title font-headings" style="font-size:1.1rem; font-weight:700;"><i class="fa-solid fa-upload me-2 text-cyan"></i> Submit Payment Receipt</h5>
-                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <form asp-controller="Admission" asp-action="UploadPaymentProof" method="post" enctype="multipart/form-data">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="voucherId" value="@v.Id" />
-                                                <div class="modal-body p-4 text-start">
-                                                    <div class="mb-3">
-                                                        <label class="portal-form-label">Payment Method <span class="required">*</span></label>
-                                                        <select name="paymentMethod" class="portal-form-select" required>
-                                                            <option value="Bank Deposit Slip">Bank Deposit Slip (NBP / HBL / MCB)</option>
-                                                            <option value="Online Bank Transfer">Online 1Link / IBFT Bank Transfer</option>
-                                                            <option value="JazzCash / EasyPaisa">JazzCash / EasyPaisa Mobile Wallet</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="portal-form-label">Bank Transaction Reference / Deposit Slip # <span class="required">*</span></label>
-                                                        <input type="text" name="transactionRef" class="portal-form-control" placeholder="e.g. TXN-982147102" required />
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="portal-form-label">Upload Receipt Image / PDF (Max 5MB) <span class="required">*</span></label>
-                                                        <input type="file" name="proofFile" class="portal-form-control" accept=".pdf,.jpg,.jpeg,.png" required />
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer" style="border-top:1px solid var(--portal-border);">
-                                                    <button type="button" class="portal-btn portal-btn-outline" data-bs-dismiss="modal">Cancel</button>
-                                                    <button type="submit" class="portal-btn portal-btn-cyan"><i class="fa-solid fa-check me-1"></i> Submit Payment Proof</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
                             }
                         </tbody>
                     </table>
                 </div>
+
+                @foreach (var v in vouchers.Where(x => x.PaymentStatus == PaymentStatus.Unpaid))
+                {
+                    <!-- Upload Proof Modal -->
+                    <div class="modal fade" id="uploadProofModal-@v.Id" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content" style="background:var(--portal-surface); border:1px solid var(--portal-border); color:var(--portal-text);">
+                                <div class="modal-header" style="border-bottom:1px solid var(--portal-border);">
+                                    <h5 class="modal-title font-headings" style="font-size:1.1rem; font-weight:700;"><i class="fa-solid fa-upload me-2 text-cyan"></i> Submit Payment Receipt — Voucher #@v.VoucherNumber</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form asp-controller="Admission" asp-action="UploadPaymentProof" method="post" enctype="multipart/form-data">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="voucherId" value="@v.Id" />
+                                    <div class="modal-body p-4 text-start">
+                                        <div class="mb-3">
+                                            <label class="portal-form-label">Payment Method <span class="required">*</span></label>
+                                            <select name="paymentMethod" class="portal-form-select" required>
+                                                <option value="Bank Deposit Slip">Bank Deposit Slip (NBP / HBL / MCB)</option>
+                                                <option value="Online Bank Transfer">Online 1Link / IBFT Bank Transfer</option>
+                                                <option value="JazzCash / EasyPaisa">JazzCash / EasyPaisa Mobile Wallet</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="portal-form-label">Bank Transaction Reference / Deposit Slip # <span class="required">*</span></label>
+                                            <input type="text" name="transactionRef" class="portal-form-control" placeholder="e.g. TXN-982147102" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="portal-form-label">Upload Receipt Image / PDF (Max 5MB) <span class="required">*</span></label>
+                                            <input type="file" name="proofFile" class="portal-form-control" accept=".pdf,.jpg,.jpeg,.png" required />
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer" style="border-top:1px solid var(--portal-border);">
+                                        <button type="button" class="portal-btn portal-btn-outline" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="portal-btn portal-btn-cyan"><i class="fa-solid fa-check me-1"></i> Submit Payment Proof</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
             }
             else
             {
-                <div class="portal-empty-state">
-                    <div class="portal-empty-icon"><i class="fa-solid fa-receipt"></i></div>
-                    <div class="portal-empty-title">No Vouchers Generated Yet</div>
-                    <div class="portal-empty-desc">Your processing fee voucher will be generated automatically when you complete and submit your admission application.</div>
+                <div class="portal-empty-state text-center py-5">
+                    <div class="portal-empty-icon mb-3" style="font-size: 2.5rem; color: var(--portal-text-muted);"><i class="fa-solid fa-receipt"></i></div>
+                    <div class="portal-empty-title font-headings fw-bold mb-2" style="font-size: 1.15rem; color: var(--portal-text);">No Vouchers Generated Yet</div>
+                    <div class="portal-empty-desc text-muted mb-4 mx-auto" style="max-width: 520px;">Your processing fee voucher will be generated automatically when you complete and submit your admission application form.</div>
+                    <a href="@Url.Action("Apply", "Admission")" class="portal-btn portal-btn-primary">
+                        <i class="fa-solid fa-file-pen me-2"></i> Complete Admission Form
+                    </a>
                 </div>
             }
         </div>

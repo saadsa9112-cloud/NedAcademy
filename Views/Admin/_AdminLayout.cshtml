@@ -3,12 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Enterprise CMS Portal</title>
+    <title>@ViewData["Title"] - NED University Enterprise Suite</title>
     
     <!-- Google Fonts & FontAwesome -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
@@ -16,375 +16,737 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- CKEditor 5 -->
     <script src="https://cdn.ckeditor.com/ckeditor5/38.1.0/classic/ckeditor.js"></script>
+
     <style>
+        /* ═══════════════════════════════════════════════════════════════════════
+           NED UNIVERSITY ENTERPRISE SUITE — CLEAN MODERN SAAS DESIGN SYSTEM
+           ═══════════════════════════════════════════════════════════════════════ */
         :root {
-            --bg-color: #030712;
-            --card-bg: rgba(15, 23, 42, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --cyan: #00f2fe;
-            --royal-blue: #0077ff;
-            --text-muted: #cbd5e1;
-            --text-light: #f8fafc;
-            --font-headings: 'Outfit', 'Space Grotesk', system-ui, sans-serif;
-            --font-body: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            /* Light Mode Default Theme (Clean Slate & Royal Blue) */
+            --app-bg: #f8fafc;
+            --app-surface: #ffffff;
+            --app-surface-hover: #f1f5f9;
+            --app-sidebar-bg: #0f172a; /* Deep Slate Sidebar */
+            --app-sidebar-text: #94a3b8;
+            --app-sidebar-hover: #1e293b;
+            --app-sidebar-active: #2563eb;
+            --app-border: #e2e8f0;
+            --app-border-light: #f1f5f9;
+            --app-text: #0f172a;
+            --app-text-muted: #64748b;
+            --app-primary: #2563eb;
+            --app-primary-hover: #1d4ed8;
+            --app-emerald: #059669;
+            --app-amber: #d97706;
+            --app-purple: #7c3aed;
+            --app-danger: #dc2626;
+            --app-radius: 10px;
+            --app-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.07), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --app-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --app-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            --font-headings: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        /* Dark Mode Theme */
+        body.theme-dark {
+            --app-bg: #0b0f19;
+            --app-surface: #111827;
+            --app-surface-hover: #1f2937;
+            --app-sidebar-bg: #090d16;
+            --app-sidebar-text: #9ca3af;
+            --app-sidebar-hover: #1f2937;
+            --app-sidebar-active: #3b82f6;
+            --app-border: #1f2937;
+            --app-border-light: #162032;
+            --app-text: #f9fafb;
+            --app-text-muted: #9ca3af;
+            --app-primary: #3b82f6;
+            --app-primary-hover: #2563eb;
+            --app-emerald: #10b981;
+            --app-amber: #f59e0b;
+            --app-purple: #8b5cf6;
+            --app-danger: #ef4444;
+            --app-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+            --app-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --app-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
-            background-color: var(--bg-color);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 119, 255, 0.06) 0%, transparent 65%),
-                radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.06) 0%, transparent 65%);
-            color: var(--text-light);
+            background-color: var(--app-bg);
+            color: var(--app-text);
             font-family: var(--font-body);
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            text-rendering: optimizeLegibility;
             min-height: 100vh;
+            margin: 0;
             overflow-x: hidden;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
-        h1, h2, h3, h4, h5, h6, .font-headings { font-family: var(--font-headings); letter-spacing: -0.02em; }
-
-        .text-gradient-cyan {
-            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        h1, h2, h3, h4, h5, h6, .font-headings {
+            font-family: var(--font-headings);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--app-text);
         }
 
-        .glass-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
+        /* ─── Modern Card ─── */
+        .glass-card, .app-card {
+            background: var(--app-surface);
+            border: 1px solid var(--app-border);
+            border-radius: var(--app-radius);
+            box-shadow: var(--app-shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .glass-card:hover, .app-card:hover {
+            box-shadow: var(--app-shadow-md);
         }
 
+        /* ─── Sidebar Navigation ─── */
         .sidebar {
             width: 270px;
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-right: 1px solid var(--glass-border);
+            background: var(--app-sidebar-bg);
+            border-right: 1px solid var(--app-border);
             position: fixed;
             top: 0; bottom: 0; left: 0;
             z-index: 100;
-            padding: 24px;
+            padding: 20px 16px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             overflow-y: auto;
+            color: var(--app-sidebar-text);
         }
 
-        .topbar {
-            margin-left: 270px;
-            height: 70px;
-            background: rgba(15, 23, 42, 0.4);
-            border-bottom: 1px solid var(--glass-border);
-            backdrop-filter: blur(15px);
-            padding: 0 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 90;
+        .sidebar-brand-box {
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 20px;
         }
 
-        .main-content {
-            margin-left: 270px;
-            padding: 40px;
-            min-height: calc(100vh - 70px);
+        .nav-section-header {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #64748b;
+            margin: 16px 0 6px 12px;
+            font-weight: 700;
         }
 
         .nav-link-custom {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 14px;
-            color: var(--text-muted);
+            padding: 9px 12px;
+            color: var(--app-sidebar-text);
             text-decoration: none;
             border-radius: 8px;
             font-weight: 500;
+            font-size: 0.88rem;
+            transition: all 0.15s ease;
+            margin-bottom: 2px;
+        }
+
+        .nav-link-custom:hover {
+            color: #ffffff;
+            background: var(--app-sidebar-hover);
+        }
+
+        .nav-link-custom.active {
+            color: #ffffff !important;
+            background: var(--app-primary) !important;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+        }
+
+        .nav-link-custom i {
+            width: 20px;
+            text-align: center;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        /* ─── Topbar ─── */
+        .topbar {
+            margin-left: 270px;
+            height: 68px;
+            background: var(--app-surface);
+            border-bottom: 1px solid var(--app-border);
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            box-shadow: var(--app-shadow);
+        }
+
+        .main-content {
+            margin-left: 270px;
+            padding: 32px 36px;
+            min-height: calc(100vh - 68px);
+        }
+
+        /* ─── Enterprise App Switcher Dropdown ─── */
+        .portal-switcher-btn {
+            background: var(--app-surface-hover);
+            border: 1px solid var(--app-border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--app-text);
             transition: all 0.2s ease;
-            font-size: 0.92rem;
         }
-
-        .nav-link-custom:hover, .nav-link-custom.active {
-            color: #fff;
-            background: rgba(0, 242, 254, 0.08);
-            box-shadow: inset 0 0 10px rgba(0, 242, 254, 0.1);
+        .portal-switcher-btn:hover {
+            border-color: var(--app-primary);
         }
+        .portal-badge-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        .portal-badge-icon.icon-academic { background: rgba(5, 150, 105, 0.12); color: var(--app-emerald); }
+        .portal-badge-icon.icon-admissions { background: rgba(37, 99, 235, 0.12); color: var(--app-primary); }
+        .portal-badge-icon.icon-cms { background: rgba(124, 58, 237, 0.12); color: var(--app-purple); }
+        .portal-badge-icon.icon-system { background: rgba(217, 119, 6, 0.12); color: var(--app-amber); }
 
-        .nav-link-custom.active i { color: var(--cyan); }
-
-        .nav-section-header {
-            font-size: 0.68rem;
+        .portal-switcher-menu {
+            min-width: 330px;
+            background: var(--app-surface);
+            border: 1px solid var(--app-border);
+            border-radius: 12px;
+            padding: 8px;
+        }
+        .portal-menu-header {
+            font-size: 0.72rem;
             text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: rgba(255,255,255,0.4);
-            margin: 16px 0 6px 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--app-text-muted);
+            padding: 6px 10px;
+        }
+        .portal-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--app-text);
+            transition: background 0.15s ease;
+        }
+        .portal-menu-item:hover {
+            background: var(--app-surface-hover);
+            color: var(--app-text);
+        }
+        .portal-menu-item.active {
+            background: rgba(37, 99, 235, 0.08);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+        .portal-item-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .portal-item-title {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--app-text);
+        }
+        .portal-item-desc {
+            font-size: 0.74rem;
+            color: var(--app-text-muted);
+        }
+
+        /* ─── Workspace Switcher Pills Bar ─── */
+        .workspace-pills-bar {
+            background: var(--app-surface-hover);
+            border: 1px solid var(--app-border);
+            padding: 3px;
+            border-radius: 8px;
+            display: inline-flex;
+            gap: 2px;
+        }
+        .workspace-pill {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--app-text-muted);
+            text-decoration: none;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+        .workspace-pill:hover {
+            color: var(--app-text);
+            background: rgba(0, 0, 0, 0.04);
+        }
+        body.theme-dark .workspace-pill:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .workspace-pill.active {
+            background: var(--app-surface) !important;
+            color: var(--app-primary) !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             font-weight: 700;
         }
 
-        .btn-cyber {
-            background: linear-gradient(135deg, var(--cyan) 0%, var(--royal-blue) 100%);
-            border: none;
-            color: #000;
+        /* ─── Buttons & Controls ─── */
+        .btn-modern-primary {
+            background: var(--app-primary);
+            border: 1px solid var(--app-primary);
+            color: #ffffff !important;
             font-weight: 600;
-            transition: all 0.3s ease;
+            border-radius: 8px;
+            padding: 8px 16px;
+            transition: all 0.15s ease;
         }
-        .btn-cyber:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.35);
-            color: #000;
+        .btn-modern-primary:hover {
+            background: var(--app-primary-hover);
+            border-color: var(--app-primary-hover);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
         }
 
-        .btn-cyber-outline {
+        .btn-modern-outline {
             background: transparent;
-            border: 1px solid var(--cyan);
-            color: var(--cyan);
-            font-weight: 500;
-            transition: all 0.3s ease;
+            border: 1px solid var(--app-border);
+            color: var(--app-text) !important;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 8px 16px;
+            transition: all 0.15s ease;
         }
-        .btn-cyber-outline:hover {
-            background: rgba(0, 242, 254, 0.08);
-            color: #fff;
+        .btn-modern-outline:hover {
+            background: var(--app-surface-hover);
+            border-color: var(--app-text-muted);
         }
 
         .form-control, .form-select {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--glass-border);
-            color: #fff !important;
+            background: var(--app-surface);
+            border: 1px solid var(--app-border);
+            color: var(--app-text) !important;
             border-radius: 8px;
-            padding: 10px 14px;
+            padding: 9px 13px;
             font-family: var(--font-body);
+            font-size: 0.9rem;
         }
         .form-control:focus, .form-select:focus {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--cyan);
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+            background: var(--app-surface);
+            border-color: var(--app-primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
-        .form-select option { background: #0b1329; color: #fff; }
 
-        body, p, span, h1, h2, h3, h4, h5, h6, li, label, .form-label, th, td, a { color: var(--text-light); }
-        p, .text-muted { color: var(--text-muted) !important; }
-        .table { color: var(--text-light) !important; }
-        .table th, .table td { color: var(--text-light) !important; }
-        .modal-content { color: var(--text-light) !important; }
+        .table {
+            color: var(--app-text);
+            border-color: var(--app-border);
+        }
+        .table th {
+            color: var(--app-text-muted);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            background: var(--app-surface-hover);
+            border-bottom: 1px solid var(--app-border);
+            padding: 12px 16px;
+        }
+        .table td {
+            color: var(--app-text);
+            padding: 14px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--app-border);
+        }
 
-        .ck-editor__editable {
-            background-color: #0b1329 !important;
-            color: #ffffff !important;
-            min-height: 180px;
+        .theme-toggle-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--app-surface-hover);
+            border: 1px solid var(--app-border);
+            color: var(--app-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .theme-toggle-btn:hover {
+            color: var(--app-primary);
+            border-color: var(--app-primary);
         }
     </style>
+
+    <script>
+        (function() {
+            var theme = localStorage.getItem('adminTheme') || 'light';
+            if (theme === 'dark') {
+                document.documentElement.classList.add('theme-dark');
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.body.classList.add('theme-dark');
+                });
+            }
+        })();
+    </script>
 </head>
+@{
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    string reqWorkspace = Context.Request.Query["workspace"].ToString().ToLower().Trim();
+
+    string activeWorkspace = "system";
+    if (!string.IsNullOrEmpty(reqWorkspace))
+    {
+        activeWorkspace = reqWorkspace;
+    }
+    else if (currentAction == "Admissions" || currentAction == "ApplicantDetails" || currentAction == "Scholarships" || currentAction == "FeeConfig")
+    {
+        activeWorkspace = "admissions";
+    }
+    else if (currentAction == "Students" || currentAction == "Programs" || currentAction == "Departments" || currentAction == "Faculty" || currentAction == "Leadership")
+    {
+        activeWorkspace = "academic";
+    }
+    else if (currentAction == "PageBuilder" || currentAction == "Structure" || currentAction == "Navigation" || currentAction == "FormBuilder" || currentAction == "News" || currentAction == "Media" || currentAction == "Facilities" || currentAction == "Research" || currentAction == "Messages" || currentAction == "Downloads" || currentAction == "FAQs")
+    {
+        activeWorkspace = "cms";
+    }
+    else
+    {
+        activeWorkspace = "system";
+    }
+
+    string portalTitle = "Executive System Hub";
+    string portalIcon = "fa-sliders";
+    string portalBadgeClass = "icon-system";
+
+    if (activeWorkspace == "admissions")
+    {
+        portalTitle = "Admission ERP Console";
+        portalIcon = "fa-id-card-clip";
+        portalBadgeClass = "icon-admissions";
+    }
+    else if (activeWorkspace == "academic")
+    {
+        portalTitle = "Academic Registry (UMS)";
+        portalIcon = "fa-graduation-cap";
+        portalBadgeClass = "icon-academic";
+    }
+    else if (activeWorkspace == "cms")
+    {
+        portalTitle = "Web Experience CMS";
+        portalIcon = "fa-globe";
+        portalBadgeClass = "icon-cms";
+    }
+}
 <body>
 
-    <!-- Sidebar Navigation -->
-    <div class="sidebar d-flex flex-column justify-content-between">
+    <!-- ═══════ SIDEBAR NAVIGATION ═══════ -->
+    <aside class="sidebar" role="navigation" aria-label="Admin Navigation">
         <div>
-            <div class="mb-3 text-center">
-                <h4 class="font-headings fw-bold m-0"><span class="text-gradient-cyan">NED CMS</span></h4>
-                <small class="text-muted text-uppercase font-headings" style="font-size:0.65rem; letter-spacing:0.1em;">Enterprise Architecture</small>
+            <!-- Active Sub-Portal Brand Card -->
+            <div class="sidebar-brand-box">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <div class="portal-badge-icon @portalBadgeClass" style="width:28px; height:28px; font-size:0.85rem;">
+                        <i class="fa-solid @portalIcon"></i>
+                    </div>
+                    <span class="font-headings fw-bold text-white small text-uppercase" style="letter-spacing:0.05em;">@portalTitle</span>
+                </div>
+                <div class="text-muted" style="font-size:0.7rem;">NED University Enterprise Suite</div>
             </div>
-            
+
+            <!-- Contextual Navigation Modules for Active Portal -->
             <nav class="d-flex flex-column">
-                <div class="nav-section-header">Core Dashboard</div>
-                <a asp-action="Index" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
-                    <i class="fa-solid fa-gauge"></i> Executive Console
-                </a>
-                <a asp-action="Settings" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Settings" ? "active" : "")">
-                    <i class="fa-solid fa-sliders"></i> Site Settings (10 Tabs)
-                </a>
+                @if (activeWorkspace == "academic" || activeWorkspace == "all")
+                {
+                    <div class="nav-section-header" style="color: var(--app-emerald);"><i class="fa-solid fa-graduation-cap me-1"></i> Academic UMS</div>
+                    <a asp-action="Students" asp-route-workspace="academic" class="nav-link-custom @(currentAction == "Students" ? "active" : "")">
+                        <i class="fa-solid fa-user-graduate"></i> Enrolled Students
+                    </a>
+                    <a asp-action="Programs" asp-route-workspace="academic" class="nav-link-custom @(currentAction == "Programs" ? "active" : "")">
+                        <i class="fa-solid fa-book-open"></i> Degree Programs
+                    </a>
+                    <a asp-action="Departments" asp-route-workspace="academic" class="nav-link-custom @(currentAction == "Departments" ? "active" : "")">
+                        <i class="fa-solid fa-building-columns"></i> Departments
+                    </a>
+                    <a asp-action="Faculty" asp-route-workspace="academic" class="nav-link-custom @(currentAction == "Faculty" ? "active" : "")">
+                        <i class="fa-solid fa-chalkboard-user"></i> Faculty Directory
+                    </a>
+                    <a asp-action="Leadership" asp-route-workspace="academic" class="nav-link-custom @(currentAction == "Leadership" ? "active" : "")">
+                        <i class="fa-solid fa-user-shield"></i> Leadership Roster
+                    </a>
+                }
 
-                <div class="nav-section-header">Page & Layout Engine</div>
-                <a asp-action="PageBuilder" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "PageBuilder" ? "active" : "")">
-                    <i class="fa-solid fa-cubes"></i> Universal Page Builder
-                </a>
-                <a asp-action="Structure" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Structure" ? "active" : "")">
-                    <i class="fa-solid fa-layer-group"></i> Homepage Layout
-                </a>
-                <a asp-action="Navigation" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Navigation" ? "active" : "")">
-                    <i class="fa-solid fa-bars"></i> Navigation Manager
-                </a>
-                <a asp-action="FormBuilder" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "FormBuilder" ? "active" : "")">
-                    <i class="fa-solid fa-rectangle-list"></i> Dynamic Form Builder
-                </a>
+                @if (activeWorkspace == "admissions" || activeWorkspace == "all")
+                {
+                    <div class="nav-section-header" style="color: var(--app-primary);"><i class="fa-solid fa-id-card-clip me-1"></i> Admission ERP</div>
+                    <a asp-action="Admissions" asp-route-workspace="admissions" class="nav-link-custom @(currentAction == "Admissions" || currentAction == "ApplicantDetails" ? "active" : "")">
+                        <i class="fa-solid fa-inbox"></i> Applications Scrutiny
+                    </a>
+                    <a asp-action="Students" asp-route-workspace="admissions" class="nav-link-custom @(currentAction == "Students" ? "active" : "")">
+                        <i class="fa-solid fa-user-check"></i> Enrolled Students
+                    </a>
+                    <a asp-action="Scholarships" asp-route-workspace="admissions" class="nav-link-custom @(currentAction == "Scholarships" ? "active" : "")">
+                        <i class="fa-solid fa-award"></i> Scholarships Engine
+                    </a>
+                    <a asp-action="FeeConfig" asp-route-workspace="admissions" class="nav-link-custom @(currentAction == "FeeConfig" ? "active" : "")">
+                        <i class="fa-solid fa-calculator"></i> Fee Structure
+                    </a>
+                    <a asp-action="AuditLogs" asp-route-workspace="admissions" class="nav-link-custom @(currentAction == "AuditLogs" ? "active" : "")">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Admission Logs
+                    </a>
+                }
 
-                <div class="nav-section-header">Admission ERP System</div>
-                <a asp-action="Admissions" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Admissions" || ViewContext.RouteData.Values["action"]?.ToString() == "ApplicantDetails" ? "active" : "")">
-                    <i class="fa-solid fa-id-card-clip"></i> Applications Queue
-                </a>
-                <a asp-action="Scholarships" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Scholarships" ? "active" : "")">
-                    <i class="fa-solid fa-award"></i> Scholarships Engine
-                </a>
-                <a asp-action="FeeConfig" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "FeeConfig" ? "active" : "")">
-                    <i class="fa-solid fa-calculator"></i> Fee Structure Config
-                </a>
+                @if (activeWorkspace == "cms" || activeWorkspace == "all")
+                {
+                    <div class="nav-section-header" style="color: var(--app-purple);"><i class="fa-solid fa-globe me-1"></i> Web CMS Engine</div>
+                    <a asp-action="PageBuilder" asp-route-workspace="cms" class="nav-link-custom @(currentAction == "PageBuilder" ? "active" : "")">
+                        <i class="fa-solid fa-cubes"></i> Visual Page Builder
+                    </a>
+                    <a asp-action="Structure" asp-route-workspace="cms" class="nav-link-custom @(currentAction == "Structure" ? "active" : "")">
+                        <i class="fa-solid fa-layer-group"></i> Homepage Layout
+                    </a>
+                    <a asp-action="Navigation" asp-route-workspace="cms" class="nav-link-custom @(currentAction == "Navigation" ? "active" : "")">
+                        <i class="fa-solid fa-bars"></i> Menus &amp; Navigation
+                    </a>
+                    <a asp-action="News" asp-route-workspace="cms" class="nav-link-custom @(currentAction == "News" ? "active" : "")">
+                        <i class="fa-solid fa-newspaper"></i> News &amp; Events
+                    </a>
+                    <a asp-action="FormBuilder" asp-route-workspace="cms" class="nav-link-custom @(currentAction == "FormBuilder" ? "active" : "")">
+                        <i class="fa-solid fa-rectangle-list"></i> Form Builder
+                    </a>
+                    <a asp-action="Media" asp-route-workspace="cms" class="nav-link-custom @(currentAction == "Media" ? "active" : "")">
+                        <i class="fa-solid fa-photo-film"></i> Media Assets
+                    </a>
+                    <a asp-action="Facilities" asp-route-workspace="cms" class="nav-link-custom @(currentAction == "Facilities" ? "active" : "")">
+                        <i class="fa-solid fa-school"></i> Campus Facilities
+                    </a>
+                    <a asp-action="Research" asp-route-workspace="cms" class="nav-link-custom @(currentAction == "Research" ? "active" : "")">
+                        <i class="fa-solid fa-microchip"></i> Research Labs
+                    </a>
+                    <a asp-action="Messages" asp-route-workspace="cms" class="nav-link-custom @(currentAction == "Messages" ? "active" : "")">
+                        <i class="fa-solid fa-envelope"></i> Public Inquiries
+                    </a>
+                    <a asp-action="Downloads" asp-route-workspace="cms" class="nav-link-custom @(currentAction == "Downloads" ? "active" : "")">
+                        <i class="fa-solid fa-file-arrow-down"></i> Downloads Center
+                    </a>
+                    <a asp-action="FAQs" asp-route-workspace="cms" class="nav-link-custom @(currentAction == "FAQs" ? "active" : "")">
+                        <i class="fa-solid fa-circle-question"></i> FAQs
+                    </a>
+                }
 
-                <div class="nav-section-header">Content Modules</div>
-                <a asp-action="Programs" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Programs" ? "active" : "")">
-                    <i class="fa-solid fa-graduation-cap"></i> Degree Programs
-                </a>
-                <a asp-action="Faculty" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Faculty" ? "active" : "")">
-                    <i class="fa-solid fa-users-line"></i> Faculty Directory
-                </a>
-                <a asp-action="News" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "News" ? "active" : "")">
-                    <i class="fa-solid fa-newspaper"></i> News & Events
-                </a>
-                <a asp-action="Research" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Research" ? "active" : "")">
-                    <i class="fa-solid fa-microchip"></i> Research Labs
-                </a>
-                <a asp-action="Facilities" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Facilities" ? "active" : "")">
-                    <i class="fa-solid fa-school"></i> Campus Facilities
-                </a>
-                <a asp-action="Media" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Media" ? "active" : "")">
-                    <i class="fa-solid fa-photo-film"></i> Media Assets
-                </a>
-                <a asp-action="Messages" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Messages" ? "active" : "")">
-                    <i class="fa-solid fa-envelope"></i> Inquiries Inbox
-                </a>
-
-                <div class="nav-section-header">System Utilities</div>
-                <a asp-action="AuditLogs" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "AuditLogs" ? "active" : "")">
-                    <i class="fa-solid fa-clock-rotate-left"></i> Audit Logs
-                </a>
-                <a asp-action="RecycleBin" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "RecycleBin" ? "active" : "")">
-                    <i class="fa-solid fa-trash-arrow-up"></i> Recycle Bin
-                </a>
-                <a asp-action="Backups" class="nav-link-custom @(ViewContext.RouteData.Values["action"]?.ToString() == "Backups" ? "active" : "")">
-                    <i class="fa-solid fa-database"></i> Backup Manager
-                </a>
+                @if (activeWorkspace == "system" || activeWorkspace == "all")
+                {
+                    <div class="nav-section-header" style="color: var(--app-amber);"><i class="fa-solid fa-sliders me-1"></i> Executive Hub</div>
+                    <a asp-action="Index" asp-route-workspace="system" class="nav-link-custom @(currentAction == "Index" ? "active" : "")">
+                        <i class="fa-solid fa-gauge"></i> Executive Overview
+                    </a>
+                    <a asp-action="Settings" asp-route-workspace="system" class="nav-link-custom @(currentAction == "Settings" ? "active" : "")">
+                        <i class="fa-solid fa-sliders"></i> Global Settings
+                    </a>
+                    <a asp-action="AuditLogs" asp-route-workspace="system" class="nav-link-custom @(currentAction == "AuditLogs" ? "active" : "")">
+                        <i class="fa-solid fa-shield-halved"></i> Security Audit Logs
+                    </a>
+                    <a asp-action="Backups" asp-route-workspace="system" class="nav-link-custom @(currentAction == "Backups" ? "active" : "")">
+                        <i class="fa-solid fa-database"></i> Database Backups
+                    </a>
+                    <a asp-action="RecycleBin" asp-route-workspace="system" class="nav-link-custom @(currentAction == "RecycleBin" ? "active" : "")">
+                        <i class="fa-solid fa-trash-arrow-up"></i> Recycle Bin
+                    </a>
+                }
             </nav>
         </div>
 
-        <div class="pt-3">
-            <hr style="border-color: rgba(255,255,255,0.08); margin: 10px 0;" />
+        <!-- Sidebar Footer -->
+        <div class="pt-3 border-top border-secondary border-opacity-25">
+            <a asp-action="@currentAction" asp-route-workspace="@(activeWorkspace == "all" ? "admissions" : "all")" class="text-muted small text-decoration-none d-block mb-2 px-2" style="font-size:0.75rem;">
+                <i class="fa-solid fa-layer-group me-1"></i> @(activeWorkspace == "all" ? "Filtered Mode" : "Show All Modules")
+            </a>
             <a asp-controller="Home" asp-action="Index" class="nav-link-custom mb-1" target="_blank">
-                <i class="fa-solid fa-globe text-gradient-cyan"></i> Live Public Site
+                <i class="fa-solid fa-arrow-up-right-from-square text-primary"></i> Public Website
             </a>
             <a asp-action="Logout" class="nav-link-custom text-danger">
-                <i class="fa-solid fa-right-from-bracket"></i> Logout Console
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
             </a>
         </div>
-    </div>
+    </aside>
 
-    <!-- Topbar Area -->
-    <div class="topbar">
+    <!-- ═══════ TOPBAR ═══════ -->
+    <header class="topbar">
         <div class="d-flex align-items-center gap-3">
-            <div class="position-relative" style="width: 320px;">
-                <i class="fa-solid fa-magnifying-glass position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                <input type="text" id="globalSearchInput" class="form-control ps-5 py-2 font-headings" style="font-size:0.85rem;" placeholder="Global Search (Ctrl+K)..." />
-                <div id="searchResultsDropdown" class="position-absolute top-100 start-0 w-100 glass-card mt-2 p-2 d-none" style="z-index: 200; background:#0b1329;"></div>
+            <!-- App Switcher Dropdown (9-Dot / App Selector) -->
+            <div class="dropdown">
+                <button type="button" class="portal-switcher-btn" data-bs-toggle="dropdown" aria-expanded="false" title="Switch Portal">
+                    <div class="portal-badge-icon @portalBadgeClass">
+                        <i class="fa-solid @portalIcon"></i>
+                    </div>
+                    <div class="d-none d-md-block text-start">
+                        <div class="fw-bold font-headings small">@portalTitle</div>
+                        <div class="text-muted" style="font-size:0.7rem;">Switch App <i class="fa-solid fa-chevron-down ms-1"></i></div>
+                    </div>
+                </button>
+                <div class="dropdown-menu portal-switcher-menu shadow-lg">
+                    <div class="portal-menu-header">NED University Portals</div>
+                    
+                    <a href="/UMS" class="portal-menu-item @(activeWorkspace == "academic" ? "active" : "")">
+                        <div class="portal-item-icon bg-success bg-opacity-10 text-success">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <div class="portal-item-title">Academic Registry (UMS)</div>
+                            <div class="portal-item-desc">Enrolled Students, Faculty, Departments</div>
+                        </div>
+                        @if (activeWorkspace == "academic") { <span class="badge bg-success ms-auto">Active</span> }
+                    </a>
+
+                    <a href="/Admissions" class="portal-menu-item @(activeWorkspace == "admissions" ? "active" : "")">
+                        <div class="portal-item-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="fa-solid fa-id-card-clip"></i>
+                        </div>
+                        <div>
+                            <div class="portal-item-title">Admission ERP Console</div>
+                            <div class="portal-item-desc">Applications, Scrutiny, Merit &amp; Vouchers</div>
+                        </div>
+                        @if (activeWorkspace == "admissions") { <span class="badge bg-primary ms-auto">Active</span> }
+                    </a>
+
+                    <a href="/CMS" class="portal-menu-item @(activeWorkspace == "cms" ? "active" : "")">
+                        <div class="portal-item-icon bg-info bg-opacity-10 text-info">
+                            <i class="fa-solid fa-globe"></i>
+                        </div>
+                        <div>
+                            <div class="portal-item-title">Web Experience CMS</div>
+                            <div class="portal-item-desc">PageBuilder, News, Events &amp; Media Assets</div>
+                        </div>
+                        @if (activeWorkspace == "cms") { <span class="badge bg-info text-dark ms-auto">Active</span> }
+                    </a>
+
+                    <div class="dropdown-divider my-2"></div>
+
+                    <a href="/Admin/Index?workspace=system" class="portal-menu-item @(activeWorkspace == "system" ? "active" : "")">
+                        <div class="portal-item-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="fa-solid fa-sliders"></i>
+                        </div>
+                        <div>
+                            <div class="portal-item-title">Executive Governance Hub</div>
+                            <div class="portal-item-desc">Global Settings, Audit Logs, Backups</div>
+                        </div>
+                        @if (activeWorkspace == "system") { <span class="badge bg-warning text-dark ms-auto">Active</span> }
+                    </a>
+                </div>
+            </div>
+
+            <!-- Workspace Switcher Segmented Pills (Fast Direct Switch) -->
+            <div class="d-none d-xl-flex workspace-pills-bar">
+                <a href="/UMS" class="workspace-pill @(activeWorkspace == "academic" ? "active" : "")">
+                    <i class="fa-solid fa-graduation-cap me-1"></i> Academic UMS
+                </a>
+                <a href="/Admissions" class="workspace-pill @(activeWorkspace == "admissions" ? "active" : "")">
+                    <i class="fa-solid fa-id-card-clip me-1"></i> Admission ERP
+                </a>
+                <a href="/CMS" class="workspace-pill @(activeWorkspace == "cms" ? "active" : "")">
+                    <i class="fa-solid fa-globe me-1"></i> Web CMS
+                </a>
+                <a href="/Admin/Index?workspace=system" class="workspace-pill @(activeWorkspace == "system" ? "active" : "")">
+                    <i class="fa-solid fa-sliders me-1"></i> System Hub
+                </a>
             </div>
         </div>
 
+        <!-- Topbar Right Controls -->
         <div class="d-flex align-items-center gap-3">
+            <!-- Theme Toggle Button -->
+            <button type="button" class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme" aria-label="Toggle Theme">
+                <i class="fa-solid fa-moon" id="themeToggleIcon"></i>
+            </button>
+
+            <!-- Quick Action Dropdown -->
             <div class="dropdown">
-                <button class="btn btn-cyber-outline py-1 px-3 dropdown-toggle" data-bs-toggle="dropdown" style="font-size:0.85rem;">
+                <button class="btn btn-modern-primary py-1 px-3 dropdown-toggle" data-bs-toggle="dropdown" style="font-size:0.85rem;">
                     <i class="fa-solid fa-plus me-1"></i> Quick Action
                 </button>
-                <ul class="dropdown-menu dropdown-menu-dark" style="background:#0b1329;">
-                    <li><a class="dropdown-item" asp-action="Programs"><i class="fa-solid fa-graduation-cap me-2"></i> Add Program</a></li>
-                    <li><a class="dropdown-item" asp-action="Faculty"><i class="fa-solid fa-users-line me-2"></i> Add Faculty</a></li>
-                    <li><a class="dropdown-item" asp-action="News"><i class="fa-solid fa-newspaper me-2"></i> Publish News</a></li>
-                    <li><a class="dropdown-item" asp-action="Media"><i class="fa-solid fa-cloud-arrow-up me-2"></i> Upload File</a></li>
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="background: var(--app-surface); border-color: var(--app-border);">
+                    <li><a class="dropdown-item" href="/Admissions"><i class="fa-solid fa-inbox me-2 text-primary"></i> Application Scrutiny</a></li>
+                    <li><a class="dropdown-item" href="/UMS"><i class="fa-solid fa-user-graduate me-2 text-success"></i> Enrolled Students</a></li>
+                    <li><a class="dropdown-item" asp-action="Programs" asp-route-workspace="academic"><i class="fa-solid fa-book-open me-2 text-info"></i> Add Program</a></li>
+                    <li><a class="dropdown-item" asp-action="News" asp-route-workspace="cms"><i class="fa-solid fa-newspaper me-2 text-warning"></i> Post Announcement</a></li>
+                    <li><a class="dropdown-item" asp-action="Media" asp-route-workspace="cms"><i class="fa-solid fa-cloud-arrow-up me-2 text-purple"></i> Upload Asset</a></li>
                 </ul>
             </div>
 
-            <div class="rounded-circle text-center d-flex align-items-center justify-content-center text-white font-headings fw-bold"
-                 style="width:38px; height:38px; background:linear-gradient(135deg, var(--cyan), var(--royal-blue));">
+            <!-- Admin Avatar -->
+            <div class="rounded-circle text-center d-flex align-items-center justify-content-center text-white font-headings fw-bold shadow-sm"
+                 style="width:38px; height:38px; background: linear-gradient(135deg, #2563eb, #1d4ed8);">
                 AD
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Main Content Area -->
-    <div class="main-content">
+    <!-- ═══════ MAIN CONTENT ═══════ -->
+    <main class="main-content">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm" style="background: rgba(16, 185, 129, 0.12); border: 1px solid #10b981; color: var(--app-emerald); border-radius: 8px;" role="alert">
+                <i class="fa-solid fa-circle-check me-2 fa-lg"></i> @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mb-4 shadow-sm" style="background: rgba(239, 68, 68, 0.12); border: 1px solid #ef4444; color: var(--app-danger); border-radius: 8px;" role="alert">
+                <i class="fa-solid fa-triangle-exclamation me-2 fa-lg"></i> @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
         @RenderBody()
-    </div>
+    </main>
 
     <!-- Bootstrap Bundle JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Global Search Script (Ctrl+K) -->
+    <!-- Dark/Light Mode Switcher Script -->
     <script>
-        document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                document.getElementById('globalSearchInput').focus();
+        const themeBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeToggleIcon');
+
+        function updateThemeIcon() {
+            const isDark = document.body.classList.contains('theme-dark');
+            if (isDark) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
             }
-        });
-
-        const searchInput = document.getElementById('globalSearchInput');
-        const resultsDropdown = document.getElementById('searchResultsDropdown');
-
-        searchInput.addEventListener('input', () => {
-            const val = searchInput.value.trim();
-            if (val.length < 2) {
-                resultsDropdown.classList.add('d-none');
-                return;
-            }
-
-            fetch(`/Admin/GlobalSearch?q=${encodeURIComponent(val)}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.length === 0) {
-                        resultsDropdown.innerHTML = `<div class="p-2 text-muted text-center" style="font-size:0.85rem;">No results found.</div>`;
-                    } else {
-                        resultsDropdown.innerHTML = data.map(item => `
-                            <a href="${item.url}" class="d-flex align-items-center gap-2 p-2 text-decoration-none text-light rounded hover-bg-dark" style="font-size:0.88rem;">
-                                <i class="fa-solid ${item.icon} text-gradient-cyan"></i>
-                                <div>
-                                    <div class="fw-semibold">${item.title}</div>
-                                    <small class="text-muted" style="font-size:0.75rem;">${item.category}</small>
-                                </div>
-                            </a>
-                        `).join('');
-                    }
-                    resultsDropdown.classList.remove('d-none');
-                });
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!searchInput.contains(e.target) && !resultsDropdown.contains(e.target)) {
-                resultsDropdown.classList.add('d-none');
-            }
-        });
-    </script>
-
-    @await RenderSectionAsync("Scripts", required: false)
-
-    <!-- Alert Notifications -->
-    <script>
-        @if (TempData["Success"] != null)
-        {
-            <text>
-            Swal.fire({
-                title: 'Success!',
-                text: '@TempData["Success"]',
-                icon: 'success',
-                background: '#0b1329',
-                color: '#f8fafc',
-                confirmButtonColor: '#0077ff'
-            });
-            </text>
         }
-        @if (TempData["Error"] != null)
-        {
-            <text>
-            Swal.fire({
-                title: 'Attention!',
-                text: '@TempData["Error"]',
-                icon: 'error',
-                background: '#0b1329',
-                color: '#f8fafc',
-                confirmButtonColor: '#ff3b30'
+
+        if (themeBtn) {
+            themeBtn.addEventListener('click', () => {
+                const isDark = document.body.classList.toggle('theme-dark');
+                localStorage.setItem('adminTheme', isDark ? 'dark' : 'light');
+                updateThemeIcon();
             });
-            </text>
+            updateThemeIcon();
         }
     </script>
 </body>

@@ -24,251 +24,246 @@
     int profilePct = profile?.ProfileCompletionPercentage ?? 0;
     int docCount = documents.Count();
     int verifiedDocs = documents.Count(d => d.VerificationStatus == DocumentVerificationStatus.Verified);
-    int docPct = docCount > 0 ? (verifiedDocs * 100 / docCount) : 0;
     
+    // Lifecycle Stage Flags
     bool isAppSubmitted = latestApp != null && latestApp.CurrentStatus >= ApplicationStatus.Submitted;
     bool isProcessingFeePaid = processingVoucher != null && (processingVoucher.PaymentStatus == PaymentStatus.Paid || processingVoucher.VoucherStatus == VoucherStatus.Paid);
     bool isDocsVerified = latestApp != null && latestApp.CurrentStatus >= ApplicationStatus.DocumentsVerified;
     bool isTestScheduled = testSchedule != null || (latestApp != null && latestApp.CurrentStatus >= ApplicationStatus.TestScheduled);
     bool isTestCompleted = testResult != null;
-    bool isScholarshipAwarded = testResult != null && testResult.IsQualified;
-    bool isSemesterVoucherGenerated = semesterVoucher != null;
+    bool isTestQualified = testResult != null && testResult.IsQualified;
     bool isSemesterFeePaid = semesterVoucher != null && (semesterVoucher.PaymentStatus == PaymentStatus.Paid || semesterVoucher.VoucherStatus == VoucherStatus.Paid);
     bool isPortalActive = (enrollment != null && enrollment.EnrollmentStatus == "Active") || (latestApp != null && latestApp.CurrentStatus == ApplicationStatus.Approved);
+
+    // Current linear step
+    int currentActiveStep = 1;
+    if (isPortalActive) currentActiveStep = 6;
+    else if (isSemesterFeePaid) currentActiveStep = 6;
+    else if (isTestCompleted && isTestQualified) currentActiveStep = 5;
+    else if (isTestScheduled || isDocsVerified) currentActiveStep = 4;
+    else if (isProcessingFeePaid) currentActiveStep = 3;
+    else if (isAppSubmitted) currentActiveStep = 2;
+    else currentActiveStep = 1;
 }
 
 <div class="container-fluid p-0">
+    <!-- Notifications Area -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="portal-alert portal-alert-success mb-4">
-            <i class="fa-solid fa-check-circle"></i> @TempData["SuccessMessage"]
+        <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm" style="border-radius: 10px;" role="alert">
+            <i class="fa-solid fa-circle-check me-2 fa-lg"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4 shadow-sm" style="border-radius: 10px;" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2 fa-lg"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <!-- ═══════ REJECTED DOCUMENTS ACTION REQUIRED ALERT ═══════ -->
+    <!-- ═══════ REJECTED DOCUMENTS WARNING ALERT ═══════ -->
     @if (rejectedDocs.Any())
     {
-        <div class="portal-alert portal-alert-warning mb-4" style="background: rgba(239, 68, 68, 0.15); border-color: #ef4444; color: #fff;">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div>
-                    <h6 class="fw-bold text-white mb-1"><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i> Action Required: @rejectedDocs.Count Document(s) Need Re-upload</h6>
-                    <ul class="mb-0 small text-light ps-3">
-                        @foreach (var rd in rejectedDocs)
-                        {
-                            <li><strong>@rd.DocumentType:</strong> @(rd.VerificationRemarks ?? rd.RejectionReason ?? "Uploaded file does not meet criteria")</li>
-                        }
-                    </ul>
+        <div class="portal-card p-3 mb-4 border-danger" style="border-left: 5px solid #ef4444 !important; background: rgba(239, 68, 68, 0.05);">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle p-2 bg-danger bg-opacity-10 text-danger fs-4">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-danger font-headings">Action Required: @rejectedDocs.Count Document(s) Require Re-upload</h6>
+                        <div class="small text-muted">
+                            @foreach (var rd in rejectedDocs)
+                            {
+                                <div>• <strong>@rd.DocumentType:</strong> @(rd.VerificationRemarks ?? rd.RejectionReason ?? "Uploaded file does not meet clarity requirements")</div>
+                            }
+                        </div>
+                    </div>
                 </div>
-                <a href="@Url.Action("Documents", "Admission")" class="btn btn-sm btn-danger px-3 font-headings">
-                    <i class="fa-solid fa-cloud-arrow-up me-1"></i> Re-upload Rejected Documents
+                <a href="@Url.Action("Documents", "Admission")" class="btn btn-danger font-headings px-3 btn-sm">
+                    <i class="fa-solid fa-cloud-arrow-up me-1"></i> Re-upload Documents
                 </a>
             </div>
         </div>
     }
 
-    <!-- ═══════ WELCOME HERO BANNER ═══════ -->
-    <div class="portal-card mb-4 p-4" style="background: linear-gradient(135deg, rgba(3, 7, 18, 0.95), rgba(15, 23, 42, 0.95)), url('/uploads/hero_widget.png') center/cover; border: 1px solid var(--portal-cyan-glow);">
+    <!-- ═══════ WELCOME HERO BANNER (CLEAN & GUIDED) ═══════ -->
+    <div class="portal-card p-4 mb-4" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(16, 185, 129, 0.06) 100%); border-left: 5px solid var(--portal-blue, #2563eb);">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div>
-                <span class="portal-badge portal-badge-active mb-2"><i class="fa-solid fa-calendar-days me-1"></i> Intake: @(activeSession?.Title ?? "Spring 2026 Admissions")</span>
-                <h1 class="portal-content-title text-white mb-1">Welcome back, @(applicant?.FullName ?? "Applicant")</h1>
-                <p class="portal-content-subtitle text-cyan mb-0">
-                    Application ID: <strong>@(latestApp?.ApplicationNumber ?? "Not Started")</strong> | Applied Program: <strong>@(latestApp?.DegreeProgram?.Name ?? "Select Degree Program")</strong>
-                </p>
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle d-flex align-items-center justify-content-center text-white font-headings fw-bold shadow-sm"
+                     style="width: 58px; height: 58px; background: linear-gradient(135deg, #2563eb, #1d4ed8); font-size: 1.4rem;">
+                    @((applicant?.FullName ?? "A")[0])
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                        <span class="badge bg-primary bg-opacity-10 text-primary font-headings px-2 py-1">
+                            <i class="fa-solid fa-calendar-days me-1"></i> @(activeSession?.Title ?? "Spring 2026 Admissions")
+                        </span>
+                        @if (isPortalActive)
+                        {
+                            <span class="badge bg-success font-headings px-2 py-1">
+                                <i class="fa-solid fa-circle-check me-1"></i> ADMISSION CONFIRMED
+                            </span>
+                        }
+                        else if (isAppSubmitted)
+                        {
+                            <span class="badge bg-info text-dark font-headings px-2 py-1">
+                                <i class="fa-solid fa-clock me-1"></i> Application Submitted (@latestApp?.CurrentStatus)
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark font-headings px-2 py-1">
+                                <i class="fa-solid fa-pen-to-square me-1"></i> Application Draft (Action Required)
+                            </span>
+                        }
+                    </div>
+                    <h2 class="portal-content-title mb-1">Welcome back, @(applicant?.FullName ?? "Applicant")</h2>
+                    <p class="text-muted small mb-0">
+                        Application Ref: <strong>@(latestApp?.ApplicationNumber ?? "Draft (Not Submitted Yet)")</strong> | 
+                        Target Program: <strong class="text-primary">@(latestApp?.DegreeProgram?.Name ?? "Select Degree Program")</strong>
+                    </p>
+                </div>
             </div>
-            <div class="text-end">
+
+            <!-- Smart Adaptive Call-to-Action -->
+            <div class="d-flex align-items-center gap-2 flex-wrap">
                 @if (isPortalActive)
                 {
-                    <a href="@Url.Action("StudentPortal", "Admission")" class="portal-btn portal-btn-cyan portal-btn-lg">
-                        <i class="fa-solid fa-graduation-cap me-1"></i> Open Student Portal
+                    <a href="@Url.Action("StudentPortal", "Admission")" class="portal-btn portal-btn-primary portal-btn-lg">
+                        <i class="fa-solid fa-graduation-cap me-1"></i> Open Student Portal (Active)
                     </a>
                 }
-                else if (profilePct < 100)
+                else if (!isAppSubmitted)
                 {
-                    <a href="@Url.Action("ProfileWizard", "Admission")" class="portal-btn portal-btn-cyan portal-btn-lg">
-                        <i class="fa-solid fa-user-pen me-1"></i> Complete Profile Wizard (Next Step)
+                    <a href="@Url.Action("Apply", "Admission")" class="portal-btn portal-btn-primary portal-btn-lg shadow-sm">
+                        <i class="fa-solid fa-arrow-right me-1"></i> Complete &amp; Submit Application Form
                     </a>
                 }
-                else if (latestApp == null || latestApp.CurrentStatus == ApplicationStatus.Draft)
+                else if (!isProcessingFeePaid)
                 {
-                    <a href="@Url.Action("Apply", "Admission")" class="portal-btn portal-btn-cyan portal-btn-lg">
-                        <i class="fa-solid fa-file-pen me-1"></i> Complete Admission Form
+                    <a href="@Url.Action("FeeVouchers", "Admission")" class="portal-btn portal-btn-primary portal-btn-lg shadow-sm">
+                        <i class="fa-solid fa-receipt me-1"></i> Deposit Processing Fee Voucher
                     </a>
                 }
                 else if (docCount < 3)
                 {
-                    <a href="@Url.Action("Documents", "Admission")" class="portal-btn portal-btn-cyan portal-btn-lg">
+                    <a href="@Url.Action("Documents", "Admission")" class="portal-btn portal-btn-primary portal-btn-lg shadow-sm">
                         <i class="fa-solid fa-cloud-arrow-up me-1"></i> Upload Required Documents
+                    </a>
+                }
+                else if (semesterVoucher != null && !isSemesterFeePaid)
+                {
+                    <a href="@Url.Action("FeeVouchers", "Admission")" class="portal-btn portal-btn-primary portal-btn-lg" style="background:#10b981;">
+                        <i class="fa-solid fa-receipt me-1"></i> Pay 1st Semester Tuition Fee
                     </a>
                 }
                 else
                 {
-                    <a href="@Url.Action("FeeVouchers", "Admission")" class="portal-btn portal-btn-cyan portal-btn-lg">
-                        <i class="fa-solid fa-receipt me-1"></i> View Fee Voucher & Status
+                    <a href="@Url.Action("StudentPortal", "Admission")" class="portal-btn portal-btn-outline portal-btn-lg">
+                        <i class="fa-solid fa-route me-1"></i> Track Detailed Progress
                     </a>
                 }
             </div>
         </div>
     </div>
 
-    <!-- ═══════ DIGITAL ADMIT CARD CARD (IF TEST SCHEDULED) ═══════ -->
-    @if (testSchedule != null)
-    {
-        <div class="portal-card mb-4 p-4 border border-info" style="background: rgba(6, 182, 212, 0.05);">
-            <div class="row align-items-center g-3">
-                <div class="col-md-8">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="portal-action-icon text-cyan bg-dark p-3 rounded" style="width:60px; height:60px; display:flex; align-items:center; justify-content:center;">
-                            <i class="fa-solid fa-id-card-clip fs-2"></i>
-                        </div>
-                        <div>
-                            <span class="badge bg-success mb-1"><i class="fa-solid fa-circle-check me-1"></i> Official Digital Admit Card Ready</span>
-                            <h5 class="text-white font-headings fw-bold m-0">Admission Entry Test Scheduled</h5>
-                            <div class="small text-light mt-1">
-                                Date: <strong class="text-cyan">@testSchedule.TestDate.ToString("dd MMMM yyyy")</strong> | Time: <strong>@testSchedule.TestTime</strong> | Duration: <strong>@testSchedule.DurationHours Hours</strong><br />
-                                Venue: <strong>@testSchedule.BuildingName, @testSchedule.RoomNumber (@testSchedule.CampusName)</strong> | Reporting: <strong>@testSchedule.ReportingTime</strong>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 text-end">
-                    <button type="button" onclick="window.print()" class="btn btn-cyber btn-sm px-3">
-                        <i class="fa-solid fa-print me-1"></i> Print Test Admit Slip / PDF
-                    </button>
-                </div>
-            </div>
-        </div>
-    }
-
-    <!-- ═══════ ENTRY TEST EVALUATION RESULT & EVALUATOR REMARKS CARD ═══════ -->
-    @if (testResult != null)
-    {
-        <div class="portal-card mb-4 p-4 border border-cyan" style="background: rgba(0, 242, 254, 0.03);">
-            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="portal-action-icon text-cyan bg-dark p-3 rounded" style="width:55px; height:55px; display:flex; align-items:center; justify-content:center;">
-                        <i class="fa-solid fa-square-poll-vertical fs-3"></i>
-                    </div>
-                    <div>
-                        <span class="badge @(testResult.IsQualified ? "bg-success" : "bg-danger") mb-1">
-                            <i class="fa-solid @(testResult.IsQualified ? "fa-circle-check" : "fa-circle-xmark") me-1"></i>
-                            @(testResult.IsQualified ? "Admission Test Qualified" : "Test Not Qualified")
-                        </span>
-                        <h5 class="text-white font-headings fw-bold m-0">Entry Test Result & Score Summary</h5>
-                    </div>
-                </div>
-                <div class="text-end">
-                    <div class="fs-4 text-cyan font-headings fw-bold">@testResult.ObtainedMarks / @testResult.TotalMarks</div>
-                    <div class="small text-muted font-headings">Score Percentage: @testResult.CalculatedPercentage%</div>
-                </div>
-            </div>
-
-            @if (!string.IsNullOrEmpty(testResult.Remarks))
-            {
-                <div class="p-3 rounded bg-dark text-light border border-secondary">
-                    <div class="text-cyan small fw-bold mb-1"><i class="fa-solid fa-comment-dots me-1"></i> Evaluator Remarks & Notes:</div>
-                    <div class="small font-monospace text-light">@testResult.Remarks</div>
-                </div>
-            }
-        </div>
-    }
-
-    <!-- ═══════ OFFICIAL ADMISSION APPROVAL & COMMITTEE REMARKS CARD ═══════ -->
-    @if (latestApp != null && (!string.IsNullOrEmpty(latestApp.Remarks) || latestApp.CurrentStatus >= ApplicationStatus.Approved))
-    {
-        <div class="portal-card mb-4 p-4 border border-success" style="background: rgba(16, 185, 129, 0.03);">
-            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="portal-action-icon text-success bg-dark p-3 rounded" style="width:55px; height:55px; display:flex; align-items:center; justify-content:center;">
-                        <i class="fa-solid fa-gavel fs-3"></i>
-                    </div>
-                    <div>
-                        <span class="badge bg-success mb-1"><i class="fa-solid fa-certificate me-1"></i> Official Committee Decision</span>
-                        <h5 class="text-white font-headings fw-bold m-0">Admission Committee Decision Remarks</h5>
-                    </div>
-                </div>
-                <span class="badge bg-success font-headings fs-6 py-2 px-3">Status: @latestApp.CurrentStatus</span>
-            </div>
-
-            @if (!string.IsNullOrEmpty(latestApp.Remarks))
-            {
-                <div class="p-3 rounded bg-dark text-light border border-success">
-                    <div class="text-success small fw-bold mb-1"><i class="fa-solid fa-quote-left me-1"></i> Committee Approval Comments:</div>
-                    <div class="small font-monospace text-light">@latestApp.Remarks</div>
-                </div>
-            }
-        </div>
-    }
-
-    <!-- ═══════ STATUS CARDS METRICS ═══════ -->
+    <!-- ═══════ 4 KEY METRICS SUMMARY ROW ═══════ -->
     <div class="row g-3 mb-4">
-        <!-- Application Status -->
-        <div class="col-md-3">
-            <div class="portal-card p-3">
+        <!-- 1. Application Status -->
+        <div class="col-xl-3 col-sm-6">
+            <div class="portal-card p-3 h-100">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="portal-action-icon" style="background: rgba(0, 242, 254, 0.1); color: var(--portal-cyan); width:48px; height:48px;">
-                        <i class="fa-solid fa-file-signature fs-4"></i>
+                    <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-primary fs-4" style="width:50px; height:50px; display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-file-signature"></i>
                     </div>
                     <div>
-                        <div style="font-size:0.75rem; color:var(--portal-text-muted); text-transform:uppercase; letter-spacing:0.5px;">Application Status</div>
-                        <h6 class="m-0 font-headings text-white mt-1 fw-bold">@(latestApp?.CurrentStatus.ToString() ?? "Draft")</h6>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Profile Completion % -->
-        <div class="col-md-3">
-            <div class="portal-card p-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="portal-action-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--portal-green); width:48px; height:48px;">
-                        <i class="fa-solid fa-user-check fs-4"></i>
-                    </div>
-                    <div>
-                        <div style="font-size:0.75rem; color:var(--portal-text-muted); text-transform:uppercase; letter-spacing:0.5px;">Profile Completion</div>
-                        <h6 class="m-0 font-headings text-white mt-1 fw-bold">@profilePct% Complete</h6>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Document Verification -->
-        <div class="col-md-3">
-            <div class="portal-card p-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="portal-action-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--portal-gold); width:48px; height:48px;">
-                        <i class="fa-solid fa-folder-check fs-4"></i>
-                    </div>
-                    <div>
-                        <div style="font-size:0.75rem; color:var(--portal-text-muted); text-transform:uppercase; letter-spacing:0.5px;">Document Verification</div>
-                        <h6 class="m-0 font-headings text-white mt-1 fw-bold">@verifiedDocs / @docCount Verified</h6>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Payment Verification -->
-        <div class="col-md-3">
-            <div class="portal-card p-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="portal-action-icon" style="background: rgba(139, 92, 246, 0.1); color: var(--portal-purple); width:48px; height:48px;">
-                        <i class="fa-solid fa-receipt fs-4"></i>
-                    </div>
-                    <div>
-                        <div style="font-size:0.75rem; color:var(--portal-text-muted); text-transform:uppercase; letter-spacing:0.5px;">Payment Status</div>
-                        <h6 class="m-0 font-headings text-white mt-1 fw-bold">
-                            @if (isSemesterFeePaid)
+                        <div class="small text-uppercase font-headings fw-bold text-muted" style="font-size:0.7rem;">Application Status</div>
+                        <h6 class="font-headings fw-bold mb-0 mt-1">
+                            @if (isPortalActive)
                             {
-                                <span class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Semester Fee Paid</span>
+                                <span class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Enrolled</span>
                             }
-                            else if (isProcessingFeePaid)
+                            else if (latestApp != null)
                             {
-                                <span class="text-info"><i class="fa-solid fa-check me-1"></i> Processing Fee Paid</span>
-                            }
-                            else if (processingVoucher != null)
-                            {
-                                <span class="text-warning"><i class="fa-solid fa-clock me-1"></i> Processing Fee Pending</span>
+                                <span class="text-primary">@latestApp.CurrentStatus</span>
                             }
                             else
                             {
-                                <span>No Voucher</span>
+                                <span class="text-warning">Draft (Incomplete)</span>
+                            }
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Profile Completion -->
+        <div class="col-xl-3 col-sm-6">
+            <div class="portal-card p-3 h-100">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-3 bg-success bg-opacity-10 text-success fs-4" style="width:50px; height:50px; display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                    <div class="w-100 pe-2">
+                        <div class="small text-uppercase font-headings fw-bold text-muted" style="font-size:0.7rem;">Profile Completion</div>
+                        <h6 class="font-headings fw-bold mb-1 mt-1">@profilePct% Complete</h6>
+                        <div class="progress" style="height: 6px; background: rgba(0,0,0,0.06);">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: @profilePct%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Document Scrutiny -->
+        <div class="col-xl-3 col-sm-6">
+            <div class="portal-card p-3 h-100">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-3 bg-warning bg-opacity-10 text-warning fs-4" style="width:50px; height:50px; display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <div>
+                        <div class="small text-uppercase font-headings fw-bold text-muted" style="font-size:0.7rem;">Document Scrutiny</div>
+                        <h6 class="font-headings fw-bold mb-0 mt-1">
+                            @if (docCount > 0)
+                            {
+                                <span class="@(verifiedDocs == docCount ? "text-success" : "text-warning")">@verifiedDocs / @docCount Verified</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Pending Upload</span>
+                            }
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Fee Payment Status -->
+        <div class="col-xl-3 col-sm-6">
+            <div class="portal-card p-3 h-100">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-3 bg-info bg-opacity-10 text-info fs-4" style="width:50px; height:50px; display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <div>
+                        <div class="small text-uppercase font-headings fw-bold text-muted" style="font-size:0.7rem;">Tuition Fee Status</div>
+                        <h6 class="font-headings fw-bold mb-0 mt-1">
+                            @if (isSemesterFeePaid)
+                            {
+                                <span class="text-success"><i class="fa-solid fa-check me-1"></i> Paid &amp; Cleared</span>
+                            }
+                            else if (isProcessingFeePaid)
+                            {
+                                <span class="text-primary"><i class="fa-solid fa-check me-1"></i> Processing Cleared</span>
+                            }
+                            else
+                            {
+                                <span class="text-warning">Pending Payment</span>
                             }
                         </h6>
                     </div>
@@ -277,170 +272,379 @@
         </div>
     </div>
 
-    <!-- ═══════ STUDENT PORTAL ACTIVATION STATUS CARD ═══════ -->
-    <div class="portal-card mb-4 p-4" style="border-left: 5px solid @(isPortalActive ? "var(--portal-cyan)" : "var(--portal-gold)");">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <div style="font-size: 2.2rem; color: @(isPortalActive ? "var(--portal-cyan)" : "var(--portal-gold)");">
-                    <i class="fa-solid @(isPortalActive ? "fa-graduation-cap" : "fa-lock")"></i>
-                </div>
-                <div>
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <h5 class="m-0 text-white font-headings fw-bold">Student Portal Account Status</h5>
-                        <span class="portal-badge @(isPortalActive ? "portal-badge-active" : "portal-badge-info")">
-                            @(isPortalActive ? "Active & Provisioned" : "Locked — Waiting for Admission Selection & Semester Fee Verification")
-                        </span>
+    <!-- ═══════ SEQUENTIAL ADMISSION PROGRESSION ROADMAP ═══════ -->
+    <div class="portal-card mb-4 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h5 class="font-headings fw-bold m-0"><i class="fa-solid fa-route text-primary me-2"></i> Admission Progression Roadmap</h5>
+                <p class="text-muted small m-0">Linear step-by-step path from initial form submission to university enrollment.</p>
+            </div>
+            <span class="badge @(isPortalActive ? "bg-success" : "bg-primary") font-headings px-3 py-2">
+                @(isPortalActive ? "All Steps Completed (100%)" : $"Current Stage: Step {currentActiveStep} of 6")
+            </span>
+        </div>
+
+        <div class="row g-3">
+            <!-- Step 1: Form Submission -->
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="p-3 rounded-3 border text-center h-100 @(isAppSubmitted ? "border-success" : (currentActiveStep == 1 ? "border-primary" : "border-secondary"))"
+                     style="background: @(isAppSubmitted ? "rgba(16, 185, 129, 0.08)" : (currentActiveStep == 1 ? "rgba(37, 99, 235, 0.08)" : "var(--portal-surface-2)"));">
+                    <div class="mb-2">
+                        @if (isAppSubmitted) { <i class="fa-solid fa-circle-check text-success fa-xl"></i> }
+                        else if (currentActiveStep == 1) { <span class="badge bg-primary font-headings">Active Step 1</span> }
+                        else { <span class="badge bg-secondary font-headings">1</span> }
                     </div>
-                    @if (isPortalActive)
-                    {
-                        <div style="font-size:0.9rem; color:var(--portal-text-secondary);">
-                            Student ID: <strong class="text-cyan">@enrollment?.GeneratedStudentId</strong> | Roll No: <strong class="text-cyan">@enrollment?.GeneratedRollNumber</strong> | Department: <strong>Computer Science</strong> | Batch: <strong>@enrollment?.Batch</strong>
-                        </div>
-                    }
-                    else
-                    {
-                        <div style="font-size:0.85rem; color:var(--portal-text-muted);">
-                            The Student Portal will be automatically unlocked after your Admission Test is passed and your First Semester Tuition Fee payment is verified by the Admission Committee.
-                        </div>
-                    }
+                    <div class="font-headings fw-bold small">1. Form Submission</div>
+                    <div class="text-muted small" style="font-size:0.75rem;">
+                        @(isAppSubmitted ? "Form Submitted" : "Action Required")
+                    </div>
                 </div>
             </div>
-            @if (isPortalActive)
+
+            <!-- Step 2: Processing Fee -->
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="p-3 rounded-3 border text-center h-100 @(isProcessingFeePaid ? "border-success" : (currentActiveStep == 2 ? "border-warning" : "border-secondary"))"
+                     style="background: @(isProcessingFeePaid ? "rgba(16, 185, 129, 0.08)" : (currentActiveStep == 2 ? "rgba(245, 158, 11, 0.08)" : "var(--portal-surface-2)"));">
+                    <div class="mb-2">
+                        @if (isProcessingFeePaid) { <i class="fa-solid fa-circle-check text-success fa-xl"></i> }
+                        else if (currentActiveStep == 2) { <span class="badge bg-warning text-dark font-headings">Deposit Fee</span> }
+                        else { <i class="fa-solid fa-lock text-muted"></i> }
+                    </div>
+                    <div class="font-headings fw-bold small">2. Processing Fee</div>
+                    <div class="text-muted small" style="font-size:0.75rem;">
+                        @(isProcessingFeePaid ? "Paid & Cleared" : (isAppSubmitted ? "Pending Deposit" : "Locked"))
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Document Scrutiny -->
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="p-3 rounded-3 border text-center h-100 @(isDocsVerified ? "border-success" : (currentActiveStep == 3 ? "border-info" : "border-secondary"))"
+                     style="background: @(isDocsVerified ? "rgba(16, 185, 129, 0.08)" : (currentActiveStep == 3 ? "rgba(6, 182, 212, 0.08)" : "var(--portal-surface-2)"));">
+                    <div class="mb-2">
+                        @if (isDocsVerified) { <i class="fa-solid fa-circle-check text-success fa-xl"></i> }
+                        else if (currentActiveStep == 3) { <span class="badge bg-info text-dark font-headings">In Review</span> }
+                        else { <i class="fa-solid fa-lock text-muted"></i> }
+                    </div>
+                    <div class="font-headings fw-bold small">3. Scrutiny</div>
+                    <div class="text-muted small" style="font-size:0.75rem;">
+                        @(isDocsVerified ? "Verified" : (isProcessingFeePaid ? "Under Review" : "Locked"))
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Entrance Test -->
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="p-3 rounded-3 border text-center h-100 @(isTestCompleted ? "border-success" : (currentActiveStep == 4 ? "border-primary" : "border-secondary"))"
+                     style="background: @(isTestCompleted ? "rgba(16, 185, 129, 0.08)" : (currentActiveStep == 4 ? "rgba(37, 99, 235, 0.08)" : "var(--portal-surface-2)"));">
+                    <div class="mb-2">
+                        @if (isTestCompleted) { <i class="fa-solid fa-circle-check text-success fa-xl"></i> }
+                        else if (currentActiveStep == 4 && isTestScheduled) { <span class="badge bg-primary font-headings">Scheduled</span> }
+                        else if (currentActiveStep == 4) { <span class="badge bg-secondary font-headings">Awaiting Date</span> }
+                        else { <i class="fa-solid fa-lock text-muted"></i> }
+                    </div>
+                    <div class="font-headings fw-bold small">4. Entrance Test</div>
+                    <div class="text-muted small" style="font-size:0.75rem;">
+                        @(isTestCompleted ? $"{testResult?.CalculatedPercentage}% Qualified" : (isTestScheduled ? "Admit Card Ready" : "Locked"))
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Semester Tuition Fee -->
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="p-3 rounded-3 border text-center h-100 @(isSemesterFeePaid ? "border-success" : (currentActiveStep == 5 ? "border-warning" : "border-secondary"))"
+                     style="background: @(isSemesterFeePaid ? "rgba(16, 185, 129, 0.08)" : (currentActiveStep == 5 ? "rgba(245, 158, 11, 0.08)" : "var(--portal-surface-2)"));">
+                    <div class="mb-2">
+                        @if (isSemesterFeePaid) { <i class="fa-solid fa-circle-check text-success fa-xl"></i> }
+                        else if (currentActiveStep == 5) { <span class="badge bg-warning text-dark font-headings">Action Required</span> }
+                        else { <i class="fa-solid fa-lock text-muted"></i> }
+                    </div>
+                    <div class="font-headings fw-bold small">5. Semester Fee</div>
+                    <div class="text-muted small" style="font-size:0.75rem;">
+                        @(isSemesterFeePaid ? "Paid & Verified" : (currentActiveStep == 5 ? "Voucher Generated" : "Locked"))
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 6: Official Enrolment -->
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="p-3 rounded-3 border text-center h-100 @(isPortalActive ? "border-success" : "border-secondary")"
+                     style="background: @(isPortalActive ? "rgba(16, 185, 129, 0.08)" : "var(--portal-surface-2)");">
+                    <div class="mb-2">
+                        @if (isPortalActive) { <i class="fa-solid fa-graduation-cap text-success fa-xl"></i> }
+                        else { <i class="fa-solid fa-lock text-muted"></i> }
+                    </div>
+                    <div class="font-headings fw-bold small">6. Official Enrolment</div>
+                    <div class="text-muted small" style="font-size:0.75rem;">
+                        @(isPortalActive ? "Student ID Issued" : "Locked")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ DIGITAL ADMIT SLIP (IF SCHEDULED) ═══════ -->
+    @if (testSchedule != null)
+    {
+        <div class="portal-card mb-4 p-4 border-primary" style="background: rgba(37, 99, 235, 0.05);">
+            <div class="row align-items-center g-3">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-3 p-3 bg-primary text-white fs-3" style="width:55px; height:55px; display:flex; align-items:center; justify-content:center;">
+                            <i class="fa-solid fa-id-card-clip"></i>
+                        </div>
+                        <div>
+                            <span class="badge bg-success font-headings mb-1"><i class="fa-solid fa-circle-check me-1"></i> Digital Admit Slip Ready</span>
+                            <h5 class="font-headings fw-bold m-0">Admission Entry Test Scheduled</h5>
+                            <div class="small text-muted mt-1">
+                                Date: <strong class="text-primary">@testSchedule.TestDate.ToString("dd MMMM yyyy")</strong> | 
+                                Time: <strong>@testSchedule.TestTime</strong> | 
+                                Duration: <strong>@testSchedule.DurationHours Hours</strong><br />
+                                Venue: <strong>@testSchedule.BuildingName, @testSchedule.RoomNumber (@testSchedule.CampusName)</strong> | 
+                                Reporting Time: <strong>@testSchedule.ReportingTime</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button type="button" onclick="window.print()" class="portal-btn portal-btn-primary portal-btn-sm">
+                        <i class="fa-solid fa-print me-1"></i> Print Official Admit Slip
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ═══════ ENTRY TEST RESULT CARD (IF COMPLETED) ═══════ -->
+    @if (testResult != null)
+    {
+        <div class="portal-card mb-4 p-4 @(testResult.IsQualified ? "border-success" : "border-danger")" style="background: rgba(16, 185, 129, 0.04);">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-3 @(testResult.IsQualified ? "bg-success bg-opacity-10 text-success" : "bg-danger bg-opacity-10 text-danger") fs-3" style="width:50px; height:50px; display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-square-poll-vertical"></i>
+                    </div>
+                    <div>
+                        <span class="badge @(testResult.IsQualified ? "bg-success" : "bg-danger") font-headings mb-1">
+                            <i class="fa-solid @(testResult.IsQualified ? "fa-circle-check" : "fa-circle-xmark") me-1"></i>
+                            @(testResult.IsQualified ? "Entrance Test Qualified" : "Test Did Not Qualify")
+                        </span>
+                        <h5 class="font-headings fw-bold m-0">Entry Test Result &amp; Score Summary</h5>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="fs-4 text-primary font-headings fw-bold">@testResult.ObtainedMarks / @testResult.TotalMarks</div>
+                    <div class="small text-muted font-headings">Score Percentage: @testResult.CalculatedPercentage%</div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(testResult.Remarks))
             {
-                <a href="@Url.Action("StudentPortal", "Admission")" class="portal-btn portal-btn-cyan"><i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Access Student Portal</a>
+                <div class="p-3 rounded-3 small border" style="background: var(--portal-surface-2);">
+                    <div class="text-primary fw-bold mb-1"><i class="fa-solid fa-comment-dots me-1"></i> Evaluation Remarks:</div>
+                    <div>@testResult.Remarks</div>
+                </div>
             }
         </div>
-    </div>
+    }
 
-    <!-- ═══════ FEE VOUCHERS QUICK SUMMARY CARD ═══════ -->
-    <div class="portal-card mb-4 p-4">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
-            <div class="d-flex align-items-center gap-2">
-                <i class="fa-solid fa-file-invoice-dollar text-cyan fs-4"></i>
-                <h5 class="m-0 text-white font-headings fw-bold">Admission Fee Vouchers Summary</h5>
+    <!-- ═══════ OFFICIAL COMMITTEE REMARKS CARD ═══════ -->
+    @if (latestApp != null && (!string.IsNullOrEmpty(latestApp.Remarks) || latestApp.CurrentStatus >= ApplicationStatus.Approved))
+    {
+        <div class="portal-card mb-4 p-4 border-success" style="background: rgba(16, 185, 129, 0.04);">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-3 bg-success bg-opacity-10 text-success fs-3" style="width:50px; height:50px; display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-certificate"></i>
+                    </div>
+                    <div>
+                        <span class="badge bg-success font-headings mb-1"><i class="fa-solid fa-stamp me-1"></i> Official Decision</span>
+                        <h5 class="font-headings fw-bold m-0">Admission Committee Decision Remarks</h5>
+                    </div>
+                </div>
+                <span class="badge bg-success font-headings py-2 px-3">Status: @latestApp.CurrentStatus</span>
             </div>
-            <a href="@Url.Action("FeeVouchers", "Admission")" class="portal-btn portal-btn-cyan portal-btn-sm">
-                <i class="fa-solid fa-receipt me-1"></i> Open Fee Vouchers & Payment Portal
+
+            @if (!string.IsNullOrEmpty(latestApp.Remarks))
+            {
+                <div class="p-3 rounded-3 small border" style="background: var(--portal-surface-2);">
+                    <div class="text-success fw-bold mb-1"><i class="fa-solid fa-quote-left me-1"></i> Committee Decision Comments:</div>
+                    <div>@latestApp.Remarks</div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- ═══════ FEE VOUCHERS SUMMARY SECTION ═══════ -->
+    <div class="portal-card mb-4 p-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-primary fs-4"></i>
+                <h5 class="font-headings fw-bold m-0">Admission Fee Vouchers &amp; Receipts</h5>
+            </div>
+            <a href="@Url.Action("FeeVouchers", "Admission")" class="portal-btn portal-btn-outline portal-btn-sm">
+                <i class="fa-solid fa-receipt me-1"></i> Manage Payments &amp; Receipts
             </a>
         </div>
+
         <div class="row g-3">
-            <!-- Processing Fee Voucher -->
+            <!-- Stage 1: Processing Fee Voucher -->
             <div class="col-md-6">
-                <div class="p-3 rounded border border-secondary" style="background: rgba(255,255,255,0.02);">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="badge bg-dark text-cyan border border-secondary font-headings">Stage 1: Application Processing Fee</span>
-                        <span class="badge @(isProcessingFeePaid ? "bg-success" : "bg-warning text-dark")">
-                            @(isProcessingFeePaid ? "Paid & Verified" : (processingVoucher != null ? "Pending Payment" : "Not Generated"))
-                        </span>
+                <div class="p-3 rounded-3 h-100 d-flex flex-column justify-content-between border" style="background: var(--portal-surface-2);">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-primary bg-opacity-10 text-primary font-headings">Stage 1: Application Processing Fee</span>
+                            @if (isProcessingFeePaid)
+                            {
+                                <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> Paid &amp; Cleared</span>
+                            }
+                            else if (processingVoucher != null)
+                            {
+                                <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> Pending Payment</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Unlocks on Form Submission</span>
+                            }
+                        </div>
+
+                        <div class="h5 font-headings fw-bold m-0 text-success">PKR @(processingVoucher?.Amount.ToString("N0") ?? "2,500")</div>
+                        <div class="small text-muted mt-1">
+                            Voucher Reference: <strong>@(processingVoucher?.VoucherNumber ?? "Auto-Generated upon Submission")</strong>
+                        </div>
                     </div>
-                    <div class="h5 text-white fw-bold m-0">PKR @(processingVoucher?.Amount.ToString("N0") ?? "2,500")</div>
-                    <div class="small text-muted mt-1">
-                        Voucher #: <strong>@(processingVoucher?.VoucherNumber ?? "Auto-Generated on Submission")</strong>
+
+                    <div class="mt-3 pt-2 border-top">
+                        @if (isProcessingFeePaid)
+                        {
+                            <a href="@Url.Action("FeeVouchers", "Admission")" class="small fw-semibold text-success text-decoration-none">
+                                <i class="fa-solid fa-circle-check me-1"></i> View Paid Fee Receipt
+                            </a>
+                        }
+                        else if (processingVoucher != null)
+                        {
+                            <a href="@Url.Action("FeeVouchers", "Admission")" class="small fw-semibold text-warning text-decoration-none">
+                                <i class="fa-solid fa-credit-card me-1"></i> Deposit Fee &amp; Upload Proof &rarr;
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="small text-muted">Complete your application form to generate this voucher.</span>
+                        }
                     </div>
                 </div>
             </div>
 
-            <!-- Semester Fee Voucher -->
+            <!-- Stage 2: First Semester Tuition Fee Voucher -->
             <div class="col-md-6">
-                <div class="p-3 rounded border border-secondary" style="background: rgba(255,255,255,0.02);">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="badge bg-dark text-cyan border border-secondary font-headings">Stage 2: First Semester Tuition Fee</span>
-                        <span class="badge @(isSemesterFeePaid ? "bg-success" : (semesterVoucher != null ? "bg-warning text-dark" : "bg-secondary"))">
-                            @(isSemesterFeePaid ? "Paid & Verified" : (semesterVoucher != null ? "Pending Payment" : "Locked (Awaiting Entry Test)"))
-                        </span>
-                    </div>
-                    @if (semesterVoucher != null)
-                    {
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="h5 text-cyan fw-bold m-0">PKR @semesterVoucher.NetPayableAmount.ToString("N0")</div>
-                            @if (semesterVoucher.ScholarshipPercentageApplied > 0)
+                <div class="p-3 rounded-3 h-100 d-flex flex-column justify-content-between border" style="background: var(--portal-surface-2);">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-success bg-opacity-10 text-success font-headings">Stage 2: First Semester Tuition Fee</span>
+                            @if (isSemesterFeePaid)
                             {
-                                <span class="badge bg-success font-headings"><i class="fa-solid fa-award me-1"></i> @semesterVoucher.ScholarshipPercentageApplied% Scholarship Waiver</span>
+                                <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> Paid &amp; Verified</span>
+                            }
+                            else if (semesterVoucher != null)
+                            {
+                                <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> Pending Payment</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Locked (Awaiting Test Result)</span>
                             }
                         </div>
-                        <div class="small text-muted mt-1">
-                            Voucher #: <strong>@semesterVoucher.VoucherNumber</strong> | SubTotal: PKR @semesterVoucher.SubTotalAmount.ToString("N0")
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="small text-muted">First Semester Fee Voucher will be generated automatically after you pass the Entry Test.</div>
-                    }
+
+                        @if (semesterVoucher != null)
+                        {
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="h5 font-headings fw-bold m-0 text-success">PKR @semesterVoucher.NetPayableAmount.ToString("N0")</div>
+                                @if (semesterVoucher.ScholarshipPercentageApplied > 0)
+                                {
+                                    <span class="badge bg-success font-headings"><i class="fa-solid fa-award me-1"></i> @semesterVoucher.ScholarshipPercentageApplied% Scholarship</span>
+                                }
+                            </div>
+                            <div class="small text-muted mt-1">
+                                Voucher No: <strong>@semesterVoucher.VoucherNumber</strong>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="h5 font-headings fw-bold m-0 text-muted">PKR 65,000 (Approx)</div>
+                            <div class="small text-muted mt-1">
+                                1st Semester Fee Voucher unlocks automatically once your Entrance Test is cleared.
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mt-3 pt-2 border-top">
+                        @if (isSemesterFeePaid)
+                        {
+                            <a href="@Url.Action("FeeVouchers", "Admission")" class="small fw-semibold text-success text-decoration-none">
+                                <i class="fa-solid fa-circle-check me-1"></i> View Tuition Fee Receipt
+                            </a>
+                        }
+                        else if (semesterVoucher != null)
+                        {
+                            <a href="@Url.Action("FeeVouchers", "Admission")" class="small fw-semibold text-warning text-decoration-none">
+                                <i class="fa-solid fa-credit-card me-1"></i> Pay Tuition Fee &amp; Reserve Seat &rarr;
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="small text-muted">Seat confirmation voucher unlocks upon entrance test merit.</span>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ═══════ 9-MILESTONE AUTOMATED ADMISSION LIFECYCLE TIMELINE ═══════ -->
-    <div class="portal-card mb-4">
-        <div class="portal-card-header">
-            <div class="portal-card-title"><i class="fa-solid fa-timeline me-2"></i> Visual Admission Workflow Progress (Stage Engine)</div>
+    <!-- ═══════ QUICK SHORTCUTS GRID ═══════ -->
+    <div class="row g-3">
+        <div class="col-md-3 col-sm-6">
+            <a href="@Url.Action("Documents", "Admission")" class="portal-card p-3 d-flex align-items-center gap-3 text-decoration-none h-100 shadow-sm">
+                <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-primary fs-4" style="width:48px; height:48px; display:flex; align-items:center; justify-content:center;">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+                <div>
+                    <div class="font-headings fw-bold" style="color: var(--portal-text);">My Documents</div>
+                    <div class="small text-muted">Upload or update files</div>
+                </div>
+            </a>
         </div>
-        <div class="portal-card-body p-4">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 text-center">
-                <div class="timeline-step @(isAppSubmitted ? "completed" : "pending")">
-                    <div class="timeline-step-icon"><i class="fa-solid fa-file-export"></i></div>
-                    <div class="timeline-step-title">1. Form Submitted</div>
+        <div class="col-md-3 col-sm-6">
+            <a href="@Url.Action("Profile", "Admission")" class="portal-card p-3 d-flex align-items-center gap-3 text-decoration-none h-100 shadow-sm">
+                <div class="rounded-3 p-3 bg-success bg-opacity-10 text-success fs-4" style="width:48px; height:48px; display:flex; align-items:center; justify-content:center;">
+                    <i class="fa-solid fa-user"></i>
                 </div>
-                <div class="timeline-step-line @(isProcessingFeePaid ? "completed" : "pending")"></div>
-
-                <div class="timeline-step @(isProcessingFeePaid ? "completed" : "pending")">
-                    <div class="timeline-step-icon"><i class="fa-solid fa-receipt"></i></div>
-                    <div class="timeline-step-title">2. Processing Fee Paid</div>
+                <div>
+                    <div class="font-headings fw-bold" style="color: var(--portal-text);">Applicant Profile</div>
+                    <div class="small text-muted">Personal &amp; academics</div>
                 </div>
-                <div class="timeline-step-line @(isDocsVerified ? "completed" : "pending")"></div>
-
-                <div class="timeline-step @(isDocsVerified ? "completed" : "pending")">
-                    <div class="timeline-step-icon"><i class="fa-solid fa-file-circle-check"></i></div>
-                    <div class="timeline-step-title">3. Docs Verified</div>
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <a href="@Url.Action("Messages", "Admission")" class="portal-card p-3 d-flex align-items-center gap-3 text-decoration-none h-100 shadow-sm">
+                <div class="rounded-3 p-3 bg-info bg-opacity-10 text-info fs-4" style="width:48px; height:48px; display:flex; align-items:center; justify-content:center;">
+                    <i class="fa-solid fa-envelope"></i>
                 </div>
-                <div class="timeline-step-line @(isTestScheduled ? "completed" : "pending")"></div>
-
-                <div class="timeline-step @(isTestScheduled ? "completed" : "pending")">
-                    <div class="timeline-step-icon"><i class="fa-solid fa-calendar-days"></i></div>
-                    <div class="timeline-step-title">4. Test Scheduled</div>
+                <div>
+                    <div class="font-headings fw-bold" style="color: var(--portal-text);">Messages &amp; Help</div>
+                    <div class="small text-muted">Contact Admissions Desk</div>
                 </div>
-                <div class="timeline-step-line @(isTestCompleted ? "completed" : "pending")"></div>
-
-                <div class="timeline-step @(isTestCompleted ? "completed" : "pending")">
-                    <div class="timeline-step-icon"><i class="fa-solid fa-square-poll-vertical"></i></div>
-                    <div class="timeline-step-title">5. Test Completed</div>
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <a href="@Url.Action("StudentPortal", "Admission")" class="portal-card p-3 d-flex align-items-center gap-3 text-decoration-none h-100 shadow-sm">
+                <div class="rounded-3 p-3 bg-purple bg-opacity-10 font-headings fs-4" style="color: #8b5cf6; width:48px; height:48px; display:flex; align-items:center; justify-content:center;">
+                    <i class="fa-solid fa-graduation-cap"></i>
                 </div>
-                <div class="timeline-step-line @(isScholarshipAwarded ? "completed" : "pending")"></div>
-
-                <div class="timeline-step @(isScholarshipAwarded ? "completed" : "pending")">
-                    <div class="timeline-step-icon"><i class="fa-solid fa-award"></i></div>
-                    <div class="timeline-step-title">6. Scholarship</div>
+                <div>
+                    <div class="font-headings fw-bold" style="color: var(--portal-text);">Student Portal</div>
+                    <div class="small text-muted">Digital ID Card &amp; UMS</div>
                 </div>
-                <div class="timeline-step-line @(isSemesterVoucherGenerated ? "completed" : "pending")"></div>
-
-                <div class="timeline-step @(isSemesterVoucherGenerated ? "completed" : "pending")">
-                    <div class="timeline-step-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-                    <div class="timeline-step-title">7. Semester Voucher</div>
-                </div>
-                <div class="timeline-step-line @(isSemesterFeePaid ? "completed" : "pending")"></div>
-
-                <div class="timeline-step @(isSemesterFeePaid ? "completed" : "pending")">
-                    <div class="timeline-step-icon"><i class="fa-solid fa-check-double"></i></div>
-                    <div class="timeline-step-title">8. Semester Fee Paid</div>
-                </div>
-                <div class="timeline-step-line @(isPortalActive ? "completed" : "pending")"></div>
-
-                <div class="timeline-step @(isPortalActive ? "completed" : "pending")">
-                    <div class="timeline-step-icon"><i class="fa-solid fa-graduation-cap"></i></div>
-                    <div class="timeline-step-title">9. Confirmed</div>
-                </div>
-            </div>
+            </a>
         </div>
     </div>
 </div>
-
-<style>
-    .timeline-step { display: flex; flex-direction: column; align-items: center; }
-    .timeline-step-icon { width: 38px; height: 38px; border-radius: 50%; background: var(--portal-surface); border: 2px solid var(--portal-border); display: flex; align-items: center; justify-content: center; font-size: 1rem; color: var(--portal-text-muted); }
-    .timeline-step.completed .timeline-step-icon { background: rgba(0, 242, 254, 0.15); border-color: var(--portal-cyan); color: var(--portal-cyan); }
-    .timeline-step-title { font-size: 0.72rem; font-weight: 600; color: var(--portal-text-muted); margin-top: 6px; }
-    .timeline-step.completed .timeline-step-title { color: var(--portal-text); }
-    .timeline-step-line { flex: 1; height: 2px; background: var(--portal-border); margin: 0 4px; align-self: center; }
-    .timeline-step-line.completed { background: var(--portal-cyan); }
-</style>

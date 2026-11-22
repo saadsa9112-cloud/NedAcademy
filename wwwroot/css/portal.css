@@ -13,17 +13,17 @@
   --portal-surface: #0f172a;
   --portal-surface-2: #1e293b;
   --portal-surface-3: #334155;
-  --portal-cyan: #00f2fe;
-  --portal-blue: #0077ff;
-  --portal-blue-hover: #0066dd;
+  --portal-cyan: #38bdf8;
+  --portal-blue: #2563eb;
+  --portal-blue-hover: #1d4ed8;
   --portal-gold: #f59e0b;
   --portal-green: #10b981;
   --portal-red: #ef4444;
   --portal-orange: #f97316;
   --portal-purple: #8b5cf6;
   --portal-text: #f8fafc;
-  --portal-text-secondary: #94a3b8;
-  --portal-text-muted: #64748b;
+  --portal-text-secondary: #cbd5e1;
+  --portal-text-muted: #94a3b8;
   --portal-border: rgba(255, 255, 255, 0.08);
   --portal-border-light: rgba(255, 255, 255, 0.04);
   --portal-glass: rgba(15, 23, 42, 0.85);
@@ -58,24 +58,330 @@
 /* ──────── LIGHT THEME OVERRIDES ──────── */
 body.portal-light {
   --portal-primary: #ffffff;
-  --portal-bg: #f1f5f9;
+  --portal-bg: #f8fafc;
   --portal-surface: #ffffff;
-  --portal-surface-2: #f8fafc;
+  --portal-surface-2: #f1f5f9;
   --portal-surface-3: #e2e8f0;
   --portal-text: #0f172a;
-  --portal-text-secondary: #475569;
-  --portal-text-muted: #94a3b8;
-  --portal-border: rgba(0, 0, 0, 0.08);
-  --portal-border-light: rgba(0, 0, 0, 0.04);
-  --portal-glass: rgba(255, 255, 255, 0.92);
-  --portal-glass-border: rgba(0, 0, 0, 0.06);
-  --portal-hover: rgba(0, 0, 0, 0.03);
-  --portal-active: rgba(0, 119, 255, 0.06);
+  --portal-text-secondary: #334155;
+  --portal-text-muted: #64748b;
+  --portal-border: rgba(15, 23, 42, 0.12);
+  --portal-border-light: rgba(15, 23, 42, 0.06);
+  --portal-glass: rgba(255, 255, 255, 0.95);
+  --portal-glass-border: rgba(15, 23, 42, 0.1);
+  --portal-hover: rgba(15, 23, 42, 0.04);
+  --portal-active: rgba(0, 119, 255, 0.08);
   --portal-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
   --portal-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   --portal-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.08);
   --portal-shadow-xl: 0 16px 50px rgba(0, 0, 0, 0.1);
   --portal-glow-cyan: 0 0 20px rgba(0, 119, 255, 0.08);
+}
+
+/* Light Mode Text Visibility Overrides */
+body.portal-light .portal-card,
+body.portal-light .portal-content {
+  color: #0f172a;
+}
+
+/* Fix .text-white and .text-light turning invisible on white cards in light mode */
+body.portal-light .portal-card .text-white:not(.badge):not(.badge *):not(.btn):not(.btn *):not(.portal-btn):not(.portal-btn *),
+body.portal-light .portal-content .text-white:not(.badge):not(.badge *):not(.btn):not(.btn *):not(.portal-btn):not(.portal-btn *),
+body.portal-light .portal-card .text-light:not(.badge):not(.badge *):not(.btn):not(.btn *):not(.portal-btn):not(.portal-btn *),
+body.portal-light .portal-content .text-light:not(.badge):not(.badge *):not(.btn):not(.btn *):not(.portal-btn):not(.portal-btn *) {
+  color: #0f172a !important;
+}
+
+body.portal-light .portal-card h1,
+body.portal-light .portal-card h2,
+body.portal-light .portal-card h3,
+body.portal-light .portal-card h4,
+body.portal-light .portal-card h5,
+body.portal-light .portal-card h6 {
+  color: #0f172a;
+}
+
+body.portal-light .text-muted {
+  color: #475569 !important;
+}
+
+/* Light mode for cards, sidebars, modals and content */
+body.portal-light .portal-card,
+body.portal-light .portal-surface,
+body.portal-light .modal-content {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+body.portal-light .portal-card-header,
+body.portal-light .modal-header,
+body.portal-light .modal-footer {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+body.portal-light .portal-sidebar {
+  background-color: #ffffff !important;
+  border-right-color: rgba(15, 23, 42, 0.1) !important;
+}
+
+body.portal-light .portal-sidebar-brand {
+  border-bottom-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+body.portal-light .portal-sidebar-brand-name {
+  color: #0f172a !important;
+}
+
+body.portal-light .portal-nav-section-title {
+  color: #64748b !important;
+}
+
+body.portal-light .portal-nav-item {
+  color: #334155 !important;
+}
+
+body.portal-light .portal-nav-item:hover {
+  background-color: rgba(15, 23, 42, 0.04) !important;
+  color: #0f172a !important;
+}
+
+body.portal-light .portal-nav-item.active {
+  background-color: rgba(0, 119, 255, 0.08) !important;
+  color: #0077ff !important;
+}
+
+body.portal-light .portal-topbar {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-bottom-color: rgba(15, 23, 42, 0.1) !important;
+}
+
+body.portal-light .btn-close-white,
+body.portal-light .modal .btn-close {
+  filter: none !important;
+  opacity: 0.6;
+}
+body.portal-light .btn-close-white:hover,
+body.portal-light .modal .btn-close:hover {
+  opacity: 1;
+}
+
+/* Forms in light mode */
+body.portal-light .portal-form-control,
+body.portal-light .portal-form-select,
+body.portal-light .form-control,
+body.portal-light .form-select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.portal-light .portal-form-label,
+body.portal-light label {
+  color: #1e293b !important;
+  font-weight: 600;
+}
+
+body.portal-light .portal-form-hint {
+  color: #64748b !important;
+}
+
+/* In light mode, turn dark embedded blocks (e.g. bg-dark inside cards) to light slate */
+body.portal-light .portal-card .bg-dark:not(.badge),
+body.portal-light .portal-content .bg-dark:not(.badge) {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.portal-light .portal-card .bg-dark:not(.badge) *,
+body.portal-light .portal-content .bg-dark:not(.badge) * {
+  color: #0f172a !important;
+}
+
+body.portal-light .portal-card .bg-dark:not(.badge) .text-muted,
+body.portal-light .portal-content .bg-dark:not(.badge) .text-muted {
+  color: #475569 !important;
+}
+
+body.portal-light .portal-card .bg-dark:not(.badge) .text-cyan,
+body.portal-light .portal-content .bg-dark:not(.badge) .text-cyan {
+  color: #0077ff !important;
+}
+
+/* Cyan text in light mode */
+body.portal-light .text-cyan {
+  color: #0077ff !important;
+}
+
+/* Badges in light mode */
+body.portal-light .badge.bg-dark {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.portal-light .badge.bg-warning,
+body.portal-light .portal-badge-warning {
+  background-color: #f59e0b !important;
+  color: #030712 !important;
+}
+
+body.portal-light .badge.bg-success,
+body.portal-light .portal-badge-active {
+  background-color: #10b981 !important;
+  color: #ffffff !important;
+}
+
+body.portal-light .badge.bg-danger,
+body.portal-light .portal-badge-error {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+body.portal-light .badge.bg-info,
+body.portal-light .portal-badge-info {
+  background-color: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+/* Table in light mode */
+body.portal-light table {
+  color: #0f172a !important;
+}
+
+body.portal-light table th {
+  color: #475569 !important;
+}
+
+body.portal-light table td {
+  color: #0f172a !important;
+}
+
+/* 3D Student ID Card: Always maintain high-contrast dark aesthetic */
+.id-card-3d {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(3, 7, 18, 0.99)) !important;
+  color: #ffffff !important;
+}
+
+.id-card-3d h5,
+.id-card-3d .font-headings,
+.id-card-3d strong,
+.id-card-3d div {
+  color: #ffffff !important;
+}
+
+.id-card-3d .text-cyan {
+  color: #00f2fe !important;
+}
+
+.id-card-3d .text-warning {
+  color: #f59e0b !important;
+}
+
+.id-card-3d .text-muted {
+  color: #94a3b8 !important;
+}
+
+.id-card-3d .badge.bg-success {
+  background-color: #10b981 !important;
+  color: #ffffff !important;
+}
+
+.id-card-3d .badge.bg-warning {
+  background-color: #f59e0b !important;
+  color: #030712 !important;
+}
+
+/* Hero / Dark Banners: Always retain pristine white text on dark background in both modes */
+.portal-hero-dark-banner,
+body.portal-light .portal-card.portal-hero-dark-banner,
+body.portal-light .portal-hero-dark-banner {
+  background: linear-gradient(135deg, rgba(3, 7, 18, 0.95), rgba(15, 23, 42, 0.95)) !important;
+  color: #ffffff !important;
+}
+
+.portal-hero-dark-banner *,
+body.portal-light .portal-hero-dark-banner *,
+body.portal-light .portal-hero-dark-banner h1,
+body.portal-light .portal-hero-dark-banner h2,
+body.portal-light .portal-hero-dark-banner h3,
+body.portal-light .portal-hero-dark-banner h4,
+body.portal-light .portal-hero-dark-banner h5,
+body.portal-light .portal-hero-dark-banner h6,
+body.portal-light .portal-hero-dark-banner p,
+body.portal-light .portal-hero-dark-banner span,
+body.portal-light .portal-hero-dark-banner strong,
+body.portal-light .portal-hero-dark-banner .text-white {
+  color: #ffffff !important;
+}
+
+body.portal-light .portal-hero-dark-banner .text-cyan {
+  color: #00f2fe !important;
+}
+
+body.portal-light .portal-hero-dark-banner .portal-badge {
+  background-color: rgba(0, 242, 254, 0.15) !important;
+  color: #00f2fe !important;
+}
+
+/* Outline light button in light mode */
+body.portal-light .btn-outline-light {
+  color: #1e293b !important;
+  border-color: #94a3b8 !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body.portal-light .btn-outline-light:hover {
+  color: #0f172a !important;
+  border-color: #0f172a !important;
+  background-color: #f1f5f9 !important;
+}
+
+/* Dark Mode Contrast Refinements */
+body:not(.portal-light) .text-muted {
+  color: #94a3b8 !important;
+}
+
+body:not(.portal-light) .portal-form-control,
+body:not(.portal-light) .portal-form-select,
+body:not(.portal-light) .form-control,
+body:not(.portal-light) .form-select {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+body:not(.portal-light) .portal-form-label,
+body:not(.portal-light) label {
+  color: #e2e8f0 !important;
+}
+
+body:not(.portal-light) .badge.bg-dark {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+body:not(.portal-light) .badge.bg-warning {
+  background-color: #f59e0b !important;
+  color: #030712 !important;
+  font-weight: 700 !important;
+}
+
+body:not(.portal-light) .badge.bg-info {
+  background-color: #00f2fe !important;
+  color: #030712 !important;
+  font-weight: 700 !important;
+}
+
+body:not(.portal-light) .portal-btn-primary {
+  background-color: var(--portal-blue) !important;
+  color: #ffffff !important;
+}
+
+body:not(.portal-light) .portal-btn-primary * {
+  color: #ffffff !important;
 }
 
 /* ──────────────────── BASE RESET ──────────────────── */
@@ -615,8 +921,14 @@ body.portal-light {
   margin-left: var(--sidebar-width);
   margin-top: var(--topbar-height);
   min-height: calc(100vh - var(--topbar-height));
-  padding: 28px;
+  padding: 32px 36px;
   transition: margin-left var(--portal-transition);
+}
+
+.portal-content > * {
+  max-width: 1360px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .portal-sidebar-collapsed .portal-content {
@@ -1089,14 +1401,20 @@ body.portal-light {
 }
 
 .portal-btn-cyan {
-  background: linear-gradient(135deg, var(--portal-cyan), var(--portal-blue));
-  color: #fff;
+  background: linear-gradient(135deg, #00f2fe 0%, #00c4fe 100%) !important;
+  color: #030712 !important;
+  font-weight: 700 !important;
+}
+
+.portal-btn-cyan * {
+  color: #030712 !important;
 }
 
 .portal-btn-cyan:hover {
-  box-shadow: 0 4px 18px rgba(0, 242, 254, 0.3);
+  background: linear-gradient(135deg, #00d9e5 0%, #00b0e5 100%) !important;
+  box-shadow: 0 4px 18px rgba(0, 242, 254, 0.45);
   transform: translateY(-1px);
-  color: #fff;
+  color: #030712 !important;
 }
 
 .portal-btn-outline {

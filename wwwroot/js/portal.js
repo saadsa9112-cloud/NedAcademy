@@ -62,7 +62,10 @@
         var themeBtn = document.getElementById('portalThemeToggle');
         var savedTheme = localStorage.getItem('portalTheme');
 
-        if (savedTheme === 'light') {
+        if (savedTheme === 'dark') {
+            document.body.classList.remove('portal-light');
+            updateThemeIcon(false);
+        } else {
             document.body.classList.add('portal-light');
             updateThemeIcon(true);
         }

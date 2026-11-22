@@ -4,6 +4,9 @@
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
     int? applicantId = Context.Session.GetInt32("ApplicantId");
     string? applicantName = Context.Session.GetString("ApplicantName");
+    bool isApproved = Context.Session.GetString("IsApproved") == "true";
+    string? studentId = Context.Session.GetString("StudentId");
+    string? rollNumber = Context.Session.GetString("RollNumber");
     string applicantInitials = "A";
     if (!string.IsNullOrEmpty(applicantName))
     {
@@ -37,11 +40,14 @@
     <!-- Portal CSS (NOT site.css) -->
     <link rel="stylesheet" href="~/css/portal.css" asp-append-version="true" />
 
-    <!-- Portal Theme Initializer -->
+    <!-- Portal Theme Initializer: Default to Pristine Light Mode -->
     <script>
         (function () {
             var savedTheme = localStorage.getItem('portalTheme');
-            if (savedTheme === 'light') {
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.remove('portal-light');
+            } else {
+                document.documentElement.classList.add('portal-light');
                 document.addEventListener('DOMContentLoaded', function () {
                     document.body.classList.add('portal-light');
                 });
@@ -49,7 +55,7 @@
         })();
     </script>
 </head>
-<body class="portal-page">
+<body class="portal-page portal-light">
 
     <!-- Portal Preloader -->
     <div class="portal-preloader" id="portalPreloader">
@@ -98,6 +104,18 @@
                 <a href="@Url.Action("FeeVouchers", "Admission")" class="portal-nav-item @(currentAction == "FeeVouchers" ? "active" : "")">
                     <i class="fa-solid fa-receipt"></i>
                     <span class="portal-nav-item-label">Fee & Payments</span>
+                </a>
+                <a href="@Url.Action("StudentPortal", "Admission")" class="portal-nav-item @(currentAction == "StudentPortal" ? "active" : "")">
+                    <i class="fa-solid fa-graduation-cap text-primary"></i>
+                    <span class="portal-nav-item-label">Student Portal</span>
+                    @if (isApproved)
+                    {
+                        <span class="badge bg-success text-white ms-auto font-headings px-2 py-0" style="font-size:0.62rem;"><i class="fa-solid fa-check me-1"></i>ACTIVE</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-primary bg-opacity-10 text-primary ms-auto" style="font-size:0.6rem;">UMS</span>
+                    }
                 </a>
             </div>
 
@@ -162,6 +180,18 @@
         </div>
 
         <div class="portal-topbar-right">
+            @if (isApproved && !string.IsNullOrEmpty(studentId))
+            {
+                <a href="@Url.Action("StudentPortal", "Admission")" class="d-none d-md-flex align-items-center gap-2 me-2 px-3 py-1 rounded-pill text-decoration-none" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35);" title="Active Student Record">
+                    <i class="fa-solid fa-graduation-cap text-success"></i>
+                    <span class="font-headings text-success fw-bold" style="font-size: 0.78rem;">Student ID: @studentId</span>
+                    @if (!string.IsNullOrEmpty(rollNumber))
+                    {
+                        <span class="text-muted small">| Roll: @rollNumber</span>
+                    }
+                </a>
+            }
+
             <!-- Theme Toggle -->
             <button class="portal-topbar-btn" id="portalThemeToggle" aria-label="Toggle Theme">
                 <i class="fa-solid fa-moon"></i>
@@ -178,7 +208,7 @@
                     <div class="portal-profile-avatar">@applicantInitials</div>
                     <div class="portal-profile-info">
                         <span class="portal-profile-name">@(applicantName ?? "Applicant")</span>
-                        <span class="portal-profile-role">Applicant</span>
+                        <span class="portal-profile-role @(isApproved ? "text-success fw-bold" : "")">@(isApproved ? "Enrolled Student" : "Applicant")</span>
                     </div>
                     <i class="fa-solid fa-chevron-down portal-profile-chevron"></i>
                 </button>
@@ -203,6 +233,18 @@
 
     <!-- ═══════ MAIN CONTENT ═══════ -->
     <main class="portal-content" role="main">
+        @if (TempData["GlobalSuccess"] != null)
+        {
+            <div class="portal-alert portal-alert-success mb-4">
+                <i class="fa-solid fa-check-circle me-2"></i> @TempData["GlobalSuccess"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="portal-alert portal-alert-error mb-4" style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fff;">
+                <i class="fa-solid fa-triangle-exclamation me-2 text-danger"></i> @TempData["ErrorMessage"]
+            </div>
+        }
         @RenderBody()
     </main>
 

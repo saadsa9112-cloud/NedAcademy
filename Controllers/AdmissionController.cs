@@ -95,11 +95,13 @@ public class AdmissionController : Controller
         if (password != confirmPassword)
         {
             ModelState.AddModelError("Password", "Password and Confirm Password do not match.");
+            ModelState.AddModelError(string.Empty, "Password and Confirm Password do not match.");
         }
 
         if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
         {
             ModelState.AddModelError("Password", "Password must be at least 6 characters long.");
+            ModelState.AddModelError(string.Empty, "Password must be at least 6 characters long.");
         }
 
         DegreeProgram? selectedProgram = null;
@@ -177,6 +179,14 @@ public class AdmissionController : Controller
         // Store Session & Claims Authentication
         HttpContext.Session.SetInt32("ApplicantId", applicant.Id);
         HttpContext.Session.SetString("ApplicantName", applicant.FullName);
+
+        var enrollment = await _admissionService.GetEnrollmentRecordByApplicantAsync(applicant.Id);
+        if (enrollment != null && enrollment.EnrollmentStatus == "Active")
+        {
+            HttpContext.Session.SetString("IsApproved", "true");
+            HttpContext.Session.SetString("StudentId", enrollment.GeneratedStudentId ?? "");
+            HttpContext.Session.SetString("RollNumber", enrollment.GeneratedRollNumber ?? "");
+        }
 
         return RedirectToAction(nameof(Dashboard), new { program });
     }
@@ -272,6 +282,27 @@ public class AdmissionController : Controller
         var documents = await _admissionService.GetDocumentsByApplicantAsync(applicantId.Value);
 
         var latestApp = applications.FirstOrDefault();
+
+        // FAILSAFE: If latestApp is Approved but enrollment is missing, auto-provision
+        if (enrollment == null && latestApp != null && latestApp.CurrentStatus == ApplicationStatus.Approved)
+        {
+            enrollment = await _admissionService.ProcessAdmissionDecisionAsync(latestApp.Id, "Approve", "Auto-provisioned on admission approval", "System");
+        }
+
+        bool isApprovedOrActive = (enrollment != null && enrollment.EnrollmentStatus == "Active") || (latestApp != null && latestApp.CurrentStatus == ApplicationStatus.Approved);
+        if (isApprovedOrActive && enrollment != null)
+        {
+            HttpContext.Session.SetString("IsApproved", "true");
+            HttpContext.Session.SetString("StudentId", enrollment.GeneratedStudentId ?? "");
+            HttpContext.Session.SetString("RollNumber", enrollment.GeneratedRollNumber ?? "");
+        }
+        else
+        {
+            HttpContext.Session.Remove("IsApproved");
+            HttpContext.Session.Remove("StudentId");
+            HttpContext.Session.Remove("RollNumber");
+        }
+
         var timelineLogs = latestApp != null 
             ? await _admissionService.GetTimelineLogsAsync(latestApp.Id) 
             : new List<ApplicationTimelineLog>();
@@ -322,16 +353,38 @@ public class AdmissionController : Controller
         }
 
         bool isApprovedOrActive = (enrollment != null && enrollment.EnrollmentStatus == "Active") || (latestApp != null && latestApp.CurrentStatus == ApplicationStatus.Approved);
-
-        if (!isApprovedOrActive)
+        if (isApprovedOrActive && enrollment != null)
         {
-            TempData["ErrorMessage"] = "Student Portal Account is locked. Admission Confirmation & Fee Verification required.";
-            return RedirectToAction(nameof(Dashboard));
+            HttpContext.Session.SetString("IsApproved", "true");
+            HttpContext.Session.SetString("StudentId", enrollment.GeneratedStudentId ?? "");
+            HttpContext.Session.SetString("RollNumber", enrollment.GeneratedRollNumber ?? "");
+        }
+        else
+        {
+            HttpContext.Session.Remove("IsApproved");
+            HttpContext.Session.Remove("StudentId");
+            HttpContext.Session.Remove("RollNumber");
+        }
+
+        AdmissionTestSchedule? testSchedule = null;
+        AdmissionTestResult? testResult = null;
+        if (latestApp != null)
+        {
+            testSchedule = await _admissionService.GetTestScheduleByApplicationAsync(latestApp.Id);
+            testResult = await _admissionService.GetTestResultByApplicationAsync(latestApp.Id);
         }
 
         ViewBag.Applicant = applicant;
+        ViewBag.ApplicantProfile = await _admissionService.GetApplicantProfileAsync(applicantId.Value);
         ViewBag.EnrollmentRecord = enrollment;
         ViewBag.Application = latestApp;
+        ViewBag.TestSchedule = testSchedule;
+        ViewBag.TestResult = testResult;
+        ViewBag.Documents = await _admissionService.GetDocumentsByApplicantAsync(applicantId.Value);
+        ViewBag.TimelineLogs = latestApp != null 
+            ? await _admissionService.GetTimelineLogsAsync(latestApp.Id) 
+            : new List<ApplicationTimelineLog>();
+        ViewBag.IsApprovedOrActive = isApprovedOrActive;
         ViewBag.SystemSettings = await _settingService.GetSettingsAsync();
 
         return View();

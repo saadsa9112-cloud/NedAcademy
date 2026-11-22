@@ -93,6 +93,24 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Login));
     }
 
+    [HttpGet("/UMS")]
+    public IActionResult UmsPortal()
+    {
+        return RedirectToAction(nameof(Students), new { workspace = "academic" });
+    }
+
+    [HttpGet("/Admissions")]
+    public IActionResult AdmissionsPortal()
+    {
+        return RedirectToAction(nameof(Admissions), new { workspace = "admissions" });
+    }
+
+    [HttpGet("/CMS")]
+    public IActionResult CmsPortal()
+    {
+        return RedirectToAction(nameof(Index), new { workspace = "cms" });
+    }
+
     public async Task<IActionResult> Index()
     {
         ViewBag.ProgramsCount = await _context.DegreePrograms.CountAsync(p => !p.IsDeleted);
@@ -101,6 +119,8 @@ public class AdminController : Controller
         ViewBag.MessagesCount = await _context.ContactMessages.CountAsync();
         ViewBag.DownloadsCount = await _context.DownloadFiles.CountAsync();
         ViewBag.MediaAssetsCount = await _context.MediaAssets.CountAsync(m => !m.IsDeleted);
+        ViewBag.EnrolledStudentsCount = await _context.EnrollmentRecords.CountAsync(e => e.EnrollmentStatus == "Active");
+        ViewBag.DepartmentsCount = await _context.Departments.CountAsync();
         ViewBag.RecentLogs = await _auditLog.GetLogsAsync(7);
         ViewBag.RecentUploads = await _context.MediaAssets.Where(m => !m.IsDeleted).OrderByDescending(m => m.UploadDate).Take(4).ToListAsync();
 
@@ -995,6 +1015,48 @@ public class AdminController : Controller
     }
     #endregion
 
+    #region Academic Registry: Enrolled Students Directory (UMS)
+    // GET: /Admin/Students (Academic Registry & Student Roster)
+    [HttpGet("Admin/Students")]
+    public async Task<IActionResult> Students(string? department, string? batch, string? search)
+    {
+        var query = _context.EnrollmentRecords
+            .Include(e => e.Applicant)
+                .ThenInclude(a => a!.Profile)
+            .Include(e => e.DegreeProgram)
+            .Include(e => e.Department)
+            .Include(e => e.AdmissionApplication)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(department))
+        {
+            query = query.Where(e => e.Department != null && (e.Department.Code == department || e.Department.Name == department));
+        }
+
+        if (!string.IsNullOrEmpty(batch))
+        {
+            query = query.Where(e => e.Batch == batch);
+        }
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(e => e.GeneratedStudentId.Contains(search) 
+                || e.GeneratedRollNumber.Contains(search) 
+                || (e.Applicant != null && e.Applicant.FullName.Contains(search))
+                || (e.Applicant != null && e.Applicant.Email.Contains(search))
+                || (e.DegreeProgram != null && e.DegreeProgram.Name.Contains(search)));
+        }
+
+        var list = await query.OrderByDescending(e => e.ActivationDate).ToListAsync();
+        ViewBag.Departments = await _context.Departments.ToListAsync();
+        ViewBag.Batches = await _context.EnrollmentRecords.Select(e => e.Batch).Distinct().ToListAsync();
+        ViewBag.CurrentDept = department;
+        ViewBag.CurrentBatch = batch;
+        ViewBag.Search = search;
+        return View(list);
+    }
+    #endregion
+
     #region Admission Digital Admission File & Decision Workflow
     // GET: /Admin/Admissions or /Admin/Applications
     [HttpGet("Admin/Admissions")]
@@ -1031,7 +1093,11 @@ public class AdminController : Controller
             .Include(a => a.DegreeProgram)
             .FirstOrDefaultAsync(a => a.Id == id);
 
-        if (app == null) return NotFound();
+        if (app == null)
+        {
+            TempData["Error"] = $"Application #{id} was not found or has been removed.";
+            return RedirectToAction(nameof(Admissions));
+        }
 
         var profile = await _admissionService.GetApplicantProfileAsync(app.ApplicantId);
         var guardian = await _admissionService.GetGuardianInfoAsync(app.ApplicantId);
@@ -1157,6 +1223,12 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> GenerateFeeVoucher(int applicationId, string voucherType, decimal amount, string? activeTab = "fee")
     {
+        if (amount <= 0)
+        {
+            TempData["Error"] = "Voucher amount must be greater than zero.";
+            return RedirectToAction(nameof(ApplicantDetails), new { id = applicationId, tab = activeTab ?? "fee" });
+        }
+
         string officerId = User.Identity?.Name ?? "AdmissionAdmin";
         await _admissionService.GenerateFeeVoucherAsync(applicationId, voucherType, amount, DateTime.UtcNow.AddDays(14));
         TempData["Success"] = $"Fee voucher ({voucherType} - PKR {amount:N0}) generated successfully!";
@@ -1240,6 +1312,12 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RecordTestResult(int applicationId, double obtainedMarks, double totalMarks, string remarks, string? activeTab = "results")
     {
+        if (totalMarks <= 0 || obtainedMarks < 0 || obtainedMarks > totalMarks)
+        {
+            TempData["Error"] = "Invalid marks entered. Obtained marks must be between 0 and total marks, and total marks must be greater than zero.";
+            return RedirectToAction(nameof(ApplicantDetails), new { id = applicationId, tab = activeTab ?? "results" });
+        }
+
         string officerId = User.Identity?.Name ?? "AdmissionOfficer";
         var result = await _admissionService.RecordTestResultAsync(applicationId, obtainedMarks, totalMarks, remarks, officerId);
         TempData["Success"] = $"Test Result recorded ({obtainedMarks}/{totalMarks} - {result.CalculatedPercentage}%). Status updated!";

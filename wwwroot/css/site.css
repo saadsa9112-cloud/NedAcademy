@@ -48,20 +48,87 @@ body.light-theme, html.light-theme {
   --bs-link-hover-color: #0f172a;
 }
 
-/* Force dark colors for headings and Bootstrap text utility overlays inside light theme */
-body.light-theme .text-white, 
-body.light-theme .text-light,
+/* High contrast headings and text utility overlays inside light theme */
 body.light-theme h1,
 body.light-theme h2,
 body.light-theme h3,
 body.light-theme h4,
 body.light-theme h5,
 body.light-theme h6 {
-  color: var(--text-light) !important;
+  color: var(--text-light);
+}
+
+/* In light theme, convert general text-white/light to deep slate EXCEPT inside dark buttons, badges, banners, alerts and footer */
+body.light-theme .text-white:not(.btn):not(.btn *):not(.badge):not(.badge *):not(.alert *):not(footer *):not(.footer *):not(.nav-cta-btn *):not(.bg-dark *):not(.bg-primary *):not(.bg-success *):not(.bg-danger *):not(.card.bg-primary *),
+body.light-theme .text-light:not(.btn):not(.btn *):not(.badge):not(.badge *):not(.alert *):not(footer *):not(.footer *):not(.nav-cta-btn *):not(.bg-dark *):not(.bg-primary *):not(.bg-success *):not(.bg-danger *):not(.card.bg-primary *) {
+  color: #0f172a !important;
 }
 
 body.light-theme .text-white-50 {
-  color: rgba(15, 23, 42, 0.6) !important;
+  color: rgba(15, 23, 42, 0.75) !important;
+}
+
+/* Guarantee 100% visible text for buttons and badges in both Light and Dark themes */
+.btn-primary,
+.btn-primary *,
+.btn-success,
+.btn-success *,
+.btn-danger,
+.btn-danger * {
+  color: #ffffff !important;
+}
+
+body.light-theme .btn-primary,
+body.light-theme .btn-primary *,
+body.light-theme .btn-success,
+body.light-theme .btn-success *,
+body.light-theme .btn-danger,
+body.light-theme .btn-danger * {
+  color: #ffffff !important;
+}
+
+/* Badges contrast */
+.badge.bg-warning,
+.badge.bg-info,
+body.light-theme .badge.bg-warning,
+body.light-theme .badge.bg-info {
+  color: #030712 !important;
+  font-weight: 700 !important;
+}
+
+.badge.bg-primary,
+.badge.bg-dark,
+.badge.bg-success,
+.badge.bg-danger,
+body.light-theme .badge.bg-primary,
+body.light-theme .badge.bg-dark,
+body.light-theme .badge.bg-success,
+body.light-theme .badge.bg-danger {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+/* Form Controls High Contrast */
+body.light-theme .form-control,
+body.light-theme .form-select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+body:not(.light-theme) .form-control,
+body:not(.light-theme) .form-select {
+  background-color: #0b1329 !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+body:not(.light-theme) .text-muted {
+  color: #cbd5e1 !important;
+}
+
+body.light-theme .text-muted {
+  color: #475569 !important;
 }
 
 /* Dynamic Gradients for Light Theme headings and stats */
@@ -176,6 +243,18 @@ body.light-theme footer .text-muted {
 body.light-theme footer .footer-social-link {
   border-color: rgba(0, 119, 255, 0.4) !important;
   color: #00f2fe !important;
+}
+
+body.light-theme .btn-outline-light {
+  color: #1e293b !important;
+  border-color: #94a3b8 !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body.light-theme .btn-outline-light:hover {
+  color: #0f172a !important;
+  border-color: #0f172a !important;
+  background-color: #f1f5f9 !important;
 }
 
 
@@ -768,18 +847,22 @@ body.light-theme .subpage-breadcrumb-bar {
 .btn-cyber {
   position: relative;
   font-family: var(--font-headings);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   padding: 12px 28px;
   border-radius: 8px;
   transition: all var(--transition-normal);
   border: none;
-  color: var(--primary);
-  background: linear-gradient(135deg, var(--cyan) 0%, var(--royal-blue) 100%);
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #0077ff 0%, #0055dd 100%);
   box-shadow: var(--glow-blue);
   overflow: hidden;
   z-index: 1;
+}
+
+.btn-cyber * {
+  color: #ffffff !important;
 }
 
 .btn-cyber::before {
@@ -789,14 +872,14 @@ body.light-theme .subpage-breadcrumb-bar {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--royal-blue) 0%, var(--cyan) 100%);
+  background: linear-gradient(135deg, #0055dd 0%, #0088ff 100%);
   opacity: 0;
   z-index: -1;
   transition: opacity var(--transition-normal);
 }
 
 .btn-cyber:hover {
-  color: var(--primary);
+  color: #ffffff !important;
   transform: translateY(-2px);
   box-shadow: var(--glow-cyan);
 }

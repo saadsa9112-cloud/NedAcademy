@@ -513,7 +513,7 @@
                                 <button type="button" class="btn btn-sm btn-outline-cyan" onclick="goToStep(3)"><i class="fa-solid fa-pen-to-square me-1"></i> Edit Program</button>
                             </div>
                             <div class="p-3 rounded mb-2" style="background:var(--portal-surface);">
-                                <h6 class="fw-bold text-white mb-1" id="revProgramTitle">@(selectedProgram?.Name ?? "BS Software Engineering")</h6>
+                                <h6 class="fw-bold mb-1" style="color:var(--portal-text);" id="revProgramTitle">@(selectedProgram?.Name ?? "BS Software Engineering")</h6>
                                 <span class="badge bg-primary me-2">Offered Intake: @(activeSession?.Title ?? "2026")</span>
                                 <span class="badge bg-info text-dark">Degree Code: @(selectedProgram?.Code ?? "BS-SE")</span>
                             </div>
@@ -529,12 +529,12 @@
                                 <button type="button" class="btn btn-sm btn-outline-cyan" onclick="goToStep(2)"><i class="fa-solid fa-pen-to-square me-1"></i> Edit Academics</button>
                             </div>
                             <div class="mb-3 p-2 rounded" style="background:var(--portal-surface);">
-                                <div class="fw-bold text-white small">SSC / Matriculation</div>
+                                <div class="fw-bold small" style="color:var(--portal-text);">SSC / Matriculation</div>
                                 <div class="small text-muted" id="revSscDetails">@(sscRecord?.DegreeOrCertificateTitle ?? "SSC Science") | @(sscRecord?.BoardOrUniversity ?? "BISE Karachi") (@(sscRecord?.PassingYear > 1900 ? sscRecord.PassingYear : 2022))</div>
                                 <div class="small text-cyan fw-bold" id="revSscMarks">Marks: @(sscRecord?.ObtainedMarks ?? 945) / @(sscRecord?.TotalMarks ?? 1100) (@(sscRecord?.Percentage ?? 85.91)%)</div>
                             </div>
                             <div class="p-2 rounded" style="background:var(--portal-surface);">
-                                <div class="fw-bold text-white small">HSSC / Intermediate</div>
+                                <div class="fw-bold small" style="color:var(--portal-text);">HSSC / Intermediate</div>
                                 <div class="small text-muted" id="revHsscDetails">@(hsscRecord?.DegreeOrCertificateTitle ?? "HSSC Pre-Engineering") | @(hsscRecord?.BoardOrUniversity ?? "BISE Karachi") (@(hsscRecord?.PassingYear > 1900 ? hsscRecord.PassingYear : 2024))</div>
                                 <div class="small text-cyan fw-bold" id="revHsscMarks">Marks: @(hsscRecord?.ObtainedMarks ?? 960) / @(hsscRecord?.TotalMarks ?? 1100) (@(hsscRecord?.Percentage ?? 87.27)%)</div>
                             </div>
@@ -575,7 +575,7 @@
                                             <div class="p-2 rounded border border-secondary" style="background:var(--portal-surface);">
                                                 <div class="d-flex align-items-center gap-2">
                                                     <i class="fa-solid fa-file-pdf text-danger"></i>
-                                                    <div class="text-truncate small text-white fw-bold">@doc.DocumentType</div>
+                                                    <div class="text-truncate small fw-bold" style="color:var(--portal-text);">@doc.DocumentType</div>
                                                 </div>
                                                 <div class="small text-muted text-truncate mt-1">@doc.FileName</div>
                                                 <a href="@doc.FilePath" target="_blank" class="btn btn-xs btn-link text-cyan p-0 mt-1">Preview Attachment</a>
@@ -605,7 +605,7 @@
             </div>
             <div class="portal-card-body">
                 <div class="portal-card p-4 mb-4" style="background:var(--portal-surface-2); font-size:0.85rem; line-height:1.7; color:var(--portal-text-secondary);">
-                    <p class="fw-bold text-white mb-2">UNIVERSITY ADMISSION DECLARATION</p>
+                    <p class="fw-bold mb-2" style="color:var(--portal-text);">UNIVERSITY ADMISSION DECLARATION</p>
                     <p>I hereby declare that all information provided in this admission application is true, complete, and accurate to the best of my knowledge. I understand that any false statement or misrepresentation will result in immediate disqualification or cancellation of admission at NED Academy.</p>
                     <p class="mb-0">I agree to abide by all university rules, regulations, code of conduct, and fee payment schedules.</p>
                 </div>

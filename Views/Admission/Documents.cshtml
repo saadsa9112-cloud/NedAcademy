@@ -30,6 +30,12 @@
             <i class="fa-solid fa-check-circle"></i> @TempData["SuccessMessage"]
         </div>
     }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="portal-alert portal-alert-error mb-4">
+            <i class="fa-solid fa-triangle-exclamation text-danger me-2"></i> @TempData["ErrorMessage"]
+        </div>
+    }
 
     <!-- 1. PERSONAL DOCUMENTS SECTION -->
     <div class="portal-card mb-4">
@@ -157,8 +163,8 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="background:var(--portal-surface); border:1px solid var(--portal-border); color:var(--portal-text);">
             <div class="modal-header" style="border-bottom:1px solid var(--portal-border);">
-                <h5 class="modal-title font-headings" style="font-size:1.1rem; font-weight:700;"><i class="fa-solid fa-cloud-arrow-up me-2 text-cyan"></i> Upload Document</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title font-headings" style="font-size:1.1rem; font-weight:700; color:var(--portal-text);"><i class="fa-solid fa-cloud-arrow-up me-2 text-primary"></i> Upload Document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form asp-controller="Admission" asp-action="UploadDocument" method="post" enctype="multipart/form-data">
                 @Html.AntiForgeryToken()

@@ -6,68 +6,172 @@
     var recentUploads = (List<NedAcademyWebsite.Models.MediaAsset>)ViewBag.RecentUploads;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-5 reveal-up">
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
     <div>
-        <h1 class="display-5 font-headings fw-bold m-0 text-white">Executive Control Console</h1>
-        <p class="text-muted m-0">Live system performance indicators, storage metrics, audit streams, and quick CMS shortcuts.</p>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-primary bg-opacity-10 text-primary font-headings px-2 py-1" style="font-size:0.75rem;">
+                <i class="fa-solid fa-server me-1"></i> NED ENTERPRISE ARCHITECTURE
+            </span>
+            <span class="badge bg-success bg-opacity-10 text-success font-headings px-2 py-1" style="font-size:0.75rem;">
+                <i class="fa-solid fa-circle-check me-1"></i> Subsystems Active
+            </span>
+        </div>
+        <h2 class="font-headings fw-bold mb-1">Executive Control &amp; Portal Hub</h2>
+        <p class="text-muted mb-0 small">Enterprise switcher connecting Academic Registry (UMS), Admission ERP, and Web Content CMS.</p>
     </div>
-    <div>
-        <span class="badge bg-success py-2 px-3 font-headings text-uppercase" style="letter-spacing: 0.05em;"><i class="fa-solid fa-circle-check me-1"></i> System Online</span>
+    <div class="d-flex align-items-center gap-2">
+        <a asp-controller="Home" asp-action="Index" target="_blank" class="btn btn-modern-outline btn-sm font-headings">
+            <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> View Live Site
+        </a>
     </div>
 </div>
 
-<!-- Metrics Cards Bar -->
-<div class="row g-4 mb-5 reveal-up">
-    <div class="col-xl-3 col-md-6">
-        <div class="glass-card p-4" style="border-left: 4px solid var(--cyan);">
+<!-- ═══════ ENTERPRISE SUITE WORKSPACE LAUNCHPAD ═══════ -->
+<div class="row g-4 mb-5">
+    <!-- 1. Academic Registry & UMS -->
+    <div class="col-xl-4 col-md-6">
+        <div class="app-card p-4 h-100 d-flex flex-column justify-content-between" style="border-top: 4px solid var(--app-emerald);">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge bg-success bg-opacity-10 text-success font-headings px-2 py-1">
+                        <i class="fa-solid fa-graduation-cap me-1"></i> ACADEMIC REGISTRY (UMS)
+                    </span>
+                    <span class="badge bg-secondary bg-opacity-10 text-muted">@ViewBag.EnrolledStudentsCount Students</span>
+                </div>
+                <h4 class="font-headings fw-bold mb-2">University Registrar &amp; UMS</h4>
+                <p class="text-muted small mb-3">Enrolled student directory, student identity records, degree program catalogs, departments, and faculty roster.</p>
+                
+                <div class="p-3 rounded-3 mb-3" style="background: var(--app-surface-hover); border: 1px solid var(--app-border);">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="text-muted">Degree Programs:</span>
+                        <span class="fw-bold">@ViewBag.ProgramsCount</span>
+                    </div>
+                    <div class="d-flex justify-content-between small">
+                        <span class="text-muted">Faculty Members:</span>
+                        <span class="fw-bold">@ViewBag.FacultyCount</span>
+                    </div>
+                </div>
+            </div>
+            <a href="/UMS" class="btn btn-modern-primary w-100 font-headings text-center mt-2" style="background: var(--app-emerald); border-color: var(--app-emerald);">
+                <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Launch Academic UMS
+            </a>
+        </div>
+    </div>
+
+    <!-- 2. Admission ERP -->
+    <div class="col-xl-4 col-md-6">
+        <div class="app-card p-4 h-100 d-flex flex-column justify-content-between" style="border-top: 4px solid var(--app-primary);">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge bg-primary bg-opacity-10 text-primary font-headings px-2 py-1">
+                        <i class="fa-solid fa-id-card-clip me-1"></i> ADMISSION ERP
+                    </span>
+                    <span class="badge bg-secondary bg-opacity-10 text-muted">@ViewBag.ApplicationsCount Applications</span>
+                </div>
+                <h4 class="font-headings fw-bold mb-2">Admissions Directorate</h4>
+                <p class="text-muted small mb-3">Applicant scrutiny queue, entrance test scheduling, fee voucher clearances &amp; decision committee.</p>
+                
+                <div class="p-3 rounded-3 mb-3" style="background: var(--app-surface-hover); border: 1px solid var(--app-border);">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="text-muted">Pending Review:</span>
+                        <span class="fw-bold text-warning">@ViewBag.PendingApplicationsCount</span>
+                    </div>
+                    <div class="d-flex justify-content-between small">
+                        <span class="text-muted">Scholarships &amp; Vouchers:</span>
+                        <span class="fw-bold text-success">Automated</span>
+                    </div>
+                </div>
+            </div>
+            <a href="/Admissions" class="btn btn-modern-primary w-100 font-headings text-center mt-2">
+                <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Launch Admission ERP
+            </a>
+        </div>
+    </div>
+
+    <!-- 3. Web CMS & Content Engine -->
+    <div class="col-xl-4 col-md-6">
+        <div class="app-card p-4 h-100 d-flex flex-column justify-content-between" style="border-top: 4px solid var(--app-purple);">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge bg-purple bg-opacity-10 font-headings px-2 py-1" style="color: var(--app-purple);">
+                        <i class="fa-solid fa-globe me-1"></i> WEB CMS PORTAL
+                    </span>
+                    <span class="badge bg-secondary bg-opacity-10 text-muted">@ViewBag.MediaAssetsCount Assets</span>
+                </div>
+                <h4 class="font-headings fw-bold mb-2">Digital Media &amp; CMS</h4>
+                <p class="text-muted small mb-3">Visual page builder, dynamic forms, announcements, news publisher, facilities, and public inquiries inbox.</p>
+                
+                <div class="p-3 rounded-3 mb-3" style="background: var(--app-surface-hover); border: 1px solid var(--app-border);">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="text-muted">Public Inquiries:</span>
+                        <span class="fw-bold">@ViewBag.MessagesCount</span>
+                    </div>
+                    <div class="d-flex justify-content-between small">
+                        <span class="text-muted">Downloads Available:</span>
+                        <span class="fw-bold">@ViewBag.DownloadsCount</span>
+                    </div>
+                </div>
+            </div>
+            <a href="/CMS" class="btn btn-modern-primary w-100 font-headings text-center mt-2" style="background: var(--app-purple); border-color: var(--app-purple);">
+                <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Launch Web CMS
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ KEY METRICS ROW ═══════ -->
+<div class="row g-4 mb-5">
+    <div class="col-xl-3 col-sm-6">
+        <div class="app-card p-4">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <span class="text-muted font-headings text-uppercase" style="font-size:0.7rem; font-weight:700;">Degree Programs</span>
-                    <h2 class="text-white font-headings fw-bold mt-1 mb-0">@ViewBag.ProgramsCount</h2>
+                    <span class="text-muted small text-uppercase font-headings fw-bold">Enrolled Students</span>
+                    <h3 class="font-headings fw-bold mt-1 mb-0">@ViewBag.EnrolledStudentsCount</h3>
                 </div>
-                <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-gradient-cyan">
-                    <i class="fa-solid fa-graduation-cap fa-2x"></i>
+                <div class="rounded-3 p-3 bg-success bg-opacity-10 text-success">
+                    <i class="fa-solid fa-user-graduate fa-2x"></i>
                 </div>
             </div>
         </div>
     </div>
     
-    <div class="col-xl-3 col-md-6">
-        <div class="glass-card p-4" style="border-left: 4px solid var(--royal-blue);">
+    <div class="col-xl-3 col-sm-6">
+        <div class="app-card p-4">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <span class="text-muted font-headings text-uppercase" style="font-size:0.7rem; font-weight:700;">Faculty Profiles</span>
-                    <h2 class="text-white font-headings fw-bold mt-1 mb-0">@ViewBag.FacultyCount</h2>
+                    <span class="text-muted small text-uppercase font-headings fw-bold">Academic Programs</span>
+                    <h3 class="font-headings fw-bold mt-1 mb-0">@ViewBag.ProgramsCount</h3>
                 </div>
-                <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-gradient-blue">
-                    <i class="fa-solid fa-users-line fa-2x"></i>
+                <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-primary">
+                    <i class="fa-solid fa-book-open fa-2x"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6">
-        <div class="glass-card p-4" style="border-left: 4px solid var(--cyan);">
+    <div class="col-xl-3 col-sm-6">
+        <div class="app-card p-4">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <span class="text-muted font-headings text-uppercase" style="font-size:0.7rem; font-weight:700;">Media Assets</span>
-                    <h2 class="text-white font-headings fw-bold mt-1 mb-0">@ViewBag.MediaAssetsCount</h2>
+                    <span class="text-muted small text-uppercase font-headings fw-bold">Faculty Members</span>
+                    <h3 class="font-headings fw-bold mt-1 mb-0">@ViewBag.FacultyCount</h3>
                 </div>
-                <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-gradient-cyan">
-                    <i class="fa-solid fa-photo-film fa-2x"></i>
+                <div class="rounded-3 p-3 bg-info bg-opacity-10 text-info">
+                    <i class="fa-solid fa-chalkboard-user fa-2x"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6">
-        <div class="glass-card p-4" style="border-left: 4px solid var(--royal-blue);">
+    <div class="col-xl-3 col-sm-6">
+        <div class="app-card p-4">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <span class="text-muted font-headings text-uppercase" style="font-size:0.7rem; font-weight:700;">Inquiries</span>
-                    <h2 class="text-white font-headings fw-bold mt-1 mb-0">@ViewBag.MessagesCount</h2>
+                    <span class="text-muted small text-uppercase font-headings fw-bold">Public Inquiries</span>
+                    <h3 class="font-headings fw-bold mt-1 mb-0">@ViewBag.MessagesCount</h3>
                 </div>
-                <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-gradient-blue">
+                <div class="rounded-3 p-3 bg-warning bg-opacity-10 text-warning">
                     <i class="fa-solid fa-envelope fa-2x"></i>
                 </div>
             </div>
@@ -75,234 +179,85 @@
     </div>
 </div>
 
-<div class="row g-4 mb-5">
-    <!-- Storage & System Health Gauge -->
-    <div class="col-lg-4">
-        <div class="glass-card p-4 h-100 reveal-up">
-            <h4 class="text-white font-headings fw-bold mb-3"><i class="fa-solid fa-server text-gradient-cyan me-2"></i> System Health & Storage</h4>
-            <div class="mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:0.85rem;">
-                    <span class="text-muted">Storage Usage</span>
-                    <span class="text-light fw-bold">14.2 MB / 10 GB</span>
-                </div>
-                <div class="progress" style="height: 8px; background: rgba(255,255,255,0.05);">
-                    <div class="progress-bar bg-info" role="progressbar" style="width: 12%;"></div>
-                </div>
-            </div>
-
-            <div class="d-flex flex-column gap-3" style="font-size:0.9rem;">
-                <div class="d-flex justify-content-between border-bottom border-white border-opacity-10 pb-2">
-                    <span class="text-muted">Framework Version</span>
-                    <span class="text-gradient-cyan font-monospace">.NET 10.0 MVC</span>
-                </div>
-                <div class="d-flex justify-content-between border-bottom border-white border-opacity-10 pb-2">
-                    <span class="text-muted">Database Provider</span>
-                    <span class="text-light font-monospace">SQL Server EF Core</span>
-                </div>
-                <div class="d-flex justify-content-between border-bottom border-white border-opacity-10 pb-2">
-                    <span class="text-muted">Security Encryption</span>
-                    <span class="text-success font-monospace">Cookie Auth + CSRF</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- System Audit Log Activity Stream -->
+<!-- ═══════ RECENT AUDIT LOGS & SYSTEM ACTIVITY ═══════ -->
+<div class="row g-4 mb-4">
+    <!-- Audit Activity Stream -->
     <div class="col-lg-8">
-        <div class="glass-card p-4 h-100 reveal-up">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="text-white font-headings fw-bold m-0"><i class="fa-solid fa-clock-rotate-left text-gradient-cyan me-2"></i> Recent Audit Activity</h4>
-                <a asp-action="AuditLogs" class="btn btn-cyber-outline py-1 px-3" style="font-size:0.8rem;">View All Logs</a>
+        <div class="app-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="font-headings fw-bold m-0"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i> Recent System Activity</h5>
+                <a asp-action="AuditLogs" class="small text-decoration-none fw-semibold">View All Logs &rarr;</a>
             </div>
-
-            <div class="table-responsive">
-                <table class="table table-dark table-hover table-borderless m-0" style="background:transparent;">
-                    <thead>
-                        <tr style="border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.85rem;" class="text-muted">
-                            <th>Timestamp</th>
-                            <th>Action</th>
-                            <th>Details</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (recentLogs == null || !recentLogs.Any())
-                        {
+            
+            @if (recentLogs != null && recentLogs.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
                             <tr>
-                                <td colspan="3" class="text-center py-4 text-muted">No recent activity recorded.</td>
+                                <th>Action</th>
+                                <th>Entity</th>
+                                <th>Details</th>
+                                <th>Time</th>
                             </tr>
-                        }
-                        else
-                        {
-                            foreach (var log in recentLogs)
+                        </thead>
+                        <tbody>
+                            @foreach (var log in recentLogs.Take(6))
                             {
-                                <tr style="border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:middle; font-size:0.9rem;">
-                                    <td class="text-muted font-monospace">@log.Timestamp.ToString("HH:mm:ss")</td>
-                                    <td><span class="badge bg-primary bg-opacity-20 text-primary font-headings">@log.Action</span></td>
-                                    <td class="text-light">@log.Details</td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-<!-- Admission ERP Live Queue Section -->
-@{
-    var recentApps = ViewBag.RecentApplications as List<NedAcademyWebsite.Models.AdmissionApplication>;
-}
-<div class="row g-4 mb-5">
-    <div class="col-12">
-        <div class="glass-card p-4 reveal-up" style="border-left: 4px solid var(--cyan);">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h4 class="text-white font-headings fw-bold m-0"><i class="fa-solid fa-id-card-clip text-cyan me-2"></i> Recent Admission Applications</h4>
-                    <p class="text-muted small m-0">Live online admissions queue submitted by prospective candidates.</p>
-                </div>
-                <div>
-                    <a asp-action="Admissions" class="btn btn-cyber py-2 px-3 fs-6">
-                        <i class="fa-solid fa-list-check me-1"></i> View Full Applications Queue (@ViewBag.ApplicationsCount)
-                    </a>
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-dark table-hover align-middle m-0" style="background:transparent;">
-                    <thead>
-                        <tr style="border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.85rem;" class="text-muted">
-                            <th>App #</th>
-                            <th>Candidate Name</th>
-                            <th>Offered Program</th>
-                            <th>Submission Date</th>
-                            <th>Status</th>
-                            <th class="text-end">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (recentApps != null && recentApps.Any())
-                        {
-                            foreach (var app in recentApps)
-                            {
-                                var badge = app.CurrentStatus switch
-                                {
-                                    NedAcademyWebsite.Models.ApplicationStatus.Submitted => "bg-primary",
-                                    NedAcademyWebsite.Models.ApplicationStatus.UnderReview => "bg-warning text-dark",
-                                    NedAcademyWebsite.Models.ApplicationStatus.Approved => "bg-success",
-                                    NedAcademyWebsite.Models.ApplicationStatus.Rejected => "bg-danger",
-                                    _ => "bg-secondary"
-                                };
-
                                 <tr>
-                                    <td class="fw-bold text-cyan">@app.ApplicationNumber</td>
                                     <td>
-                                        <div class="fw-bold text-white">@(app.Applicant?.FullName ?? "Applicant #" + app.ApplicantId)</div>
-                                        <div class="small text-muted">@app.Applicant?.Email</div>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary font-headings px-2 py-1">@log.Action</span>
                                     </td>
-                                    <td><span class="badge bg-secondary">@(app.DegreeProgram?.Name ?? "Program")</span></td>
-                                    <td>@app.CreatedDate.ToString("dd MMM yyyy, hh:mm tt")</td>
-                                    <td><span class="badge @badge">@app.CurrentStatus</span></td>
-                                    <td class="text-end">
-                                        <a asp-action="ApplicantDetails" asp-route-id="@app.Id" class="btn btn-sm btn-outline-info">
-                                            <i class="fa-solid fa-folder-open me-1"></i> Open File
-                                        </a>
-                                    </td>
+                                    <td class="fw-semibold">@log.EntityName</td>
+                                    <td class="text-muted small">@log.Details</td>
+                                    <td class="text-muted small">@log.Timestamp.ToString("MMM dd, HH:mm")</td>
                                 </tr>
                             }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">No admission applications submitted yet.</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4 text-muted">
+                    <i class="fa-solid fa-clipboard-check fa-2x mb-2 opacity-50"></i>
+                    <p class="small mb-0">No recent administrative logs found.</p>
+                </div>
+            }
         </div>
     </div>
-</div>
 
-<div class="row g-4">
-    <!-- Recent Messages List -->
-    <div class="col-lg-8">
-        <div class="glass-card p-4 h-100 reveal-up">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="text-white font-headings fw-bold m-0"><i class="fa-solid fa-envelope text-gradient-cyan me-2"></i> Recent User Inquiries</h4>
-                <a asp-action="Messages" class="btn btn-cyber-outline py-1 px-3" style="font-size:0.8rem;">View All Messages</a>
-            </div>
-            
-            <div class="table-responsive">
-                <table class="table table-dark table-hover table-borderless m-0" style="background:transparent;">
-                    <thead>
-                        <tr style="border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.85rem;" class="text-muted">
-                            <th>Sender</th>
-                            <th>Subject</th>
-                            <th>Received Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (!Model.Any())
-                        {
-                            <tr>
-                                <td colspan="4" class="text-center py-4 text-muted">No messages received yet in the database.</td>
-                            </tr>
-                        }
-                        else
-                        {
-                            foreach (var msg in Model)
-                            {
-                                <tr style="border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:middle; font-size:0.92rem;">
-                                    <td>
-                                        <div class="fw-semibold text-light">@msg.Name</div>
-                                        <small class="text-muted">@msg.Email</small>
-                                    </td>
-                                    <td>@msg.Subject</td>
-                                    <td>@msg.ReceivedDate.ToString("MMM dd, yyyy HH:mm")</td>
-                                    <td>
-                                        @if (msg.IsRead)
-                                        {
-                                            <span class="badge bg-success bg-opacity-20 text-success px-2 py-1">Reviewed</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-warning bg-opacity-20 text-warning px-2 py-1">New Message</span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Quick Actions Panel -->
+    <!-- Quick Governance Settings -->
     <div class="col-lg-4">
-        <div class="glass-card p-4 h-100 d-flex flex-column gap-3 reveal-up">
-            <h4 class="text-white font-headings fw-bold mb-3"><i class="fa-solid fa-bolt text-gradient-cyan me-2"></i> Quick CMS Commands</h4>
+        <div class="app-card p-4 h-100">
+            <h5 class="font-headings fw-bold mb-3"><i class="fa-solid fa-shield-halved text-success me-2"></i> System Health &amp; Security</h5>
             
-            <a asp-action="PageBuilder" class="btn btn-cyber w-100 py-3 text-start d-flex align-items-center justify-content-between px-4">
-                <span><i class="fa-solid fa-cubes me-2"></i> Universal Page Builder</span>
-                <i class="fa-solid fa-chevron-right"></i>
-            </a>
+            <div class="p-3 rounded-3 mb-3" style="background: var(--app-surface-hover); border: 1px solid var(--app-border);">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small text-muted">Core Framework</span>
+                    <span class="badge bg-primary bg-opacity-10 text-primary font-headings">.NET 10.0 MVC</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small text-muted">Database Engine</span>
+                    <span class="badge bg-secondary bg-opacity-10 text-muted font-headings">SQL Server EF Core</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="small text-muted">Security Architecture</span>
+                    <span class="badge bg-success bg-opacity-10 text-success font-headings">Encrypted Session</span>
+                </div>
+            </div>
 
-            <a asp-action="FormBuilder" class="btn btn-cyber-outline w-100 py-3 text-start d-flex align-items-center justify-content-between px-4">
-                <span><i class="fa-solid fa-rectangle-list me-2"></i> Custom Form Builder</span>
-                <i class="fa-solid fa-chevron-right"></i>
-            </a>
-
-            <a asp-action="Structure" class="btn btn-cyber-outline w-100 py-3 text-start d-flex align-items-center justify-content-between px-4">
-                <span><i class="fa-solid fa-layer-group me-2"></i> Homepage Layout</span>
-                <i class="fa-solid fa-chevron-right"></i>
-            </a>
-
-            <a asp-action="Settings" class="btn btn-cyber-outline w-100 py-3 text-start d-flex align-items-center justify-content-between px-4">
-                <span><i class="fa-solid fa-sliders me-2"></i> Edit 10 System Tabs</span>
-                <i class="fa-solid fa-chevron-right"></i>
-            </a>
+            <div class="d-grid gap-2">
+                <a asp-action="Settings" asp-route-workspace="system" class="btn btn-modern-outline btn-sm font-headings">
+                    <i class="fa-solid fa-sliders me-1"></i> Global Settings
+                </a>
+                <a asp-action="Backups" asp-route-workspace="system" class="btn btn-modern-outline btn-sm font-headings">
+                    <i class="fa-solid fa-database me-1"></i> Database Backups
+                </a>
+                <a asp-action="RecycleBin" asp-route-workspace="system" class="btn btn-modern-outline btn-sm font-headings text-danger">
+                    <i class="fa-solid fa-trash-can me-1"></i> Recycle Bin
+                </a>
+            </div>
         </div>
     </div>
 </div>

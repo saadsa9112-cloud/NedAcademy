@@ -24,6 +24,12 @@
             <i class="fa-solid fa-check-circle"></i> @TempData["SuccessMessage"]
         </div>
     }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="portal-alert portal-alert-error mb-4">
+            <i class="fa-solid fa-triangle-exclamation text-danger me-2"></i> @TempData["ErrorMessage"]
+        </div>
+    }
 
     <!-- Conversation Feed -->
     <div class="portal-card mb-4">

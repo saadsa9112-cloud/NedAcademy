@@ -724,6 +724,7 @@ public class AdmissionService : IAdmissionService
         {
             var app = await _context.AdmissionApplications
                 .Include(a => a.Applicant)
+                .Include(a => a.DegreeProgram)
                 .FirstOrDefaultAsync(a => a.Id == applicationId);
 
             if (app == null) return null;
@@ -749,6 +750,9 @@ public class AdmissionService : IAdmissionService
                 string studentId = $"STD-2026-{app.ApplicantId:D5}";
                 string rollNumber = $"2026-CS-{app.Id:D3}";
 
+                int deptId = app.DegreeProgram?.DepartmentId ?? (await _context.Departments.Select(d => d.Id).FirstOrDefaultAsync());
+                if (deptId == 0) deptId = 13;
+
                 record = await _context.EnrollmentRecords.FirstOrDefaultAsync(e => e.ApplicantId == app.ApplicantId);
                 if (record == null)
                 {
@@ -759,7 +763,7 @@ public class AdmissionService : IAdmissionService
                         GeneratedStudentId = studentId,
                         GeneratedRollNumber = rollNumber,
                         DegreeProgramId = app.DegreeProgramId,
-                        DepartmentId = 1,
+                        DepartmentId = deptId,
                         Batch = "Batch 2026",
                         Semester = "1st Semester",
                         EnrollmentStatus = "Active",
@@ -771,6 +775,7 @@ public class AdmissionService : IAdmissionService
                 }
                 else
                 {
+                    record.DepartmentId = deptId;
                     record.EnrollmentStatus = "Active";
                     record.ActivationDate = DateTime.UtcNow;
                 }
